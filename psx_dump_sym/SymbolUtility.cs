@@ -37,7 +37,9 @@ public static class SymbolUtility
 
             Symbol symbol = symbolHeader.Type switch
             {
+                0x01 => new SymbolName(stream),
                 0x02 => new SymbolName(stream),
+                0x06 => new SymbolName(stream),
                 0x88 => new SymbolSetSldToLineOfFile(stream),
                 0x82 => new SymbolIncSldLineNumByByte(stream),
                 0x84 => new SymbolIncSldLineNumByWord(stream),
@@ -48,8 +50,11 @@ public static class SymbolUtility
                 0x8E => new SymbolFunctionEnd(stream),
                 0x94 => new SymbolDef(stream),
                 0x96 => new SymbolDef2(stream),
+                0x98 => new SymbolOverlay(stream),
                 0x90 => new SymbolBlockStart(stream),
                 0x92 => new SymbolBlockEnd(stream),
+                0x9A => new SymbolSetOverlay(stream),
+                0x9C => new SymbolFunction2Start(stream),
                 _    => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition}")
             };
 

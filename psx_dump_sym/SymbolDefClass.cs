@@ -19,5 +19,7 @@ public enum SymbolDefClass : ushort
     UNTAG          = 0xC,
     MOU            = 0xB,
     FIELD          = 0x12,
-    EXT            = 0x2
+    EXT            = 0x2,
+    ENTAG          = 0xF,
+    MOE            = 0x10,
 }
