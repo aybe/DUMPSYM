@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public sealed class SymbolSetSldToLineOfFile(Stream stream) : Symbol
+public sealed class SymbolRecordSetSldToLineOfFile(Stream stream) : SymbolRecord
 {
     public uint Line { get; } = stream.Read<uint>();
 

@@ -5,7 +5,7 @@ namespace psx_dump_sym;
 
 public static class SymbolUtility
 {
-    public static Dictionary<SymbolHeader, Symbol> Dump(Stream stream)
+    public static Dictionary<SymbolHeader, SymbolRecord> Dump(Stream stream)
     {
         using var scope = stream.SetEndiannessScope(Endianness.LE);
 
@@ -22,7 +22,7 @@ public static class SymbolUtility
         }
 
         var targetUnit = stream.Read<int>();
-
+        
         var symbols = new Dictionary<SymbolHeader, SymbolRecord>();
 
         while (stream.Position < stream.Length)
@@ -31,30 +31,30 @@ public static class SymbolUtility
 
             var symbolHeader = new SymbolHeader(stream);
 
-            Symbol symbol = symbolHeader.Type switch
+            SymbolRecord symbolRecord = symbolHeader.Type switch
             {
-                0x01 => new SymbolName(stream),
-                0x02 => new SymbolName(stream),
-                0x06 => new SymbolName(stream),
-                0x88 => new SymbolSetSldToLineOfFile(stream),
-                0x82 => new SymbolIncSldLineNumByByte(stream),
-                0x84 => new SymbolIncSldLineNumByWord(stream),
-                0x80 => new SymbolIncSldLineNum(stream),
-                0x86 => new SymbolSetSldLineNum(stream),
-                0x8A => new SymbolEndSldInfo(stream),
-                0x8C => new SymbolFunctionStart(stream),
-                0x8E => new SymbolFunctionEnd(stream),
-                0x94 => new SymbolDef(stream),
-                0x96 => new SymbolDef2(stream),
-                0x98 => new SymbolOverlay(stream),
-                0x90 => new SymbolBlockStart(stream),
-                0x92 => new SymbolBlockEnd(stream),
-                0x9A => new SymbolSetOverlay(stream),
-                0x9C => new SymbolFunction2Start(stream),
+                0x01 => new SymbolRecordName(stream),
+                0x02 => new SymbolRecordName(stream),
+                0x06 => new SymbolRecordName(stream),
+                0x88 => new SymbolRecordSetSldToLineOfFile(stream),
+                0x82 => new SymbolRecordIncSldLineNumByByte(stream),
+                0x84 => new SymbolRecordIncSldLineNumByWord(stream),
+                0x80 => new SymbolRecordIncSldLineNum(stream),
+                0x86 => new SymbolRecordSetSldLineNum(stream),
+                0x8A => new SymbolRecordEndSldInfo(stream),
+                0x8C => new SymbolRecordFunctionStart(stream),
+                0x8E => new SymbolRecordFunctionEnd(stream),
+                0x94 => new SymbolRecordDef(stream),
+                0x96 => new SymbolRecordDef2(stream),
+                0x98 => new SymbolRecordOverlay(stream),
+                0x90 => new SymbolRecordBlockStart(stream),
+                0x92 => new SymbolRecordBlockEnd(stream),
+                0x9A => new SymbolRecordSetOverlay(stream),
+                0x9C => new SymbolRecordFunction2Start(stream),
                 _    => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition}")
             };
 
-            symbols.Add(symbolHeader, symbol);
+            symbols.Add(symbolHeader, symbolRecord);
         }
 
         return symbols;

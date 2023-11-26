@@ -2,9 +2,9 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolDef : Symbol
+public class SymbolRecordDef : SymbolRecord
 {
-    public SymbolDef(Stream stream)
+    public SymbolRecordDef(Stream stream)
     {
         var symbolClass = SymbolUtility.ReadEnum<SymbolStorageClass>(stream);
         var symbolType = new SymbolType(stream.Read<ushort>());

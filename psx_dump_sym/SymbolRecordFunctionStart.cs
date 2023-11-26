@@ -2,9 +2,9 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolFunctionStart : Symbol
+public class SymbolRecordFunctionStart : SymbolRecord
 {
-    public SymbolFunctionStart(Stream stream)
+    public SymbolRecordFunctionStart(Stream stream)
     {
         var framePointer = stream.Read<ushort>();
         var size = stream.Read<uint>();

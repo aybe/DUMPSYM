@@ -2,9 +2,9 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolDef2 : Symbol
+public class SymbolRecordDef2 : SymbolRecord
 {
-    public SymbolDef2(Stream stream)
+    public SymbolRecordDef2(Stream stream)
     {
         var position = stream.Position;
         var symbolClass = SymbolUtility.ReadEnum<SymbolStorageClass>(stream);

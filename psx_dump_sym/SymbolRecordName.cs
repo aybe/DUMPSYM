@@ -1,8 +1,8 @@
 namespace psx_dump_sym;
 
-public class SymbolName : Symbol
+public class SymbolRecordName : SymbolRecord
 {
-    public SymbolName(Stream stream)
+    public SymbolRecordName(Stream stream)
     {
         var name = SymbolUtility.ReadStringAscii(stream);
     }

@@ -2,9 +2,9 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolIncSldLineNumByByte(Stream stream) : Symbol
+public class SymbolRecordIncSldLineNumByWord(Stream stream) : SymbolRecord
 {
-    public byte Length { get; } = stream.Read<byte>();
+    public ushort Length { get; } = stream.Read<ushort>();
 
     public override string ToString()
     {
