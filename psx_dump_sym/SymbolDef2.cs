@@ -9,7 +9,7 @@ public class SymbolDef2 : Symbol
         var position = stream.Position;
         var symbolClass = SymbolUtility.ReadEnum<SymbolDefClass>(stream);
 
-        var symbolType = SymbolUtility.ReadEnum<SymbolDefType>(stream);
+        var symbolType = new SymbolType(stream.Read<ushort>());
 
         var size = stream.Read<uint>();
         var dimsLen = stream.Read<ushort>();
