@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+################################################################################
+# DUMPSYM
+################################################################################
+
+/psx_dump_sym.Tests/.SYM file list.txt
