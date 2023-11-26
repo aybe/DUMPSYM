@@ -23,7 +23,7 @@ public class UnitTest1
     public void DumpSymFile(string path)
     {
         using var stream = File.OpenRead(path);
-        
-        SymbolUtility.Dump(stream);
+
+        var file = SymbolUtility.Dump(stream);
     }
 }

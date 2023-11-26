@@ -5,7 +5,7 @@ namespace psx_dump_sym;
 
 public static class SymbolUtility
 {
-    public static Dictionary<SymbolHeader, SymbolRecord> Dump(Stream stream)
+    public static SymbolFile Dump(Stream stream)
     {
         using var scope = stream.SetEndiannessScope(Endianness.LE);
 
@@ -23,7 +23,7 @@ public static class SymbolUtility
 
         var targetUnit = stream.Read<int>();
         
-        var symbols = new Dictionary<SymbolHeader, SymbolRecord>();
+        var symbols = new LinkedList<Symbol>();
 
         while (stream.Position < stream.Length)
         {
@@ -54,10 +54,10 @@ public static class SymbolUtility
                 _    => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition}")
             };
 
-            symbols.Add(symbolHeader, symbolRecord);
+            symbols.AddLast(new Symbol(symbolHeader, symbolRecord));
         }
 
-        return symbols;
+        return new SymbolFile(header, version, targetUnit, symbols);
     }
 
     /// <summary>
