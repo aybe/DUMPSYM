@@ -22,12 +22,8 @@ public static class SymbolUtility
         }
 
         var targetUnit = stream.Read<int>();
-        if (targetUnit != 0)
-        {
-            throw new InvalidDataException($"Invalid target unit: {targetUnit}.");
-        }
 
-        var symbols = new Dictionary<SymbolHeader, Symbol>();
+        var symbols = new Dictionary<SymbolHeader, SymbolRecord>();
 
         while (stream.Position < stream.Length)
         {
