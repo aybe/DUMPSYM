@@ -22,4 +22,5 @@ public enum SymbolDefClass : ushort
     EXT            = 0x2,
     ENTAG          = 0xF,
     MOE            = 0x10,
+    FILE= 0x67
 }
