@@ -20,4 +20,10 @@
 	  <ProjectReference Include="..\psx_dump_sym\psx_dump_sym.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update=".SYM file list.txt">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
