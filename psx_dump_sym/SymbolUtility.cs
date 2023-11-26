@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Whatever.Extensions;
 
 namespace psx_dump_sym;
@@ -72,7 +73,7 @@ public static class SymbolUtility
 
         var integer = Convert.ToInt32(value);
 
-        var message = $"Enum value {integer} (0x{integer:X}) is not defined for {typeof(T)}.";
+        var message = $"Enum value {integer} (0x{integer:X}) is not defined for {typeof(T).Name} at position {stream.Position - Unsafe.SizeOf<T>()}.";
 
         throw new InvalidDataException(message);
     }
