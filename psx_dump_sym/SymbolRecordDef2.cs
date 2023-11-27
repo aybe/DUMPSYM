@@ -2,23 +2,31 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolRecordDef2 : SymbolRecord
+public sealed class SymbolRecordDef2(Stream stream) : SymbolRecord
 {
-    public SymbolRecordDef2(Stream stream)
+    public SymbolStorageClass Class { get; } = SymbolUtility.ReadEnum<SymbolStorageClass>(stream);
+
+    public SymbolType Type { get; } = new(stream.Read<ushort>());
+
+    public uint Size { get; } = stream.Read<uint>();
+
+    public uint[] Dimensions { get; } = ReadDimensions(stream);
+
+    public string Tag { get; } = SymbolUtility.ReadStringAscii(stream);
+
+    public string Name { get; } = SymbolUtility.ReadStringAscii(stream);
+
+    private static uint[] ReadDimensions(Stream stream)
     {
-        var position = stream.Position;
-        var symbolClass = SymbolUtility.ReadEnum<SymbolStorageClass>(stream);
+        var length = stream.Read<ushort>();
 
-        var symbolType = new SymbolType(stream.Read<ushort>());
+        var dimensions = new uint[length];
 
-        var size = stream.Read<uint>();
-        var dimsLen = stream.Read<ushort>();
-        for (var i = 0; i < dimsLen; i++)
+        for (var i = 0; i < length; i++)
         {
-            stream.Read<uint>(); // TODO
+            dimensions[i] = stream.Read<uint>();
         }
 
-        var tag = SymbolUtility.ReadStringAscii(stream);
-        var name = SymbolUtility.ReadStringAscii(stream);
+        return dimensions;
     }
 }

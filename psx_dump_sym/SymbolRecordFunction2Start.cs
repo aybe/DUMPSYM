@@ -2,21 +2,25 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolRecordFunction2Start : SymbolRecord
+public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord
 {
-    public SymbolRecordFunction2Start(Stream stream)
-    {
-        var framePointer = stream.Read<ushort>();
-        var size = stream.Read<uint>();
-        var returnAddressRegister = stream.Read<ushort>();
-        var mask = stream.Read<uint>();
-        var maskOffset = stream.Read<int>();
+    public ushort FramePointer { get; } = stream.Read<ushort>();
 
-        var fmask = stream.Read<uint>();
-        var fmaskOffset = stream.Read<int>();
+    public uint Size { get; } = stream.Read<uint>();
 
-        var line = stream.Read<uint>();
-        var path = SymbolUtility.ReadStringAscii(stream);
-        var name = SymbolUtility.ReadStringAscii(stream);
-    }
+    public ushort ReturnAddressRegister { get; } = stream.Read<ushort>();
+
+    public uint Mask { get; } = stream.Read<uint>();
+
+    public int MaskOffset { get; } = stream.Read<int>();
+
+    public uint FMask { get; } = stream.Read<uint>();
+
+    public int FMaskOffset { get; } = stream.Read<int>();
+
+    public uint Line { get; } = stream.Read<uint>();
+
+    public string Path { get; } = SymbolUtility.ReadStringAscii(stream);
+
+    public string Name { get; } = SymbolUtility.ReadStringAscii(stream);
 }

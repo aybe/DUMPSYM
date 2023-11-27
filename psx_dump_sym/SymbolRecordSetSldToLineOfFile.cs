@@ -7,9 +7,4 @@ public sealed class SymbolRecordSetSldToLineOfFile(Stream stream) : SymbolRecord
     public uint Line { get; } = stream.Read<uint>();
 
     public string Path { get; } = stream.ReadStringAscii(stream.Read<byte>());
-
-    public override string ToString()
-    {
-        return $"{nameof(Line)}: {Line}, {nameof(Path)}: {Path}";
-    }
 }

@@ -39,9 +39,9 @@ public static class SymbolUtility
                 0x88 => new SymbolRecordSetSldToLineOfFile(stream),
                 0x82 => new SymbolRecordIncSldLineNumByByte(stream),
                 0x84 => new SymbolRecordIncSldLineNumByWord(stream),
-                0x80 => new SymbolRecordIncSldLineNum(stream),
+                0x80 => new SymbolRecordIncSldLineNum(),
                 0x86 => new SymbolRecordSetSldLineNum(stream),
-                0x8A => new SymbolRecordEndSldInfo(stream),
+                0x8A => new SymbolRecordEndSldInfo(),
                 0x8C => new SymbolRecordFunctionStart(stream),
                 0x8E => new SymbolRecordFunctionEnd(stream),
                 0x94 => new SymbolRecordDef(stream),
@@ -49,7 +49,7 @@ public static class SymbolUtility
                 0x98 => new SymbolRecordOverlay(stream),
                 0x90 => new SymbolRecordBlockStart(stream),
                 0x92 => new SymbolRecordBlockEnd(stream),
-                0x9A => new SymbolRecordSetOverlay(stream),
+                0x9A => new SymbolRecordSetOverlay(),
                 0x9C => new SymbolRecordFunction2Start(stream),
                 _    => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition}")
             };

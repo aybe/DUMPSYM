@@ -2,10 +2,7 @@ using Whatever.Extensions;
 
 namespace psx_dump_sym;
 
-public class SymbolRecordBlockEnd : SymbolRecord
+public sealed class SymbolRecordBlockEnd(Stream stream) : SymbolRecord
 {
-    public SymbolRecordBlockEnd(Stream stream)
-    {
-        var line = stream.Read<uint>();
-    }
+    public uint Line { get; } = stream.Read<uint>();
 }
