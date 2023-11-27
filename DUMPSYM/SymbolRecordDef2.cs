@@ -4,7 +4,7 @@ namespace DUMPSYM;
 
 public sealed class SymbolRecordDef2(Stream stream) : SymbolRecord
 {
-    public SymbolStorageClass Class { get; } = SymbolUtility.ReadEnum<SymbolStorageClass>(stream);
+    public SymbolStorageClass Class { get; } = stream.Read<SymbolStorageClass>();
 
     public SymbolType Type { get; } = new(stream.Read<ushort>());
 
@@ -12,9 +12,9 @@ public sealed class SymbolRecordDef2(Stream stream) : SymbolRecord
 
     public uint[] Dimensions { get; } = ReadDimensions(stream);
 
-    public string Tag { get; } = SymbolUtility.ReadStringAscii(stream);
+    public string Tag { get; } = stream.ReadStringAscii(stream.Read<byte>());
 
-    public string Name { get; } = SymbolUtility.ReadStringAscii(stream);
+    public string Name { get; } = stream.ReadStringAscii(stream.Read<byte>());
 
     private static uint[] ReadDimensions(Stream stream)
     {

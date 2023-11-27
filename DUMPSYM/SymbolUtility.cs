@@ -61,35 +61,4 @@ public static class SymbolUtility
 
         return new SymbolFile(header, version, targetUnit, symbols);
     }
-
-    /// <summary>
-    ///     Reads an enum.
-    /// </summary>
-    public static T ReadEnum<T>(Stream stream) where T : unmanaged, Enum
-    {
-        var value = stream.Read<T>();
-
-        if (Enum.IsDefined(typeof(T), value))
-        {
-            return value;
-        }
-
-        var integer = Convert.ToInt32(value);
-
-        var message = $"Enum value {integer} (0x{integer:X}) is not defined for {typeof(T).Name} at position {stream.Position - Unsafe.SizeOf<T>()}.";
-
-        throw new InvalidDataException(message);
-    }
-
-    /// <summary>
-    ///     Reads a length-prefixed (byte) ASCII string.
-    /// </summary>
-    public static string ReadStringAscii(Stream stream)
-    {
-        var count = stream.Read<byte>();
-
-        var ascii = stream.ReadStringAscii(count);
-
-        return ascii;
-    }
 }

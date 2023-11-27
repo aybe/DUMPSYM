@@ -1,8 +1,10 @@
+using Whatever.Extensions;
+
 namespace DUMPSYM;
 
 public sealed class SymbolRecordName(Stream stream) : SymbolRecord
 {
-    public string Name { get; } = SymbolUtility.ReadStringAscii(stream);
+    public string Name { get; } = stream.ReadStringAscii(stream.Read<byte>());
 
     public override void Write(SymbolHeader header, TextWriter writer, uint line)
     {
