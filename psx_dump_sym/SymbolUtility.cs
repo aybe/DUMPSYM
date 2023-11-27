@@ -21,8 +21,10 @@ public static class SymbolUtility
             throw new InvalidDataException($"Invalid version: {version}.");
         }
 
-        var targetUnit = stream.Read<int>();
-        
+        var targetUnit = stream.Read<byte>();
+
+        stream.Position += 3;
+
         var symbols = new LinkedList<Symbol>();
 
         while (stream.Position < stream.Length)
