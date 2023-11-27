@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public sealed class SymbolFile(string header, int version, int targetUnit, LinkedList<Symbol> symbols)
+public sealed class SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
 {
     public string Header { get; } = header;
 
@@ -8,7 +8,7 @@ public sealed class SymbolFile(string header, int version, int targetUnit, Linke
 
     public int TargetUnit { get; } = targetUnit;
 
-    public LinkedList<Symbol> Symbols { get; } = symbols;
+    public IList<Symbol> Symbols { get; } = symbols;
 
     public override string ToString()
     {
@@ -20,10 +20,8 @@ public sealed class SymbolFile(string header, int version, int targetUnit, Linke
 
         var line = 0u;
 
-        for (var node = Symbols.First; node != null; node = node.Next)
+        foreach (var symbol in Symbols)
         {
-            var symbol = node.Value;
-
             var header = symbol.Header;
 
             var record = symbol.Record;

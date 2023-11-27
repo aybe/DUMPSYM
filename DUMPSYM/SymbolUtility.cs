@@ -25,7 +25,7 @@ public static class SymbolUtility
 
         stream.Position += 3;
 
-        var symbols = new LinkedList<Symbol>();
+        var symbols = new List<Symbol>();
 
         while (stream.Position < stream.Length)
         {
@@ -56,7 +56,7 @@ public static class SymbolUtility
                 _    => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition}")
             };
 
-            symbols.AddLast(new Symbol(symbolHeader, symbolRecord));
+            symbols.Add(new Symbol(symbolHeader, symbolRecord));
         }
 
         return new SymbolFile(header, version, targetUnit, symbols);
