@@ -33,9 +33,20 @@ public class UnitTest1
 
         var file = SymbolUtility.Dump(stream);
 
-        var format = file.ToString();
-        var expected = File.ReadAllLines(Path.ChangeExtension(path, ".txt"))[..^1];
-        var actual = format.ReadLines();
+        var text = file.ToString();
+
+        Console.WriteLine(text);
+
+        var textFile = Path.ChangeExtension(path, ".txt");
+
+        if (!Path.Exists(textFile))
+        {
+            Assert.Inconclusive("Can't compare against original, no associated .txt file was found.");
+            return;
+        }
+
+        var expected = File.ReadAllLines(textFile)[..^1];
+        var actual = text.ReadLines();
 
         for (var i = 0; i < Math.Min(expected.Length, actual.Length); i++)
         {
@@ -49,7 +60,5 @@ public class UnitTest1
         }
 
         CollectionAssert.AreEquivalent(expected, actual);
-
-        Console.WriteLine(format);
     }
 }
