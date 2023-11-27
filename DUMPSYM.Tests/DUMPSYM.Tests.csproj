@@ -17,13 +17,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DUMPSYM\DUMPSYM.csproj" />
+		<ProjectReference Include="..\DUMPSYM\DUMPSYM.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update=".SYM file list.txt">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<None Update=".SYM file list.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

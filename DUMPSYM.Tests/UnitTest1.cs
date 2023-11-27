@@ -27,7 +27,7 @@ public class UnitTest1
 
     [TestMethod]
     [DynamicData(nameof(DumpSymFileData), DynamicDataSourceType.Method, DynamicDataDisplayName = nameof(DumpSymFileName))]
-    public void DumpSymFile(string path) 
+    public void DumpSymFile(string path)
     {
         using var stream = File.OpenRead(path);
 
