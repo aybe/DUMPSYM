@@ -34,13 +34,13 @@ public sealed class SymbolFile(string header, int version, int targetUnit, IList
                     line += 1;
                     break;
                 case SymbolRecordIncSldLineNumByByte a:
-                    line += a.Length;
+                    line += a.Line;
                     break;
                 case SymbolRecordIncSldLineNumByWord b:
-                    line += b.Length;
+                    line += b.Line;
                     break;
                 case SymbolRecordSetSldLineNum c:
-                    line = c.Value;
+                    line = c.Line;
                     break;
                 case SymbolRecordSetSldToLineOfFile d:
                     line = d.Line;

@@ -4,7 +4,7 @@ namespace DUMPSYM;
 
 public sealed class SymbolRecordSetSldLineNum(Stream stream) : SymbolRecord
 {
-    public uint Value { get; } = stream.Read<uint>();
+    public uint Line { get; } = stream.Read<uint>();
 
     public override void Write(SymbolHeader header, TextWriter writer, uint line)
     {

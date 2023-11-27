@@ -20,7 +20,7 @@ public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord
 
     public uint Line { get; } = stream.Read<uint>();
 
-    public string Path { get; } = stream.ReadStringAscii(stream.Read<byte>());
+    public string File { get; } = stream.ReadStringAscii(stream.Read<byte>());
 
     public string Name { get; } = stream.ReadStringAscii(stream.Read<byte>());
 
@@ -37,7 +37,7 @@ public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord
         writer.WriteLine($"    fmask = ${FMask:x8}");
         writer.WriteLine($"    fmaskoffs = {FMaskOffset}");
         writer.WriteLine($"    line = {Line}");
-        writer.WriteLine($"    file = {Path}");
+        writer.WriteLine($"    file = {File}");
         writer.WriteLine($"    name = {Name}");
     }
 }
