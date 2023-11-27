@@ -23,4 +23,21 @@ public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord
     public string Path { get; } = SymbolUtility.ReadStringAscii(stream);
 
     public string Name { get; } = SymbolUtility.ReadStringAscii(stream);
+
+    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    {
+        header.WriteHeaderPositionAddressType(writer);
+
+        writer.WriteLine("Function2 start");
+        writer.WriteLine($"    fp = {FramePointer}");
+        writer.WriteLine($"    fsize = {Size}");
+        writer.WriteLine($"    retreg = {ReturnAddressRegister}");
+        writer.WriteLine($"    mask = ${Mask:x8}");
+        writer.WriteLine($"    maskoffs = {MaskOffset}");
+        writer.WriteLine($"    fmask = ${FMask:x8}");
+        writer.WriteLine($"    fmaskoffs = {FMaskOffset}");
+        writer.WriteLine($"    line = {Line}");
+        writer.WriteLine($"    file = {Path}");
+        writer.WriteLine($"    name = {Name}");
+    }
 }

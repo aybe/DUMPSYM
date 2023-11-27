@@ -29,4 +29,18 @@ public sealed class SymbolRecordDef2(Stream stream) : SymbolRecord
 
         return dimensions;
     }
+
+    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    {
+        header.WriteHeaderPositionAddressType(writer);
+
+        writer.WriteLine(
+            $"Def2 " +
+            $"class {Class} " +
+            $"type {Type} " +
+            $"size {Size} " +
+            $"dims {(Dimensions.Length > 0 ? $"{Dimensions.Length} {string.Join(" ", Dimensions)}" : "0")} " +
+            $"tag {Tag} " +
+            $"name {Name}");
+    }
 }
