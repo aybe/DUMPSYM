@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace psx_dump_sym.Tests;
 
 [TestClass]
@@ -18,8 +20,13 @@ public class UnitTest1
         }
     }
 
+    public static string DumpSymFileName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name} {Path.GetFileName(data[0].ToString()!)}";
+    }
+
     [TestMethod]
-    [DynamicData(nameof(DumpSymFileData), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(DumpSymFileData), DynamicDataSourceType.Method, DynamicDataDisplayName = nameof(DumpSymFileName))]
     public void DumpSymFile(string path)
     {
         using var stream = File.OpenRead(path);
