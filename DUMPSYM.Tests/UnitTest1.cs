@@ -31,7 +31,7 @@ public class UnitTest1
     {
         using var stream = File.OpenRead(path);
 
-        var file = SymbolUtility.Dump(stream);
+        var file = SymbolFile.Dump(stream);
 
         var text = file.ToString();
 
