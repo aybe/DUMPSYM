@@ -30,8 +30,6 @@ public readonly struct SymbolType
 
     public override string ToString()
     {
-        var modifiers = Modifiers.ToArray();
-
-        return $"{(modifiers.Length > 0 ? $"{string.Join(" ", modifiers)} " : string.Empty)}{Kind}";
+        return string.Join(" ", string.Join(" ", Modifiers), Kind).Trim();
     }
 }
