@@ -1,8 +1,10 @@
+using System.Collections;
 using Whatever.Extensions;
 
 namespace DUMPSYM;
 
 public sealed class SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
+    : IEnumerable<SymbolRecord>
 {
     public string Header { get; } = header;
 
@@ -11,6 +13,16 @@ public sealed class SymbolFile(string header, int version, int targetUnit, IList
     public int TargetUnit { get; } = targetUnit;
 
     public IList<Symbol> Symbols { get; } = symbols;
+
+    public IEnumerator<SymbolRecord> GetEnumerator()
+    {
+        return Symbols.Select(s => s.Record).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     public override string ToString()
     {
