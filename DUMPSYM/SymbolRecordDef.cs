@@ -6,7 +6,7 @@ public sealed class SymbolRecordDef(Stream stream) : SymbolRecord
 {
     public SymbolStorageClass Class { get; } = stream.Read<SymbolStorageClass>();
 
-    public SymbolType Type { get; } = new(stream.Read<ushort>());
+    public SymbolType Type { get; } = stream.Read<SymbolType>();
 
     public uint Size { get; } = stream.Read<uint>();
 

@@ -1,30 +1,37 @@
+using JetBrains.Annotations;
+
 namespace DUMPSYM;
 
-public sealed class SymbolType
+public readonly struct SymbolType
 {
-    public SymbolType(ushort value)
+    [UsedImplicitly] public readonly ushort Value;
+
+    public SymbolTypeKind Kind => (SymbolTypeKind)(Value & 0xF);
+
+    public IEnumerable<SymbolTypeModifier> Modifiers
     {
-        Kind = (SymbolTypeKind)(value & 0xF);
-
-        for (var i = 0; i < 6; i++)
+        get
         {
-            var modifier = (value >> (4 + 2 * i)) & 0b11;
-
-            if (modifier is 0)
+            for (var i = 0; i < 6; i++)
             {
-                break;
-            }
+                var bits = (Value >> (4 + 2 * i)) & 0b11;
 
-            Modifiers.Add((SymbolTypeModifier)modifier);
+                if (bits is 0)
+                {
+                    yield break;
+                }
+
+                var modifier = (SymbolTypeModifier)bits;
+
+                yield return modifier;
+            }
         }
     }
 
-    public SymbolTypeKind Kind { get; }
-
-    public IList<SymbolTypeModifier> Modifiers { get; } = new List<SymbolTypeModifier>();
-
     public override string ToString()
     {
-        return $"{(Modifiers.Count > 0 ? $"{string.Join(" ", Modifiers)} " : string.Empty)}{Kind}";
+        var modifiers = Modifiers.ToArray();
+
+        return $"{(modifiers.Length > 0 ? $"{string.Join(" ", modifiers)} " : string.Empty)}{Kind}";
     }
 }
