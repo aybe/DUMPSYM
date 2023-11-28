@@ -11,6 +11,8 @@ public sealed class UnitTest2 : UnitTestBase
 
     private static bool PrintStructures => true;
 
+    private static bool PrintUnions => true;
+
     [ClassInitialize]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static void ClassInitialize(TestContext context)
@@ -125,20 +127,39 @@ public sealed class UnitTest2 : UnitTestBase
     {
         var symbol = symbolNode.Value;
 
-        if (symbol.Record is not SymbolRecordDef { Class: SymbolStorageClass.UNTAG } def)
-        {
-            throw new ArgumentOutOfRangeException(nameof(symbolNode));
-        }
+        Assert.IsTrue(symbol.Record is SymbolRecordDef { Class: SymbolStorageClass.UNTAG });
 
-        WriteLine($"Parsing union {def.Name}");
+        MemberCollection? collection = null;
 
         for (var node = symbolNode; node != null; node = node.Next)
         {
             var record = node.Value.Record;
 
-            if (record is SymbolRecordDef2 { Class: SymbolStorageClass.EOS, Name: ".eos" } end && end.Tag == def.Name)
+            if (record is not ISymbolDefinition definition)
             {
-                return node;
+                throw new InvalidDataException();
+            }
+
+            switch (definition.Class)
+            {
+                case SymbolStorageClass.UNTAG:
+                    Assert.IsNull(collection);
+                    collection = new MemberCollection("union", definition.Name);
+                    break;
+                case SymbolStorageClass.MOU:
+                    Assert.IsNotNull(collection);
+                    ParseMember(collection, definition);
+                    break;
+                case SymbolStorageClass.EOS:
+                    Assert.IsNotNull(collection);
+                    if (PrintUnions) // TODO delete
+                    {
+                        WriteLine(collection.Print());
+                    }
+
+                    return node;
+                default:
+                    throw new InvalidDataException();
             }
         }
 
@@ -257,6 +278,7 @@ public sealed class UnitTest2 : UnitTestBase
         switch (definition.Class)
         {
             case SymbolStorageClass.MOS:
+            case SymbolStorageClass.MOU:
                 foreach (var dimension in definition.Dimensions.Reverse())
                 {
                     builder.Append($"[{dimension}]");
