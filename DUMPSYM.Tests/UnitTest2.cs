@@ -191,10 +191,7 @@ public sealed class UnitTest2 : UnitTestBase
     {
         var symbol = symbolNode.Value;
 
-        if (symbol.Record is not SymbolRecordDef { Class: SymbolStorageClass.STRTAG } def)
-        {
-            throw new ArgumentOutOfRangeException(nameof(symbolNode));
-        }
+        Assert.IsTrue(symbol.Record is SymbolRecordDef { Class: SymbolStorageClass.STRTAG });
 
         MemberCollection? collection = null;
 
@@ -207,23 +204,20 @@ public sealed class UnitTest2 : UnitTestBase
                 throw new InvalidDataException();
             }
 
-            if (definition is { Class: SymbolStorageClass.EOS, Name: ".eos" })
+            switch (definition.Class)
             {
-                Assert.AreEqual(definition.Tag, def.Name);
-                Assert.IsNotNull(collection);
-                list.Add(collection);
-                return node;
-            }
-
-            if (definition.Class == SymbolStorageClass.STRTAG)
-            {
-                Assert.IsNull(collection);
-                collection = new MemberCollection("struct", definition.Name);
-            }
-            else
-            {
-                Assert.IsNotNull(collection);
-                ParseMember(collection, definition);
+                case SymbolStorageClass.STRTAG:
+                    Assert.IsNull(collection);
+                    collection = new MemberCollection("struct", definition.Name);
+                    break;
+                case SymbolStorageClass.MOS:
+                    Assert.IsNotNull(collection);
+                    ParseMember(collection, definition);
+                    break;
+                case SymbolStorageClass.EOS:
+                    Assert.IsNotNull(collection);
+                    list.Add(collection);
+                    return node;
             }
         }
 
