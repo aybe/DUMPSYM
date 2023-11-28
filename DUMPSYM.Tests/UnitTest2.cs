@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using DUMPSYM.Output;
 
 namespace DUMPSYM.Tests;
 
@@ -6,6 +8,8 @@ namespace DUMPSYM.Tests;
 public sealed class UnitTest2 : UnitTestBase
 {
     private static SymbolFile SymbolFile { get; set; } = null!;
+
+    private static bool PrintStructures => true;
 
     [ClassInitialize]
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
@@ -142,6 +146,7 @@ public sealed class UnitTest2 : UnitTestBase
     }
 
     private LinkedListNode<Symbol> ParseStruct(LinkedListNode<Symbol> symbolNode)
+        // TODO add comments to struct members?
     {
         var symbol = symbolNode.Value;
 
@@ -150,19 +155,124 @@ public sealed class UnitTest2 : UnitTestBase
             throw new ArgumentOutOfRangeException(nameof(symbolNode));
         }
 
-        WriteLine($"Parsing struct {def.Name}");
+        Structure? structure = null;
 
         for (var node = symbolNode; node != null; node = node.Next)
         {
             var record = node.Value.Record;
 
-            if (record is SymbolRecordDef2 { Class: SymbolStorageClass.EOS, Name: ".eos" } end && end.Tag == def.Name)
+            if (record is not ISymbolDefinition definition)
             {
+                throw new InvalidDataException();
+            }
+
+            if (definition is { Class: SymbolStorageClass.EOS, Name: ".eos" })
+            {
+                Assert.AreEqual(definition.Tag, def.Name);
+                Assert.IsNotNull(structure);
+                if (PrintStructures) // TODO delete
+                {
+                    WriteLine(structure.Print());
+                }
+
                 return node;
+            }
+
+            if (definition.Class == SymbolStorageClass.STRTAG)
+            {
+                Assert.IsNull(structure);
+                structure = new Structure(definition.Name);
+            }
+            else
+            {
+                Assert.IsNotNull(structure);
+                ParseStructureMember(structure, definition);
             }
         }
 
         throw new InvalidOperationException();
+    }
+
+    private void ParseStructureMember(Structure structure, ISymbolDefinition definition)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append(definition.Type.Kind switch
+        {
+            SymbolTypeKind.NULL   => "null",
+            SymbolTypeKind.VOID   => "void",
+            SymbolTypeKind.CHAR   => "char",
+            SymbolTypeKind.SHORT  => "short",
+            SymbolTypeKind.INT    => "int",
+            SymbolTypeKind.LONG   => "long",
+            SymbolTypeKind.FLOAT  => "float",
+            SymbolTypeKind.DOUBLE => "double",
+            SymbolTypeKind.STRUCT => "struct",
+            SymbolTypeKind.UNION  => "union",
+            SymbolTypeKind.ENUM   => "enum",
+            SymbolTypeKind.MOE    => "enum member",
+            SymbolTypeKind.UCHAR  => "unsigned char",
+            SymbolTypeKind.USHORT => "unsigned short",
+            SymbolTypeKind.UINT   => "unsigned int",
+            SymbolTypeKind.ULONG  => "unsigned long",
+            _                     => throw new NotSupportedException(definition.Type.Kind.ToString())
+        });
+
+        builder.Append(' ');
+
+        if (definition.Tag != string.Empty)
+        {
+            builder.Append($"{definition.Tag} ");
+        }
+
+        var modifiers = definition.Type.Modifiers.ToArray();
+
+        var functionPointer = modifiers.Contains(SymbolTypeModifier.FCN);
+
+        if (functionPointer)
+        {
+            Assert.AreEqual(1, modifiers.Count(s => s is SymbolTypeModifier.FCN), "Multiple function pointers not implemented.");
+        }
+
+        if (functionPointer)
+        {
+            builder.Append('(');
+        }
+
+        foreach (var modifier in modifiers)
+        {
+            if (modifier == SymbolTypeModifier.PTR)
+            {
+                builder.Append('*');
+            }
+        }
+
+        builder.Append(definition.Name);
+
+        if (functionPointer)
+        {
+            builder.Append(")()");
+        }
+
+        switch (definition.Class)
+        {
+            case SymbolStorageClass.MOS:
+                foreach (var dimension in definition.Dimensions.Reverse())
+                {
+                    builder.Append($"[{dimension}]");
+                }
+
+                break;
+            case SymbolStorageClass.FIELD:
+                builder.Append($" : {definition.Size}");
+                break;
+            default:
+                throw new NotImplementedException(definition.Class.ToString());
+        }
+
+        builder.Append(';');
+
+        structure.Members.Add(new Member(definition.Name) { Text = builder.ToString() });
     }
 
     private LinkedListNode<Symbol> ParseTypeDefinition(LinkedListNode<Symbol> symbolNode)
