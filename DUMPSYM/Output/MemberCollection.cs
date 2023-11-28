@@ -2,8 +2,10 @@
 
 namespace DUMPSYM.Output;
 
-public sealed class Structure(string name)
+public sealed class MemberCollection(string keyword, string name)
 {
+    public string Keyword { get; } = keyword;
+
     public string Name { get; } = name;
 
     public IList<Member> Members { get; } = new List<Member>();
@@ -12,7 +14,7 @@ public sealed class Structure(string name)
     {
         builder ??= new StringBuilder();
 
-        builder.AppendLine($"struct {Name}");
+        builder.AppendLine($"{keyword} {Name}");
 
         builder.AppendLine("{");
 

@@ -155,7 +155,7 @@ public sealed class UnitTest2 : UnitTestBase
             throw new ArgumentOutOfRangeException(nameof(symbolNode));
         }
 
-        Structure? structure = null;
+        MemberCollection? collection = null;
 
         for (var node = symbolNode; node != null; node = node.Next)
         {
@@ -169,10 +169,10 @@ public sealed class UnitTest2 : UnitTestBase
             if (definition is { Class: SymbolStorageClass.EOS, Name: ".eos" })
             {
                 Assert.AreEqual(definition.Tag, def.Name);
-                Assert.IsNotNull(structure);
+                Assert.IsNotNull(collection);
                 if (PrintStructures) // TODO delete
                 {
-                    WriteLine(structure.Print());
+                    WriteLine(collection.Print());
                 }
 
                 return node;
@@ -180,20 +180,20 @@ public sealed class UnitTest2 : UnitTestBase
 
             if (definition.Class == SymbolStorageClass.STRTAG)
             {
-                Assert.IsNull(structure);
-                structure = new Structure(definition.Name);
+                Assert.IsNull(collection);
+                collection = new MemberCollection("struct", definition.Name);
             }
             else
             {
-                Assert.IsNotNull(structure);
-                ParseStructureMember(structure, definition);
+                Assert.IsNotNull(collection);
+                ParseMember(collection, definition);
             }
         }
 
         throw new InvalidOperationException();
     }
 
-    private void ParseStructureMember(Structure structure, ISymbolDefinition definition)
+    private void ParseMember(MemberCollection collection, ISymbolDefinition definition)
     {
         var builder = new StringBuilder();
 
@@ -272,7 +272,7 @@ public sealed class UnitTest2 : UnitTestBase
 
         builder.Append(';');
 
-        structure.Members.Add(new Member(definition.Name) { Text = builder.ToString() });
+        collection.Members.Add(new Member(definition.Name) { Text = builder.ToString() });
     }
 
     private LinkedListNode<Symbol> ParseTypeDefinition(LinkedListNode<Symbol> symbolNode)
