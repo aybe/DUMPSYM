@@ -29,6 +29,10 @@ public sealed class UnitTest2 : UnitTestBase
 
         WriteLine(() => symbols, s => s.Count);
 
+        var structures = new List<MemberCollection>();
+
+        var unions = new List<MemberCollection>();
+
         for (var node = symbols.First; node != null; node = node.Next)
         {
             var record = node.Value.Record;
@@ -46,10 +50,10 @@ public sealed class UnitTest2 : UnitTestBase
                             node = ParseTypeDefinition(node);
                             continue;
                         case SymbolStorageClass.STRTAG:
-                            node = ParseStruct(node);
+                            node = ParseStruct(node, structures);
                             continue;
                         case SymbolStorageClass.UNTAG:
-                            node = ParseUnion(node);
+                            node = ParseUnion(node, unions);
                             continue;
                         case SymbolStorageClass.EXT:
                             continue; // TODO only 1 node
@@ -123,7 +127,7 @@ public sealed class UnitTest2 : UnitTestBase
         throw new InvalidDataException();
     }
 
-    private LinkedListNode<Symbol> ParseUnion(LinkedListNode<Symbol> symbolNode)
+    private LinkedListNode<Symbol> ParseUnion(LinkedListNode<Symbol> symbolNode, List<MemberCollection> list)
     {
         var symbol = symbolNode.Value;
 
@@ -152,6 +156,7 @@ public sealed class UnitTest2 : UnitTestBase
                     break;
                 case SymbolStorageClass.EOS:
                     Assert.IsNotNull(collection);
+                    list.Add(collection);
                     if (PrintUnions) // TODO delete
                     {
                         WriteLine(collection.Print());
@@ -166,7 +171,7 @@ public sealed class UnitTest2 : UnitTestBase
         throw new InvalidOperationException();
     }
 
-    private LinkedListNode<Symbol> ParseStruct(LinkedListNode<Symbol> symbolNode)
+    private LinkedListNode<Symbol> ParseStruct(LinkedListNode<Symbol> symbolNode, List<MemberCollection> list)
         // TODO add comments to struct members?
     {
         var symbol = symbolNode.Value;
@@ -191,6 +196,7 @@ public sealed class UnitTest2 : UnitTestBase
             {
                 Assert.AreEqual(definition.Tag, def.Name);
                 Assert.IsNotNull(collection);
+                list.Add(collection);
                 if (PrintStructures) // TODO delete
                 {
                     WriteLine(collection.Print());
