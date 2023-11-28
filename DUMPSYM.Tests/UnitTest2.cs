@@ -171,6 +171,7 @@ public sealed class UnitTest2 : UnitTestBase
                     collection = new MemberCollection("union", definition.Name);
                     break;
                 case SymbolStorageClass.MOU:
+                case SymbolStorageClass.FIELD:
                     Assert.IsNotNull(collection);
                     ParseMember(collection, definition);
                     break;
@@ -211,6 +212,7 @@ public sealed class UnitTest2 : UnitTestBase
                     collection = new MemberCollection("struct", definition.Name);
                     break;
                 case SymbolStorageClass.MOS:
+                case SymbolStorageClass.FIELD:
                     Assert.IsNotNull(collection);
                     ParseMember(collection, definition);
                     break;
