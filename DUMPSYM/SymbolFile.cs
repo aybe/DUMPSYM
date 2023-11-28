@@ -40,7 +40,7 @@ public sealed class SymbolFile(string header, int version, int targetUnit, IList
 
             var record = symbol.Record;
 
-            switch (record)
+            switch (record) // TODO update using ISymbolLineModifier instead
             {
                 case SymbolRecordIncSldLineNum:
                     line += 1;

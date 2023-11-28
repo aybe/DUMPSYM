@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordIncSldLineNumByByte(Stream stream) : SymbolRecord
+public sealed class SymbolRecordIncSldLineNumByByte(Stream stream) : SymbolRecord, ISymbolLineModifier
 {
     public byte Line { get; } = stream.Read<byte>();
 

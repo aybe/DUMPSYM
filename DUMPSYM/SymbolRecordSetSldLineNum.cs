@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordSetSldLineNum(Stream stream) : SymbolRecord
+public sealed class SymbolRecordSetSldLineNum(Stream stream) : SymbolRecord, ISymbolLineModifier
 {
     public uint Line { get; } = stream.Read<uint>();
 
