@@ -179,7 +179,7 @@ public sealed class UnitTest2 : UnitTestBase
                     list.Add(collection);
                     return node;
                 default:
-                    throw new InvalidDataException();
+                    throw new NotSupportedException(definition.Class.ToString());
             }
         }
 
@@ -218,6 +218,8 @@ public sealed class UnitTest2 : UnitTestBase
                     Assert.IsNotNull(collection);
                     list.Add(collection);
                     return node;
+                default:
+                    throw new NotSupportedException(definition.Class.ToString());
             }
         }
 
