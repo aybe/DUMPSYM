@@ -50,10 +50,10 @@ public sealed class UnitTest2 : UnitTestBase
                             node = ParseTypeDefinition(node);
                             continue;
                         case SymbolStorageClass.STRTAG:
-                            node = ParseStruct(node, structures);
+                            node = ParseStruct(node, structures, "struct");
                             continue;
                         case SymbolStorageClass.UNTAG:
-                            node = ParseUnion(node, unions);
+                            node = ParseStruct(node, structures, "union");
                             continue;
                         case SymbolStorageClass.EXT:
                             continue; // TODO only 1 node
@@ -147,53 +147,9 @@ public sealed class UnitTest2 : UnitTestBase
         throw new InvalidDataException();
     }
 
-    private LinkedListNode<Symbol> ParseUnion(LinkedListNode<Symbol> symbolNode, List<MemberCollection> list)
-    {
-        var symbol = symbolNode.Value;
-
-        Assert.IsTrue(symbol.Record is SymbolRecordDef { Class: SymbolStorageClass.UNTAG });
-
-        MemberCollection? collection = null;
-
-        for (var node = symbolNode; node != null; node = node.Next)
-        {
-            var record = node.Value.Record;
-
-            if (record is not ISymbolDefinition definition)
-            {
-                throw new InvalidDataException();
-            }
-
-            switch (definition.Class)
-            {
-                case SymbolStorageClass.UNTAG:
-                    Assert.IsNull(collection);
-                    collection = new MemberCollection("union", definition.Name);
-                    break;
-                case SymbolStorageClass.MOU:
-                case SymbolStorageClass.FIELD:
-                    Assert.IsNotNull(collection);
-                    ParseMember(collection, definition);
-                    break;
-                case SymbolStorageClass.EOS:
-                    Assert.IsNotNull(collection);
-                    list.Add(collection);
-                    return node;
-                default:
-                    throw new NotSupportedException(definition.Class.ToString());
-            }
-        }
-
-        throw new InvalidOperationException();
-    }
-
-    private LinkedListNode<Symbol> ParseStruct(LinkedListNode<Symbol> symbolNode, List<MemberCollection> list)
+    private LinkedListNode<Symbol> ParseStruct(LinkedListNode<Symbol> symbolNode, List<MemberCollection> list, string keyword)
         // TODO add comments to struct members?
     {
-        var symbol = symbolNode.Value;
-
-        Assert.IsTrue(symbol.Record is SymbolRecordDef { Class: SymbolStorageClass.STRTAG });
-
         MemberCollection? collection = null;
 
         for (var node = symbolNode; node != null; node = node.Next)
@@ -208,10 +164,12 @@ public sealed class UnitTest2 : UnitTestBase
             switch (definition.Class)
             {
                 case SymbolStorageClass.STRTAG:
+                case SymbolStorageClass.UNTAG:
                     Assert.IsNull(collection);
-                    collection = new MemberCollection("struct", definition.Name);
+                    collection = new MemberCollection(keyword, definition.Name);
                     break;
                 case SymbolStorageClass.MOS:
+                case SymbolStorageClass.MOU:
                 case SymbolStorageClass.FIELD:
                     Assert.IsNotNull(collection);
                     ParseMember(collection, definition);
