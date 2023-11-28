@@ -12,7 +12,7 @@ public sealed class SymbolHeader(Stream stream)
 
     public override string ToString()
     {
-        return $"{nameof(Position)}: {Position}, {nameof(Address)}: 0x{Address:X8}, {nameof(Type)}: 0x{Type:X2}";
+        return $"{Position:x6}: ${Address:x8} {Type:x}";
     }
 
     public void WriteHeaderPositionAddress(TextWriter writer)
@@ -21,7 +21,7 @@ public sealed class SymbolHeader(Stream stream)
         writer.Write($"${Address:x8} ");
     }
 
-    public void WriteHeaderPositionAddressType(TextWriter writer)
+    public void WriteHeaderPositionAddressType(TextWriter writer) // TODO let users add space instead?
     {
         WriteHeaderPositionAddress(writer);
 
