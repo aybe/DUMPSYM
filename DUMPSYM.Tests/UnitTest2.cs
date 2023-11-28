@@ -101,6 +101,26 @@ public sealed class UnitTest2 : UnitTestBase
 
             throw new NotImplementedException(node.Value.ToString());
         }
+
+        if (PrintStructures)
+        {
+            WriteLine(() => structures, s => s.Count);
+
+            foreach (var collection in structures)
+            {
+                WriteLine(collection.Print());
+            }
+        }
+
+        if (PrintUnions)
+        {
+            WriteLine(() => unions, s => s.Count);
+
+            foreach (var collection in unions)
+            {
+                WriteLine(collection.Print());
+            }
+        }
     }
 
     private LinkedListNode<Symbol> ParseFunction(LinkedListNode<Symbol> symbolNode)
@@ -157,11 +177,6 @@ public sealed class UnitTest2 : UnitTestBase
                 case SymbolStorageClass.EOS:
                     Assert.IsNotNull(collection);
                     list.Add(collection);
-                    if (PrintUnions) // TODO delete
-                    {
-                        WriteLine(collection.Print());
-                    }
-
                     return node;
                 default:
                     throw new InvalidDataException();
@@ -197,11 +212,6 @@ public sealed class UnitTest2 : UnitTestBase
                 Assert.AreEqual(definition.Tag, def.Name);
                 Assert.IsNotNull(collection);
                 list.Add(collection);
-                if (PrintStructures) // TODO delete
-                {
-                    WriteLine(collection.Print());
-                }
-
                 return node;
             }
 
