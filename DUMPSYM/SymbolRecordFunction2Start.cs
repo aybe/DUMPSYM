@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord
+public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord, ISymbolName
 {
     public ushort FramePointer { get; } = stream.Read<ushort>();
 

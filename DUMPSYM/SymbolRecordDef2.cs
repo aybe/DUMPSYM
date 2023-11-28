@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordDef2(Stream stream) : SymbolRecord
+public sealed class SymbolRecordDef2(Stream stream) : SymbolRecord, ISymbolName
 {
     public SymbolStorageClass Class { get; } = stream.Read<SymbolStorageClass>();
 
