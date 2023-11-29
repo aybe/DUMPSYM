@@ -56,11 +56,12 @@ public sealed class UnitTest3 : UnitTestBase
                 case SymbolRecordEndSldInfo:
                     continue; // TODO 1 node
                 case SymbolRecordFunction2Start:
-                    throw new NotImplementedException(node.Value.ToString());
+                    node = ProcessFunction2Start(node);
+                    continue;
                 case SymbolRecordFunctionEnd:
                     continue; // TODO 1 node
                 case SymbolRecordFunctionStart:
-                    node = NewMethod(node);
+                    node = ProcessFunctionStart(node);
                     continue; // TODO block start/end, function end + Def2 class AUTO type STRUCT*
                 case SymbolRecordIncSldLineNum:
                     continue; // TODO 1 node
@@ -84,45 +85,52 @@ public sealed class UnitTest3 : UnitTestBase
         }
     }
 
-    private static LinkedListNode<Symbol> NewMethod(LinkedListNode<Symbol> node)
+    private static LinkedListNode<Symbol> ProcessFunctionStart(LinkedListNode<Symbol> node) // TODO merge with other?
     {
         for (var current = node; current != null; current = current.Next)
         {
-            var cvr = current.Value.Record;
-            if (cvr is SymbolRecordFunctionStart)
-            {
-                continue;
-            }
+            var record = current.Value.Record;
 
-            if (cvr is SymbolRecordBlockStart)
+            switch (record)
             {
-                continue;
+                case SymbolRecordFunctionStart:
+                case SymbolRecordBlockStart:
+                case SymbolRecordBlockEnd:
+                case SymbolRecordDef:
+                case SymbolRecordDef2:
+                    continue;
+                case SymbolRecordFunctionEnd:
+                    return current;
+                default:
+                    throw new NotImplementedException(node.Value.ToString());
             }
-
-            if (cvr is SymbolRecordBlockEnd)
-            {
-                continue;
-            }
-
-            if (cvr is SymbolRecordDef)
-            {
-                continue;
-            }
-
-            if (cvr is SymbolRecordDef2)
-            {
-                continue;
-            }
-
-            if (cvr is SymbolRecordFunctionEnd)
-            {
-                return current;
-            }
-
-            throw new NotImplementedException(cvr.GetType() + " " + cvr);
         }
 
-        throw new NotImplementedException(node.Value.Record.GetType().ToString());
+        throw new NotImplementedException(node.Value.ToString());
+    }
+
+    private static LinkedListNode<Symbol> ProcessFunction2Start(LinkedListNode<Symbol> node) // TODO merge with other?
+    {
+        for (var current = node; current != null; current = current.Next)
+        {
+            var record = current.Value.Record;
+
+            switch (record)
+            {
+                case SymbolRecordFunction2Start:
+                case SymbolRecordBlockStart:
+                case SymbolRecordBlockEnd:
+                case SymbolRecordDef:
+                case SymbolRecordDef2:
+                    continue;
+                case SymbolRecordFunctionEnd:
+                    return current;
+                default:
+                    throw new NotImplementedException(node.Value.ToString());
+            }
+        }
+
+        throw new NotImplementedException(node.Value.ToString());
     }
 
     private LinkedListNode<Symbol> ParseDef2(LinkedListNode<Symbol> node, SymbolCollection symbolCollection)
