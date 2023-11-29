@@ -52,21 +52,13 @@ public sealed class UnitTest3 : UnitTestBase
                 case ISymbolFunction:
                     node = ParseFunction(node);
                     continue;
-                case SymbolRecordIncSldLineNum:
-                    continue; // TODO 1 node
-                case SymbolRecordIncSldLineNumByByte:
-                    continue; // TODO 1 node
-                case SymbolRecordIncSldLineNumByWord:
+                case ISymbolLineModifier:
                     continue; // TODO 1 node
                 case SymbolRecordName:
                     continue; // TODO 1 node
                 case SymbolRecordOverlay:
                     continue; // TODO 1 node
                 case SymbolRecordSetOverlay:
-                    continue; // TODO 1 node
-                case SymbolRecordSetSldLineNum:
-                    continue; // TODO 1 node
-                case SymbolRecordSetSldToLineOfFile:
                     continue; // TODO 1 node
                 default:
                     throw new NotImplementedException(node.Value.ToString());
