@@ -175,68 +175,17 @@ public sealed class UnitTest3 : UnitTestBase
 
             if (def.Class is SymbolStorageClass.ENTAG)
             {
-                var list = new LinkedList<Symbol>();
-
-                for (var current = node; current != null; current = current.Next)
-                {
-                    switch (current.Value.Record)
-                    {
-                        case SymbolRecordDef { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM }:
-                            list.AddLast(current.Value);
-                            continue;
-                        case SymbolRecordDef { Class: SymbolStorageClass.MOE }:
-                            list.AddLast(current.Value);
-                            continue;
-                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
-                            list.AddLast(current.Value);
-                            collection.Enumerations.Add(list);
-                            return current;
-                    }
-                }
+                return ParseEnumeration(node, collection.Enumerations);
             }
 
             if (def.Class is SymbolStorageClass.STRTAG)
             {
-                var list = new LinkedList<Symbol>();
-
-                for (var current = node; current != null; current = current.Next)
-                {
-                    switch (current.Value.Record)
-                    {
-                        case SymbolRecordDef { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT }:
-                            list.AddLast(current.Value);
-                            continue;
-                        case SymbolRecordDef { Class: SymbolStorageClass.MOS }:
-                            list.AddLast(current.Value);
-                            continue;
-                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
-                            list.AddLast(current.Value);
-                            collection.Structures.Add(list);
-                            return current;
-                    }
-                }
+                return ParseStructure(node, collection.Structures);
             }
 
             if (def.Class is SymbolStorageClass.UNTAG)
             {
-                var list = new LinkedList<Symbol>();
-
-                for (var current = node; current != null; current = current.Next)
-                {
-                    switch (current.Value.Record)
-                    {
-                        case SymbolRecordDef { Class: SymbolStorageClass.UNTAG, Type.Kind: SymbolTypeKind.UNION }:
-                            list.AddLast(current.Value);
-                            continue;
-                        case SymbolRecordDef { Class: SymbolStorageClass.MOU }:
-                            list.AddLast(current.Value);
-                            continue;
-                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
-                            list.AddLast(current.Value);
-                            collection.Unions.Add(list);
-                            return current;
-                    }
-                }
+                return ParseUnion(node, collection.Unions);
             }
 
             if (def.Class is SymbolStorageClass.EXT)
@@ -263,6 +212,78 @@ public sealed class UnitTest3 : UnitTestBase
         }
 
         throw new NotImplementedException(node.Value.Record.ToString());
+    }
+
+    private static LinkedListNode<Symbol> ParseEnumeration(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
+    {
+        var list = new LinkedList<Symbol>();
+
+        for (var node = source; node != null; node = node.Next)
+        {
+            switch (node.Value.Record)
+            {
+                case SymbolRecordDef { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM }:
+                    list.AddLast(node.Value);
+                    continue;
+                case SymbolRecordDef { Class: SymbolStorageClass.MOE }:
+                    list.AddLast(node.Value);
+                    continue;
+                case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
+                    list.AddLast(node.Value);
+                    target.Add(list);
+                    return node;
+            }
+        }
+
+        throw new InvalidOperationException();
+    }
+
+    private static LinkedListNode<Symbol> ParseUnion(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
+    {
+        var list = new LinkedList<Symbol>();
+
+        for (var node = source; node != null; node = node.Next)
+        {
+            switch (node.Value.Record)
+            {
+                case SymbolRecordDef { Class: SymbolStorageClass.UNTAG, Type.Kind: SymbolTypeKind.UNION }:
+                    list.AddLast(node.Value);
+                    continue;
+                case SymbolRecordDef { Class: SymbolStorageClass.MOU }:
+                    list.AddLast(node.Value);
+                    continue;
+                case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
+                    list.AddLast(node.Value);
+                    target.Add(list);
+                    return node;
+            }
+        }
+
+        throw new InvalidOperationException();
+    }
+
+    private static LinkedListNode<Symbol> ParseStructure(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
+    {
+        var list = new LinkedList<Symbol>();
+
+        for (var node = source; node != null; node = node.Next)
+        {
+            switch (node.Value.Record)
+            {
+                case SymbolRecordDef { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT }:
+                    list.AddLast(node.Value);
+                    continue;
+                case SymbolRecordDef { Class: SymbolStorageClass.MOS }:
+                    list.AddLast(node.Value);
+                    continue;
+                case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
+                    list.AddLast(node.Value);
+                    target.Add(list);
+                    return node;
+            }
+        }
+
+        throw new InvalidOperationException();
     }
 
     private static void CheckCollection(SymbolCollection collection)
