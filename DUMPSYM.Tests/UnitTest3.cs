@@ -48,11 +48,8 @@ public sealed class UnitTest3 : UnitTestBase
                     continue; // TODO 1 node
                 case SymbolRecordBlockStart:
                     continue; // TODO block end
-                case SymbolRecordDef:
-                    node = ParseDef(node, symbolCollection);
-                    continue;
-                case SymbolRecordDef2:
-                    node = ParseDef2(node, symbolCollection);
+                case ISymbolDefinition:
+                    node = ParseDefinition(node, symbolCollection);
                     continue;
                 case SymbolRecordEndSldInfo:
                     continue; // TODO 1 node
@@ -137,41 +134,11 @@ public sealed class UnitTest3 : UnitTestBase
     }
 
     [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
-    private LinkedListNode<Symbol> ParseDef2(LinkedListNode<Symbol> node, SymbolCollection symbolCollection)
+    private static LinkedListNode<Symbol> ParseDefinition(LinkedListNode<Symbol> node, SymbolCollection collection)
     {
         var symbol = node.Value;
 
-        if (symbol.Record is not SymbolRecordDef2 def2)
-        {
-            throw new ArgumentOutOfRangeException(nameof(node));
-        }
-
-        switch (def2.Class)
-        {
-            case SymbolStorageClass.EXT or SymbolStorageClass.STAT or SymbolStorageClass.TPDEF:
-            {
-                var list = def2.Class switch
-                {
-                    SymbolStorageClass.EXT   => symbolCollection.Externals,
-                    SymbolStorageClass.STAT  => symbolCollection.Statics,
-                    SymbolStorageClass.TPDEF => symbolCollection.TypeDefinitions,
-                    _                        => throw new InvalidOperationException()
-                };
-                list.Add(symbol);
-                return node;
-            }
-            default:
-                throw new InvalidOperationException(symbol.ToString());
-        }
-    }
-
-    [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
-    private LinkedListNode<Symbol> ParseDef(
-        LinkedListNode<Symbol> node, SymbolCollection collection)
-    {
-        var symbol = node.Value;
-
-        if (symbol.Record is not SymbolRecordDef def)
+        if (symbol.Record is not ISymbolDefinition def)
         {
             throw new ArgumentOutOfRangeException(nameof(node));
         }
