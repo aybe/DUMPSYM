@@ -76,7 +76,7 @@ public sealed class UnitTest3 : UnitTestBase
                 case ISymbolFunctionBlock:
                 case ISymbolDefinition:
                     continue;
-                case SymbolRecordFunctionEnd:
+                case ISymbolFunctionEnd:
                     return current;
                 default:
                     throw new NotImplementedException(node.Value.ToString());
