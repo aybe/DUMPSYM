@@ -34,9 +34,9 @@ public sealed class UnitTest3 : UnitTestBase
 
         var file = SymbolFile.Dump(stream);
 
-        var symbolCollection = new SymbolCollection();
-
         var symbols = new LinkedList<Symbol>(file.Symbols);
+
+        var registry = new SymbolRegistry();
 
         for (var node = symbols.First; node != null; node = node.Next)
         {
@@ -49,7 +49,7 @@ public sealed class UnitTest3 : UnitTestBase
                 case SymbolRecordBlockStart:
                     continue; // TODO block end
                 case ISymbolDefinition:
-                    node = ParseDefinition(node, symbolCollection);
+                    node = ParseDefinition(node, registry);
                     continue;
                 case SymbolRecordEndSldInfo:
                     continue; // TODO 1 node
@@ -82,7 +82,7 @@ public sealed class UnitTest3 : UnitTestBase
             }
         }
 
-        CheckCollection(symbolCollection);
+        CheckCollection(registry);
     }
 
     private static LinkedListNode<Symbol> ProcessFunctionStart(LinkedListNode<Symbol> node) // TODO merge with other?
@@ -136,7 +136,7 @@ public sealed class UnitTest3 : UnitTestBase
     [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
     [SuppressMessage("ReSharper", "SwitchStatementHandlesSomeKnownEnumValuesWithDefault")]
     [SuppressMessage("Style", "IDE0066:Convert switch statement to expression", Justification = "code coverage")]
-    private static LinkedListNode<Symbol> ParseDefinition(LinkedListNode<Symbol> node, SymbolCollection collection)
+    private static LinkedListNode<Symbol> ParseDefinition(LinkedListNode<Symbol> node, SymbolRegistry registry)
     {
         var symbol = node.Value;
 
@@ -148,21 +148,21 @@ public sealed class UnitTest3 : UnitTestBase
         switch (def.Class)
         {
             case SymbolStorageClass.ENTAG:
-                return ParseType(node, collection.Enumerations);
+                return ParseType(node, registry.Enumerations);
             case SymbolStorageClass.STRTAG:
-                return ParseType(node, collection.Structures);
+                return ParseType(node, registry.Structures);
             case SymbolStorageClass.UNTAG:
-                return ParseType(node, collection.Unions);
+                return ParseType(node, registry.Unions);
             case SymbolStorageClass.EXT:
-                return ParseItem(node, collection.Externals);
+                return ParseItem(node, registry.Externals);
             case SymbolStorageClass.FILE:
-                return ParseItem(node, collection.Files);
+                return ParseItem(node, registry.Files);
             case SymbolStorageClass.REG:
-                return ParseItem(node, collection.Registers);
+                return ParseItem(node, registry.Registers);
             case SymbolStorageClass.STAT:
-                return ParseItem(node, collection.Statics);
+                return ParseItem(node, registry.Statics);
             case SymbolStorageClass.TPDEF:
-                return ParseItem(node, collection.TypeDefinitions);
+                return ParseItem(node, registry.TypeDefinitions);
             default:
                 throw new NotImplementedException(node.Value.Record.ToString());
         }
@@ -205,40 +205,21 @@ public sealed class UnitTest3 : UnitTestBase
         throw new InvalidOperationException();
     }
 
-    private static void CheckCollection(SymbolCollection collection)
+    private static void CheckCollection(SymbolRegistry registry)
     {
-        foreach (var list in collection.Enumerations)
+        foreach (var list in registry.Enumerations)
         {
             Assert.AreNotEqual(1, list.Count);
         }
 
-        foreach (var list in collection.Structures)
+        foreach (var list in registry.Structures)
         {
             Assert.AreNotEqual(1, list.Count);
         }
 
-        foreach (var list in collection.Unions)
+        foreach (var list in registry.Unions)
         {
             Assert.AreNotEqual(1, list.Count);
         }
     }
-}
-
-public sealed class SymbolCollection
-{
-    public IList<Symbol> Externals { get; } = new List<Symbol>();
-
-    public IList<Symbol> Files { get; } = new List<Symbol>();
-
-    public IList<Symbol> Registers { get; } = new List<Symbol>();
-
-    public IList<Symbol> Statics { get; } = new List<Symbol>();
-
-    public IList<Symbol> TypeDefinitions { get; } = new List<Symbol>();
-
-    public IList<LinkedList<Symbol>> Enumerations { get; } = new List<LinkedList<Symbol>>();
-
-    public IList<LinkedList<Symbol>> Structures { get; } = new List<LinkedList<Symbol>>();
-
-    public IList<LinkedList<Symbol>> Unions { get; } = new List<LinkedList<Symbol>>();
 }
