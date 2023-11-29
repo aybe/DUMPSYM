@@ -165,49 +165,52 @@ public sealed class UnitTest3 : UnitTestBase
         LinkedListNode<Symbol> node, SymbolCollection collection)
     {
         var symbol = node.Value;
-        if (symbol.Record is SymbolRecordDef def)
+
+        if (symbol.Record is not SymbolRecordDef def)
         {
-            if (def.Class is SymbolStorageClass.TPDEF)
-            {
-                collection.TypeDefinitions.Add(new LinkedList<Symbol>(new[] { symbol }));
-                return node;
-            }
+            throw new ArgumentOutOfRangeException(nameof(node));
+        }
 
-            if (def.Class is SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG)
-            {
-                // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-                var list = def.Class switch
-                {
-                    SymbolStorageClass.ENTAG  => collection.Enumerations,
-                    SymbolStorageClass.STRTAG => collection.Structures,
-                    SymbolStorageClass.UNTAG  => collection.Unions,
-                    _                         => throw new InvalidOperationException()
-                };
+        if (def.Class is SymbolStorageClass.TPDEF)
+        {
+            collection.TypeDefinitions.Add(new LinkedList<Symbol>(new[] { symbol }));
+            return node;
+        }
 
-                return ParseType(node, list);
-            }
-
-            if (def.Class is SymbolStorageClass.EXT)
+        if (def.Class is SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG)
+        {
+            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+            var list = def.Class switch
             {
-                collection.Externals.Add(new LinkedList<Symbol>(new[] { symbol }));
-                return node;
-            }
+                SymbolStorageClass.ENTAG  => collection.Enumerations,
+                SymbolStorageClass.STRTAG => collection.Structures,
+                SymbolStorageClass.UNTAG  => collection.Unions,
+                _                         => throw new InvalidOperationException()
+            };
 
-            if (def.Class is SymbolStorageClass.STAT)
-            {
-                collection.Statics.Add(new LinkedList<Symbol>(new[] { symbol }));
-                return node;
-            }
+            return ParseType(node, list);
+        }
 
-            if (def.Class is SymbolStorageClass.FILE)
-            {
-                return node;
-            }
+        if (def.Class is SymbolStorageClass.EXT)
+        {
+            collection.Externals.Add(new LinkedList<Symbol>(new[] { symbol }));
+            return node;
+        }
 
-            if (def.Class is SymbolStorageClass.REG)
-            {
-                return node;
-            }
+        if (def.Class is SymbolStorageClass.STAT)
+        {
+            collection.Statics.Add(new LinkedList<Symbol>(new[] { symbol }));
+            return node;
+        }
+
+        if (def.Class is SymbolStorageClass.FILE)
+        {
+            return node;
+        }
+
+        if (def.Class is SymbolStorageClass.REG)
+        {
+            return node;
         }
 
         throw new NotImplementedException(node.Value.Record.ToString());
