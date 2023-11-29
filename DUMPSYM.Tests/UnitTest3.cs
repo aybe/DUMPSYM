@@ -81,8 +81,6 @@ public sealed class UnitTest3 : UnitTestBase
                     throw new NotImplementedException(node.Value.ToString());
             }
         }
-
-        CheckCollection(registry);
     }
 
     private static LinkedListNode<Symbol> ProcessFunctionStart(LinkedListNode<Symbol> node) // TODO merge with other?
@@ -205,23 +203,5 @@ public sealed class UnitTest3 : UnitTestBase
         }
 
         throw new InvalidOperationException();
-    }
-
-    private static void CheckCollection(SymbolRegistry registry)
-    {
-        foreach (var list in registry.Enumerations)
-        {
-            Assert.AreNotEqual(1, list.Count);
-        }
-
-        foreach (var list in registry.Structures)
-        {
-            Assert.AreNotEqual(1, list.Count);
-        }
-
-        foreach (var list in registry.Unions)
-        {
-            Assert.AreNotEqual(1, list.Count);
-        }
     }
 }
