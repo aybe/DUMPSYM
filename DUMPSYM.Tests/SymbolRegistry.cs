@@ -17,6 +17,8 @@ public sealed class SymbolRegistry
 
     public List<LinkedList<Symbol>> Enumerations { get; } = new();
 
+    public List<LinkedList<Symbol>> Functions { get; } = new();
+
     public List<LinkedList<Symbol>> Structures { get; } = new();
 
     public List<LinkedList<Symbol>> Unions { get; } = new();

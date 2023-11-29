@@ -50,7 +50,7 @@ public sealed class UnitTest3 : UnitTestBase
                 case SymbolRecordEndSldInfo:
                     continue; // TODO 1 node
                 case ISymbolFunction:
-                    node = ParseFunction(node);
+                    node = ParseFunction(node, registry.Functions);
                     continue;
                 case ISymbolLineModifier:
                     continue; // TODO 1 node
@@ -64,28 +64,36 @@ public sealed class UnitTest3 : UnitTestBase
         }
     }
 
-    private static LinkedListNode<Symbol> ParseFunction(LinkedListNode<Symbol> node)
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter", Justification = "performance")]
+    private static LinkedListNode<Symbol> ParseFunction(LinkedListNode<Symbol> source, List<LinkedList<Symbol>> target)
     {
-        for (var current = node; current != null; current = current.Next)
-        {
-            var record = current.Value.Record;
+        var list = new LinkedList<Symbol>();
 
-            switch (record)
+        for (var node = source; node != null; node = node.Next)
+        {
+            var symbol = node.Value;
+
+            switch (symbol.Record)
             {
                 case ISymbolFunction:
+                    list.AddLast(symbol);
                     continue;
                 case ISymbolFunctionBlock:
+                    list.AddLast(symbol);
                     continue;
                 case ISymbolDefinition:
+                    list.AddLast(symbol); // TODO should use ParseDefinition
                     continue;
                 case ISymbolFunctionEnd:
-                    return current;
+                    list.AddLast(symbol);
+                    target.Add(list);
+                    return node;
                 default:
-                    throw new NotImplementedException(node.Value.ToString());
+                    throw new NotImplementedException(source.Value.ToString());
             }
         }
 
-        throw new NotImplementedException(node.Value.ToString());
+        throw new NotImplementedException(source.Value.ToString());
     }
 
     [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
