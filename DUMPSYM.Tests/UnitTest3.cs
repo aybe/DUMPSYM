@@ -248,6 +248,11 @@ public sealed class UnitTest3 : UnitTestBase
                 collection.Statics.Add(new LinkedList<Symbol>(new[] { symbol }));
                 return node;
             }
+
+            if (def.Class is SymbolStorageClass.FILE)
+            {
+                return node;
+            }
         }
 
         throw new NotImplementedException(node.Value.Record.ToString());
