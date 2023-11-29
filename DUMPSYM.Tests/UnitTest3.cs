@@ -136,7 +136,7 @@ public sealed class UnitTest3 : UnitTestBase
 
             if (def2.Class is SymbolStorageClass.STAT)
             {
-                symbolCollection.Externals.Add(new LinkedList<Symbol>(new[] { node.Value }));
+                symbolCollection.Statics.Add(new LinkedList<Symbol>(new[] { node.Value }));
                 return node;
             }
         }
@@ -208,7 +208,7 @@ public sealed class UnitTest3 : UnitTestBase
 
             if (def.Class is SymbolStorageClass.STAT)
             {
-                collection.Externals.Add(new LinkedList<Symbol>(new[] { symbol }));
+                collection.Statics.Add(new LinkedList<Symbol>(new[] { symbol }));
                 return node;
             }
         }
@@ -220,6 +220,8 @@ public sealed class UnitTest3 : UnitTestBase
 public class SymbolCollection
 {
     public List<LinkedList<Symbol>> Externals { get; set; } = new(); // TODO only 1 node
+
+    public List<LinkedList<Symbol>> Statics { get; set; } = new(); // TODO only 1 node
 
     public List<LinkedList<Symbol>> TypeDefinitions { get; set; } = new(); // TODO only 1 node
 
