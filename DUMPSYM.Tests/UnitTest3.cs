@@ -73,7 +73,9 @@ public sealed class UnitTest3 : UnitTestBase
             switch (record)
             {
                 case ISymbolFunction:
+                    continue;
                 case ISymbolFunctionBlock:
+                    continue;
                 case ISymbolDefinition:
                     continue;
                 case ISymbolFunctionEnd:
