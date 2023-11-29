@@ -141,19 +141,19 @@ public sealed class UnitTest3 : UnitTestBase
         {
             if (def2.Class is SymbolStorageClass.TPDEF)
             {
-                symbolCollection.TypeDefinitions.Add(new LinkedList<Symbol>(new[] { node.Value }));
+                symbolCollection.TypeDefinitions.Add(node.Value);
                 return node;
             }
 
             if (def2.Class is SymbolStorageClass.EXT)
             {
-                symbolCollection.Externals.Add(new LinkedList<Symbol>(new[] { node.Value }));
+                symbolCollection.Externals.Add(node.Value);
                 return node;
             }
 
             if (def2.Class is SymbolStorageClass.STAT)
             {
-                symbolCollection.Statics.Add(new LinkedList<Symbol>(new[] { node.Value }));
+                symbolCollection.Statics.Add(node.Value);
                 return node;
             }
         }
@@ -174,7 +174,7 @@ public sealed class UnitTest3 : UnitTestBase
         switch (def.Class)
         {
             case SymbolStorageClass.TPDEF:
-                collection.TypeDefinitions.Add(new LinkedList<Symbol>(new[] { symbol }));
+                collection.TypeDefinitions.Add(symbol);
                 return node;
             case SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG:
             {
@@ -190,10 +190,10 @@ public sealed class UnitTest3 : UnitTestBase
                 return ParseType(node, list);
             }
             case SymbolStorageClass.EXT:
-                collection.Externals.Add(new LinkedList<Symbol>(new[] { symbol }));
+                collection.Externals.Add(symbol);
                 return node;
             case SymbolStorageClass.STAT:
-                collection.Statics.Add(new LinkedList<Symbol>(new[] { symbol }));
+                collection.Statics.Add(symbol);
                 return node;
             case SymbolStorageClass.FILE:
                 return node;
@@ -234,21 +234,6 @@ public sealed class UnitTest3 : UnitTestBase
 
     private static void CheckCollection(SymbolCollection collection)
     {
-        foreach (var list in collection.Externals)
-        {
-            Assert.AreEqual(1, list.Count);
-        }
-
-        foreach (var list in collection.Statics)
-        {
-            Assert.AreEqual(1, list.Count);
-        }
-
-        foreach (var list in collection.TypeDefinitions)
-        {
-            Assert.AreEqual(1, list.Count);
-        }
-
         foreach (var list in collection.Enumerations)
         {
             Assert.AreNotEqual(1, list.Count);
@@ -268,11 +253,11 @@ public sealed class UnitTest3 : UnitTestBase
 
 public class SymbolCollection
 {
-    public List<LinkedList<Symbol>> Externals { get; set; } = new(); // TODO only 1 node
+    public List<Symbol> Externals { get; set; } = new(); // TODO only 1 node
 
-    public List<LinkedList<Symbol>> Statics { get; set; } = new(); // TODO only 1 node
+    public List<Symbol> Statics { get; set; } = new(); // TODO only 1 node
 
-    public List<LinkedList<Symbol>> TypeDefinitions { get; set; } = new(); // TODO only 1 node
+    public List<Symbol> TypeDefinitions { get; set; } = new(); // TODO only 1 node
 
     public List<LinkedList<Symbol>> Enumerations { get; set; } = new();
 
