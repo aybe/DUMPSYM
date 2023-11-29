@@ -43,50 +43,43 @@ public sealed class UnitTest3 : UnitTestBase
 
             switch (record)
             {
-                case SymbolRecordBlockEnd symbolRecordBlockEnd:
+                case SymbolRecordBlockEnd:
                     continue; // TODO 1 node
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordBlockStart symbolRecordBlockStart:
+                case SymbolRecordBlockStart:
                     continue; // TODO block end
-
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordDef symbolRecordDef:
+                case SymbolRecordDef:
                     node = ParseDef(node, symbolCollection);
                     continue;
-                case SymbolRecordDef2 symbolRecordDef2:
+                case SymbolRecordDef2:
                     node = ParseDef2(node, symbolCollection);
                     continue;
-                case SymbolRecordEndSldInfo symbolRecordEndSldInfo:
+                case SymbolRecordEndSldInfo:
                     continue; // TODO 1 node
-                case SymbolRecordFunction2Start symbolRecordFunction2Start:
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordFunctionEnd symbolRecordFunctionEnd:
+                case SymbolRecordFunction2Start:
+                    throw new NotImplementedException(node.Value.ToString());
+                case SymbolRecordFunctionEnd:
                     continue; // TODO 1 node
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordFunctionStart symbolRecordFunctionStart:
+                case SymbolRecordFunctionStart:
                     node = NewMethod(node);
                     continue; // TODO block start/end, function end + Def2 class AUTO type STRUCT*
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordIncSldLineNum symbolRecordIncSldLineNum:
+                case SymbolRecordIncSldLineNum:
                     continue; // TODO 1 node
-                case SymbolRecordIncSldLineNumByByte symbolRecordIncSldLineNumByByte:
+                case SymbolRecordIncSldLineNumByByte:
                     continue; // TODO 1 node
-                case SymbolRecordIncSldLineNumByWord symbolRecordIncSldLineNumByWord:
+                case SymbolRecordIncSldLineNumByWord:
                     continue; // TODO 1 node
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordName symbolRecordName:
+                case SymbolRecordName:
                     continue; // TODO 1 node
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordOverlay symbolRecordOverlay:
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordSetOverlay symbolRecordSetOverlay:
-                    throw new NotImplementedException(record.ToString());
-                case SymbolRecordSetSldLineNum symbolRecordSetSldLineNum:
+                case SymbolRecordOverlay:
+                    throw new NotImplementedException(node.Value.ToString());
+                case SymbolRecordSetOverlay:
+                    throw new NotImplementedException(node.Value.ToString());
+                case SymbolRecordSetSldLineNum:
                     continue; // TODO 1 node
-                case SymbolRecordSetSldToLineOfFile symbolRecordSetSldToLineOfFile:
+                case SymbolRecordSetSldToLineOfFile:
                     continue; // TODO 1 node
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(record));
+                    throw new NotImplementedException(node.Value.ToString());
             }
         }
     }
