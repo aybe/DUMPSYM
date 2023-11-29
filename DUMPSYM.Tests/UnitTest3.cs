@@ -157,11 +157,13 @@ public sealed class UnitTest3 : UnitTestBase
 
                 return ParseType(node, list);
             }
-            case SymbolStorageClass.EXT or SymbolStorageClass.STAT or SymbolStorageClass.TPDEF:
+            case SymbolStorageClass.EXT or SymbolStorageClass.FILE or SymbolStorageClass.REG or SymbolStorageClass.STAT or SymbolStorageClass.TPDEF:
             {
                 var list = def.Class switch
                 {
                     SymbolStorageClass.EXT   => collection.Externals,
+                    SymbolStorageClass.FILE  => collection.Files,
+                    SymbolStorageClass.REG   => collection.Registers,
                     SymbolStorageClass.STAT  => collection.Statics,
                     SymbolStorageClass.TPDEF => collection.TypeDefinitions,
                     _                        => throw new InvalidOperationException()
@@ -169,10 +171,6 @@ public sealed class UnitTest3 : UnitTestBase
                 list.Add(symbol);
                 return node;
             }
-            case SymbolStorageClass.FILE:
-                return node;
-            case SymbolStorageClass.REG:
-                return node;
             default:
                 throw new NotImplementedException(node.Value.Record.ToString());
         }
@@ -228,6 +226,10 @@ public sealed class UnitTest3 : UnitTestBase
 public class SymbolCollection
 {
     public List<Symbol> Externals { get; set; } = new(); // TODO only 1 node
+
+    public List<Symbol> Files { get; set; } = new(); // TODO only 1 node
+
+    public List<Symbol> Registers { get; set; } = new(); // TODO only 1 node
 
     public List<Symbol> Statics { get; set; } = new(); // TODO only 1 node
 
