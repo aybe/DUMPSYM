@@ -177,7 +177,7 @@ public sealed class UnitTest3 : UnitTestBase
             {
                 var list = new LinkedList<Symbol>();
 
-                for (var current = node.Next; current != null; current = current.Next)
+                for (var current = node; current != null; current = current.Next)
                 {
                     switch (current.Value.Record)
                     {
@@ -199,7 +199,7 @@ public sealed class UnitTest3 : UnitTestBase
             {
                 var list = new LinkedList<Symbol>();
 
-                for (var current = node.Next; current != null; current = current.Next)
+                for (var current = node; current != null; current = current.Next)
                 {
                     switch (current.Value.Record)
                     {
@@ -221,7 +221,7 @@ public sealed class UnitTest3 : UnitTestBase
             {
                 var list = new LinkedList<Symbol>();
 
-                for (var current = node.Next; current != null; current = current.Next)
+                for (var current = node; current != null; current = current.Next)
                 {
                     switch (current.Value.Record)
                     {
