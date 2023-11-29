@@ -168,7 +168,8 @@ public sealed class UnitTest3 : UnitTestBase
         }
     }
 
-    private static LinkedListNode<Symbol> ParseItem(LinkedListNode<Symbol> node, ICollection<Symbol> list)
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter", Justification = "performance")]
+    private static LinkedListNode<Symbol> ParseItem(LinkedListNode<Symbol> node, List<Symbol> list)
     {
         var symbol = node.Value;
 
@@ -177,7 +178,8 @@ public sealed class UnitTest3 : UnitTestBase
         return node;
     }
 
-    private static LinkedListNode<Symbol> ParseType(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter", Justification = "performance")]
+    private static LinkedListNode<Symbol> ParseType(LinkedListNode<Symbol> source, List<LinkedList<Symbol>> target)
     {
         var list = new LinkedList<Symbol>();
 

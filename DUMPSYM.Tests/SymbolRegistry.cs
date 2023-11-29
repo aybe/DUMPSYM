@@ -1,20 +1,23 @@
-﻿namespace DUMPSYM.Tests;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace DUMPSYM.Tests;
+
+[SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "buggy")]
 public sealed class SymbolRegistry
 {
-    public IList<Symbol> Externals { get; } = new List<Symbol>();
+    public List<Symbol> Externals { get; } = new();
 
-    public IList<Symbol> Files { get; } = new List<Symbol>();
+    public List<Symbol> Files { get; } = new();
 
-    public IList<Symbol> Registers { get; } = new List<Symbol>();
+    public List<Symbol> Registers { get; } = new();
 
-    public IList<Symbol> Statics { get; } = new List<Symbol>();
+    public List<Symbol> Statics { get; } = new();
 
-    public IList<Symbol> TypeDefinitions { get; } = new List<Symbol>();
+    public List<Symbol> TypeDefinitions { get; } = new();
 
-    public IList<LinkedList<Symbol>> Enumerations { get; } = new List<LinkedList<Symbol>>();
+    public List<LinkedList<Symbol>> Enumerations { get; } = new();
 
-    public IList<LinkedList<Symbol>> Structures { get; } = new List<LinkedList<Symbol>>();
+    public List<LinkedList<Symbol>> Structures { get; } = new();
 
-    public IList<LinkedList<Symbol>> Unions { get; } = new List<LinkedList<Symbol>>();
+    public List<LinkedList<Symbol>> Unions { get; } = new();
 }
