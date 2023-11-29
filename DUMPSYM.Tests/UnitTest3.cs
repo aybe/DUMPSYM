@@ -187,7 +187,7 @@ public sealed class UnitTest3 : UnitTestBase
                         case SymbolRecordDef { Class: SymbolStorageClass.MOE }:
                             list.AddLast(current.Value);
                             continue;
-                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL }:
+                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
                             list.AddLast(current.Value);
                             collection.Enumerations.Add(list);
                             return current;
