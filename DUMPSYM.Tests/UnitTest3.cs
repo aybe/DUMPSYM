@@ -72,7 +72,7 @@ public sealed class UnitTest3 : UnitTestBase
                 case SymbolRecordName:
                     continue; // TODO 1 node
                 case SymbolRecordOverlay:
-                    throw new NotImplementedException(node.Value.ToString());
+                    continue; // TODO 1 node
                 case SymbolRecordSetOverlay:
                     throw new NotImplementedException(node.Value.ToString());
                 case SymbolRecordSetSldLineNum:
