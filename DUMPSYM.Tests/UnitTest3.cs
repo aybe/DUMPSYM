@@ -173,19 +173,18 @@ public sealed class UnitTest3 : UnitTestBase
                 return node;
             }
 
-            if (def.Class is SymbolStorageClass.ENTAG)
+            if (def.Class is SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG)
             {
-                return ParseEnumeration(node, collection.Enumerations);
-            }
+                // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+                var list = def.Class switch
+                {
+                    SymbolStorageClass.ENTAG  => collection.Enumerations,
+                    SymbolStorageClass.STRTAG => collection.Structures,
+                    SymbolStorageClass.UNTAG  => collection.Unions,
+                    _                         => throw new InvalidOperationException()
+                };
 
-            if (def.Class is SymbolStorageClass.STRTAG)
-            {
-                return ParseStructure(node, collection.Structures);
-            }
-
-            if (def.Class is SymbolStorageClass.UNTAG)
-            {
-                return ParseUnion(node, collection.Unions);
+                return ParseType(node, list);
             }
 
             if (def.Class is SymbolStorageClass.EXT)
@@ -214,78 +213,28 @@ public sealed class UnitTest3 : UnitTestBase
         throw new NotImplementedException(node.Value.Record.ToString());
     }
 
-    private static LinkedListNode<Symbol> ParseEnumeration(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
+    private static LinkedListNode<Symbol> ParseType(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
     {
         var list = new LinkedList<Symbol>();
 
         for (var node = source; node != null; node = node.Next)
         {
-            switch (node.Value.Record)
+            var symbol = node.Value;
+
+            switch (symbol.Record)
             {
-                case SymbolRecordDef { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM }:
-                    list.AddLast(node.Value);
+                case ISymbolDefinition { Class: SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG }:
+                    list.AddLast(symbol);
                     continue;
-                case SymbolRecordDef { Class: SymbolStorageClass.MOE }:
-                    list.AddLast(node.Value);
+                case ISymbolDefinition { Class: SymbolStorageClass.FIELD or SymbolStorageClass.MOE or SymbolStorageClass.MOS or SymbolStorageClass.MOU }:
+                    list.AddLast(symbol);
                     continue;
-                case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
-                    list.AddLast(node.Value);
+                case ISymbolDefinition { Class: SymbolStorageClass.EOS }:
+                    list.AddLast(symbol);
                     target.Add(list);
                     return node;
                 default:
-                    throw new NotImplementedException(node.Value.ToString());
-            }
-        }
-
-        throw new InvalidOperationException();
-    }
-
-    private static LinkedListNode<Symbol> ParseUnion(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
-    {
-        var list = new LinkedList<Symbol>();
-
-        for (var node = source; node != null; node = node.Next)
-        {
-            switch (node.Value.Record)
-            {
-                case SymbolRecordDef { Class: SymbolStorageClass.UNTAG, Type.Kind: SymbolTypeKind.UNION }:
-                    list.AddLast(node.Value);
-                    continue;
-                case SymbolRecordDef { Class: SymbolStorageClass.MOU }:
-                    list.AddLast(node.Value);
-                    continue;
-                case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
-                    list.AddLast(node.Value);
-                    target.Add(list);
-                    return node;
-                default:
-                    throw new NotImplementedException(node.Value.ToString());
-            }
-        }
-
-        throw new InvalidOperationException();
-    }
-
-    private static LinkedListNode<Symbol> ParseStructure(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
-    {
-        var list = new LinkedList<Symbol>();
-
-        for (var node = source; node != null; node = node.Next)
-        {
-            switch (node.Value.Record)
-            {
-                case SymbolRecordDef { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT }:
-                    list.AddLast(node.Value);
-                    continue;
-                case SymbolRecordDef { Class: SymbolStorageClass.MOS }:
-                    list.AddLast(node.Value);
-                    continue;
-                case SymbolRecordDef2 { Class: SymbolStorageClass.EOS }:
-                    list.AddLast(node.Value);
-                    target.Add(list);
-                    return node;
-                default:
-                    throw new NotImplementedException(node.Value.ToString());
+                    throw new NotImplementedException(symbol.ToString());
             }
         }
 
