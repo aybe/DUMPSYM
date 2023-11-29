@@ -89,7 +89,7 @@ public sealed class UnitTest3 : UnitTestBase
                     target.Add(list);
                     return node;
                 default:
-                    throw new NotImplementedException(source.Value.ToString());
+                    throw new NotImplementedException(symbol.ToString());
             }
         }
 
@@ -127,7 +127,7 @@ public sealed class UnitTest3 : UnitTestBase
             case SymbolStorageClass.TPDEF:
                 return ParseItem(node, registry.TypeDefinitions);
             default:
-                throw new NotImplementedException(node.Value.Record.ToString());
+                throw new NotImplementedException(symbol.ToString());
         }
     }
 
@@ -167,6 +167,6 @@ public sealed class UnitTest3 : UnitTestBase
             }
         }
 
-        throw new InvalidOperationException();
+        throw new NotImplementedException(source.Value.ToString());
     }
 }
