@@ -83,6 +83,8 @@ public sealed class UnitTest3 : UnitTestBase
                     throw new NotImplementedException(node.Value.ToString());
             }
         }
+
+        CheckCollection(symbolCollection);
     }
 
     private static LinkedListNode<Symbol> ProcessFunctionStart(LinkedListNode<Symbol> node) // TODO merge with other?
@@ -261,6 +263,34 @@ public sealed class UnitTest3 : UnitTestBase
         }
 
         throw new NotImplementedException(node.Value.Record.ToString());
+    }
+
+    private static void CheckCollection(SymbolCollection collection)
+    {
+        foreach (var list in collection.Externals)
+        {
+            Assert.AreEqual(1, list.Count);
+        }
+
+        foreach (var list in collection.Statics)
+        {
+            Assert.AreEqual(1, list.Count);
+        }
+
+        foreach (var list in collection.TypeDefinitions)
+        {
+            Assert.AreEqual(1, list.Count);
+        }
+
+        foreach (var list in collection.Structures)
+        {
+            Assert.AreNotEqual(1, list.Count);
+        }
+
+        foreach (var list in collection.Unions)
+        {
+            Assert.AreNotEqual(1, list.Count);
+        }
     }
 }
 
