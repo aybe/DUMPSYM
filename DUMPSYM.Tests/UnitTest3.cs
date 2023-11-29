@@ -44,21 +44,14 @@ public sealed class UnitTest3 : UnitTestBase
 
             switch (record)
             {
-                case ISymbolFunctionBlock:
-                    continue; // TODO 1 node
                 case ISymbolDefinition:
                     node = ParseDefinition(node, registry);
                     continue;
                 case SymbolRecordEndSldInfo:
                     continue; // TODO 1 node
-                case SymbolRecordFunction2Start:
-                    node = ProcessFunction2Start(node);
+                case ISymbolFunction:
+                    node = ParseFunction(node);
                     continue;
-                case SymbolRecordFunctionEnd:
-                    continue; // TODO 1 node
-                case SymbolRecordFunctionStart:
-                    node = ProcessFunctionStart(node);
-                    continue; // TODO block start/end, function end + Def2 class AUTO type STRUCT*
                 case SymbolRecordIncSldLineNum:
                     continue; // TODO 1 node
                 case SymbolRecordIncSldLineNumByByte:
@@ -81,7 +74,7 @@ public sealed class UnitTest3 : UnitTestBase
         }
     }
 
-    private static LinkedListNode<Symbol> ProcessFunctionStart(LinkedListNode<Symbol> node) // TODO merge with other?
+    private static LinkedListNode<Symbol> ParseFunction(LinkedListNode<Symbol> node)
     {
         for (var current = node; current != null; current = current.Next)
         {
@@ -89,35 +82,9 @@ public sealed class UnitTest3 : UnitTestBase
 
             switch (record)
             {
-                case SymbolRecordFunctionStart:
-                case SymbolRecordBlockStart:
-                case SymbolRecordBlockEnd:
-                case SymbolRecordDef:
-                case SymbolRecordDef2:
-                    continue;
-                case SymbolRecordFunctionEnd:
-                    return current;
-                default:
-                    throw new NotImplementedException(node.Value.ToString());
-            }
-        }
-
-        throw new NotImplementedException(node.Value.ToString());
-    }
-
-    private static LinkedListNode<Symbol> ProcessFunction2Start(LinkedListNode<Symbol> node) // TODO merge with other?
-    {
-        for (var current = node; current != null; current = current.Next)
-        {
-            var record = current.Value.Record;
-
-            switch (record)
-            {
-                case SymbolRecordFunction2Start:
-                case SymbolRecordBlockStart:
-                case SymbolRecordBlockEnd:
-                case SymbolRecordDef:
-                case SymbolRecordDef2:
+                case ISymbolFunction:
+                case ISymbolFunctionBlock:
+                case ISymbolDefinition:
                     continue;
                 case SymbolRecordFunctionEnd:
                     return current;

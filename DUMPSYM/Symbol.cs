@@ -8,6 +8,6 @@ public sealed class Symbol(SymbolHeader header, SymbolRecord record)
 
     public override string ToString()
     {
-        return $"{Header}";
+        return $"{Header} {Record}";
     }
 }
