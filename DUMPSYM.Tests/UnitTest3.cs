@@ -1,27 +1,41 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Reflection;
 
 namespace DUMPSYM.Tests;
 
 [TestClass]
 public sealed class UnitTest3 : UnitTestBase
 {
-    private static SymbolFile SymbolFile { get; set; } = null!;
-
-    [ClassInitialize]
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
-    public static void ClassInitialize(TestContext context)
+    public static IEnumerable<object[]> DumpSymFileData()
     {
-        using var stream = File.OpenRead(@"C:\Temp\PSX\SYM\FILE_023.SYM");
+        var path = UnitTestDataUtility.GetFullPath(".SYM file list.txt");
 
-        SymbolFile = SymbolFile.Dump(stream);
+        var text = File.ReadAllLines(path);
+
+        foreach (var line in text)
+        {
+            if (File.Exists(line))
+            {
+                yield return new object[] { line };
+            }
+        }
+    }
+
+    public static string DumpSymFileName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name} {Path.GetFileName(data[0].ToString()!)}";
     }
 
     [TestMethod]
-    public void ProcessSymbols()
+    [DynamicData(nameof(DumpSymFileData), DynamicDataSourceType.Method, DynamicDataDisplayName = nameof(DumpSymFileName))]
+    public void DumpSymFile(string path)
     {
+        using var stream = File.OpenRead(path);
+
+        var file = SymbolFile.Dump(stream);
+
         var symbolCollection = new SymbolCollection();
 
-        var symbols = new LinkedList<Symbol>(SymbolFile.Symbols);
+        var symbols = new LinkedList<Symbol>(file.Symbols);
 
         for (var node = symbols.First; node != null; node = node.Next)
         {
