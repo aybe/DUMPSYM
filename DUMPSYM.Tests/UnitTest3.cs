@@ -224,21 +224,21 @@ public sealed class UnitTest3 : UnitTestBase
     }
 }
 
-public class SymbolCollection
+public sealed class SymbolCollection
 {
-    public List<Symbol> Externals { get; set; } = new(); // TODO only 1 node
+    public IList<Symbol> Externals { get; } = new List<Symbol>();
 
-    public List<Symbol> Files { get; set; } = new(); // TODO only 1 node
+    public IList<Symbol> Files { get; } = new List<Symbol>();
 
-    public List<Symbol> Registers { get; set; } = new(); // TODO only 1 node
+    public IList<Symbol> Registers { get; } = new List<Symbol>();
 
-    public List<Symbol> Statics { get; set; } = new(); // TODO only 1 node
+    public IList<Symbol> Statics { get; } = new List<Symbol>();
 
-    public List<Symbol> TypeDefinitions { get; set; } = new(); // TODO only 1 node
+    public IList<Symbol> TypeDefinitions { get; } = new List<Symbol>();
 
-    public List<LinkedList<Symbol>> Enumerations { get; set; } = new();
+    public IList<LinkedList<Symbol>> Enumerations { get; } = new List<LinkedList<Symbol>>();
 
-    public List<LinkedList<Symbol>> Structures { get; set; } = new();
+    public IList<LinkedList<Symbol>> Structures { get; } = new List<LinkedList<Symbol>>();
 
-    public List<LinkedList<Symbol>> Unions { get; set; } = new();
+    public IList<LinkedList<Symbol>> Unions { get; } = new List<LinkedList<Symbol>>();
 }
