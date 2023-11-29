@@ -171,6 +171,28 @@ public sealed class UnitTest3 : UnitTestBase
                 return node;
             }
 
+            if (def.Class is SymbolStorageClass.ENTAG)
+            {
+                var list = new LinkedList<Symbol>();
+
+                for (var current = node.Next; current != null; current = current.Next)
+                {
+                    switch (current.Value.Record)
+                    {
+                        case SymbolRecordDef { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM }:
+                            list.AddLast(current.Value);
+                            continue;
+                        case SymbolRecordDef { Class: SymbolStorageClass.MOE }:
+                            list.AddLast(current.Value);
+                            continue;
+                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS , Type.Kind: SymbolTypeKind.NULL}:
+                            list.AddLast(current.Value);
+                            collection.Structures.Add(list);
+                            return current;
+                    }
+                }
+            }
+
             if (def.Class is SymbolStorageClass.STRTAG)
             {
                 var list = new LinkedList<Symbol>();
