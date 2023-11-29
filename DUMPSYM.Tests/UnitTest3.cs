@@ -232,6 +232,8 @@ public sealed class UnitTest3 : UnitTestBase
                     list.AddLast(node.Value);
                     target.Add(list);
                     return node;
+                default:
+                    throw new NotImplementedException(node.Value.ToString());
             }
         }
 
@@ -256,6 +258,8 @@ public sealed class UnitTest3 : UnitTestBase
                     list.AddLast(node.Value);
                     target.Add(list);
                     return node;
+                default:
+                    throw new NotImplementedException(node.Value.ToString());
             }
         }
 
@@ -280,6 +284,8 @@ public sealed class UnitTest3 : UnitTestBase
                     list.AddLast(node.Value);
                     target.Add(list);
                     return node;
+                default:
+                    throw new NotImplementedException(node.Value.ToString());
             }
         }
 
