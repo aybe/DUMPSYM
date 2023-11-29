@@ -136,30 +136,33 @@ public sealed class UnitTest3 : UnitTestBase
         throw new NotImplementedException(node.Value.ToString());
     }
 
+    [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
     private LinkedListNode<Symbol> ParseDef2(LinkedListNode<Symbol> node, SymbolCollection symbolCollection)
     {
-        if (node.Value.Record is SymbolRecordDef2 def2)
+        var symbol = node.Value;
+
+        if (symbol.Record is not SymbolRecordDef2 def2)
         {
-            if (def2.Class is SymbolStorageClass.TPDEF)
-            {
-                symbolCollection.TypeDefinitions.Add(node.Value);
-                return node;
-            }
-
-            if (def2.Class is SymbolStorageClass.EXT)
-            {
-                symbolCollection.Externals.Add(node.Value);
-                return node;
-            }
-
-            if (def2.Class is SymbolStorageClass.STAT)
-            {
-                symbolCollection.Statics.Add(node.Value);
-                return node;
-            }
+            throw new ArgumentOutOfRangeException(nameof(node));
         }
 
-        throw new InvalidOperationException(node.Value.ToString());
+        switch (def2.Class)
+        {
+            case SymbolStorageClass.EXT or SymbolStorageClass.STAT or SymbolStorageClass.TPDEF:
+            {
+                var list = def2.Class switch
+                {
+                    SymbolStorageClass.EXT   => symbolCollection.Externals,
+                    SymbolStorageClass.STAT  => symbolCollection.Statics,
+                    SymbolStorageClass.TPDEF => symbolCollection.TypeDefinitions,
+                    _                        => throw new InvalidOperationException()
+                };
+                list.Add(symbol);
+                return node;
+            }
+            default:
+                throw new InvalidOperationException(symbol.ToString());
+        }
     }
 
     [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
