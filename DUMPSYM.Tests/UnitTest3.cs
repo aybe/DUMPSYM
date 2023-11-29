@@ -56,9 +56,7 @@ public sealed class UnitTest3 : UnitTestBase
                     continue; // TODO 1 node
                 case SymbolRecordName:
                     continue; // TODO 1 node
-                case SymbolRecordOverlay:
-                    continue; // TODO 1 node
-                case SymbolRecordSetOverlay:
+                case ISymbolOverlay:
                     continue; // TODO 1 node
                 default:
                     throw new NotImplementedException(node.Value.ToString());

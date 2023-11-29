@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordOverlay(Stream stream) : SymbolRecord
+public sealed class SymbolRecordOverlay(Stream stream) : SymbolRecord, ISymbolOverlay
 {
     public uint Length { get; } = stream.Read<uint>();
 
