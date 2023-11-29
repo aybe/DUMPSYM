@@ -189,7 +189,7 @@ public sealed class UnitTest3 : UnitTestBase
                             continue;
                         case SymbolRecordDef2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL }:
                             list.AddLast(current.Value);
-                            collection.Structures.Add(list);
+                            collection.Enumerations.Add(list);
                             return current;
                     }
                 }
@@ -282,6 +282,11 @@ public sealed class UnitTest3 : UnitTestBase
             Assert.AreEqual(1, list.Count);
         }
 
+        foreach (var list in collection.Enumerations)
+        {
+            Assert.AreNotEqual(1, list.Count);
+        }
+
         foreach (var list in collection.Structures)
         {
             Assert.AreNotEqual(1, list.Count);
@@ -301,6 +306,8 @@ public class SymbolCollection
     public List<LinkedList<Symbol>> Statics { get; set; } = new(); // TODO only 1 node
 
     public List<LinkedList<Symbol>> TypeDefinitions { get; set; } = new(); // TODO only 1 node
+
+    public List<LinkedList<Symbol>> Enumerations { get; set; } = new();
 
     public List<LinkedList<Symbol>> Structures { get; set; } = new();
 
