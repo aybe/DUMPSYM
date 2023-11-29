@@ -44,10 +44,8 @@ public sealed class UnitTest3 : UnitTestBase
 
             switch (record)
             {
-                case SymbolRecordBlockEnd:
+                case ISymbolFunctionBlock:
                     continue; // TODO 1 node
-                case SymbolRecordBlockStart:
-                    continue; // TODO block end
                 case ISymbolDefinition:
                     node = ParseDefinition(node, registry);
                     continue;

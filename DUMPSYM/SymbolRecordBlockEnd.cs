@@ -2,7 +2,7 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordBlockEnd(Stream stream) : SymbolRecord
+public sealed class SymbolRecordBlockEnd(Stream stream) : SymbolRecord, ISymbolFunctionBlock
 {
     public uint Line { get; } = stream.Read<uint>();
 
