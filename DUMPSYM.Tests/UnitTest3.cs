@@ -185,7 +185,7 @@ public sealed class UnitTest3 : UnitTestBase
                         case SymbolRecordDef { Class: SymbolStorageClass.MOE }:
                             list.AddLast(current.Value);
                             continue;
-                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS , Type.Kind: SymbolTypeKind.NULL}:
+                        case SymbolRecordDef2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL }:
                             list.AddLast(current.Value);
                             collection.Structures.Add(list);
                             return current;
@@ -250,6 +250,11 @@ public sealed class UnitTest3 : UnitTestBase
             }
 
             if (def.Class is SymbolStorageClass.FILE)
+            {
+                return node;
+            }
+
+            if (def.Class is SymbolStorageClass.REG)
             {
                 return node;
             }
