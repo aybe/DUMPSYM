@@ -133,7 +133,9 @@ public sealed class UnitTest3 : UnitTestBase
         throw new NotImplementedException(node.Value.ToString());
     }
 
-    [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
+    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
+    [SuppressMessage("ReSharper", "SwitchStatementHandlesSomeKnownEnumValuesWithDefault")]
+    [SuppressMessage("Style", "IDE0066:Convert switch statement to expression", Justification = "code coverage")]
     private static LinkedListNode<Symbol> ParseDefinition(LinkedListNode<Symbol> node, SymbolCollection collection)
     {
         var symbol = node.Value;
@@ -145,35 +147,34 @@ public sealed class UnitTest3 : UnitTestBase
 
         switch (def.Class)
         {
-            case SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG:
-            {
-                var list = def.Class switch
-                {
-                    SymbolStorageClass.ENTAG  => collection.Enumerations,
-                    SymbolStorageClass.STRTAG => collection.Structures,
-                    SymbolStorageClass.UNTAG  => collection.Unions,
-                    _                         => throw new InvalidOperationException()
-                };
-
-                return ParseType(node, list);
-            }
-            case SymbolStorageClass.EXT or SymbolStorageClass.FILE or SymbolStorageClass.REG or SymbolStorageClass.STAT or SymbolStorageClass.TPDEF:
-            {
-                var list = def.Class switch
-                {
-                    SymbolStorageClass.EXT   => collection.Externals,
-                    SymbolStorageClass.FILE  => collection.Files,
-                    SymbolStorageClass.REG   => collection.Registers,
-                    SymbolStorageClass.STAT  => collection.Statics,
-                    SymbolStorageClass.TPDEF => collection.TypeDefinitions,
-                    _                        => throw new InvalidOperationException()
-                };
-                list.Add(symbol);
-                return node;
-            }
+            case SymbolStorageClass.ENTAG:
+                return ParseType(node, collection.Enumerations);
+            case SymbolStorageClass.STRTAG:
+                return ParseType(node, collection.Structures);
+            case SymbolStorageClass.UNTAG:
+                return ParseType(node, collection.Unions);
+            case SymbolStorageClass.EXT:
+                return ParseItem(node, collection.Externals);
+            case SymbolStorageClass.FILE:
+                return ParseItem(node, collection.Files);
+            case SymbolStorageClass.REG:
+                return ParseItem(node, collection.Registers);
+            case SymbolStorageClass.STAT:
+                return ParseItem(node, collection.Statics);
+            case SymbolStorageClass.TPDEF:
+                return ParseItem(node, collection.TypeDefinitions);
             default:
                 throw new NotImplementedException(node.Value.Record.ToString());
         }
+    }
+
+    private static LinkedListNode<Symbol> ParseItem(LinkedListNode<Symbol> node, ICollection<Symbol> list)
+    {
+        var symbol = node.Value;
+
+        list.Add(symbol);
+
+        return node;
     }
 
     private static LinkedListNode<Symbol> ParseType(LinkedListNode<Symbol> source, ICollection<LinkedList<Symbol>> target)
