@@ -54,7 +54,7 @@ public sealed class UnitTest3 : UnitTestBase
                     continue;
                 case ISymbolLineModifier:
                     continue; // TODO 1 node
-                case SymbolRecordName:
+                case ISymbolName:
                     continue; // TODO 1 node
                 case ISymbolOverlay:
                     continue; // TODO 1 node
