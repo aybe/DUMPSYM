@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace DUMPSYM.Tests;
 
@@ -161,6 +162,7 @@ public sealed class UnitTest3 : UnitTestBase
         throw new InvalidOperationException(node.Value.ToString());
     }
 
+    [SuppressMessage("ReSharper", "SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault")]
     private LinkedListNode<Symbol> ParseDef(
         LinkedListNode<Symbol> node, SymbolCollection collection)
     {
@@ -173,12 +175,8 @@ public sealed class UnitTest3 : UnitTestBase
 
         switch (def.Class)
         {
-            case SymbolStorageClass.TPDEF:
-                collection.TypeDefinitions.Add(symbol);
-                return node;
             case SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG:
             {
-                // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
                 var list = def.Class switch
                 {
                     SymbolStorageClass.ENTAG  => collection.Enumerations,
@@ -189,12 +187,18 @@ public sealed class UnitTest3 : UnitTestBase
 
                 return ParseType(node, list);
             }
-            case SymbolStorageClass.EXT:
-                collection.Externals.Add(symbol);
+            case SymbolStorageClass.EXT or SymbolStorageClass.STAT or SymbolStorageClass.TPDEF:
+            {
+                var list = def.Class switch
+                {
+                    SymbolStorageClass.EXT   => collection.Externals,
+                    SymbolStorageClass.STAT  => collection.Statics,
+                    SymbolStorageClass.TPDEF => collection.TypeDefinitions,
+                    _                        => throw new InvalidOperationException()
+                };
+                list.Add(symbol);
                 return node;
-            case SymbolStorageClass.STAT:
-                collection.Statics.Add(symbol);
-                return node;
+            }
             case SymbolStorageClass.FILE:
                 return node;
             case SymbolStorageClass.REG:
