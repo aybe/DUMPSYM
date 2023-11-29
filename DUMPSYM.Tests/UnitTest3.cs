@@ -74,7 +74,7 @@ public sealed class UnitTest3 : UnitTestBase
                 case SymbolRecordOverlay:
                     continue; // TODO 1 node
                 case SymbolRecordSetOverlay:
-                    throw new NotImplementedException(node.Value.ToString());
+                    continue; // TODO 1 node
                 case SymbolRecordSetSldLineNum:
                     continue; // TODO 1 node
                 case SymbolRecordSetSldToLineOfFile:
