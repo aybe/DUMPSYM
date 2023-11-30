@@ -1,6 +1,6 @@
 ﻿namespace DUMPSYM.Output;
 
-public sealed class Member(string name) // TODO should be abstract?
+public sealed class Member(string name)
 {
     public string Name { get; } = name;
 
