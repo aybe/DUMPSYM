@@ -14,7 +14,7 @@ public sealed class MemberCollection(string keyword, string name)
     {
         builder ??= new StringBuilder();
 
-        builder.AppendLine($"{keyword} {Name}");
+        builder.AppendLine($"{Keyword} {Name}");
 
         builder.AppendLine("{");
 
