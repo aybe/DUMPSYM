@@ -7,6 +7,11 @@ public abstract class UnitTestBase // TODO move to library
 {
     public required TestContext TestContext { get; [UsedImplicitly] set; }
 
+    protected void Write(object? value = null)
+    {
+        TestContext.Write(value?.ToString());
+    }
+
     protected void WriteLine(object? value = null)
     {
         TestContext.WriteLine(value?.ToString());
