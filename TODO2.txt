@@ -1,0 +1,12 @@
+TODO
+create real dumpsym exe
+
+use an object
+
+fix console.write
+
+bug last line not shown
+
+combine ghidra and ida
+
+add original dumpsym

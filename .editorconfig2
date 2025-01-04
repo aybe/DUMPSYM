@@ -1,0 +1,7 @@
+
+[*]
+
+# ReSharper properties
+resharper_blank_lines_around_single_line_auto_property = 1
+resharper_int_align_switch_expressions = true
+resharper_place_accessorholder_attribute_on_same_line = false
