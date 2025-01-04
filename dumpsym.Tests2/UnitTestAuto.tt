@@ -11,7 +11,8 @@ public partial class UnitTestAuto
 {
 <#
 	const string path = @"D:\Downloads";
-
+	if(!Directory.Exists(path))
+		return "";
 	var directories = Directory.GetDirectories(path, "*.*", SearchOption.AllDirectories);
 	foreach (var directory in directories)
 	{
