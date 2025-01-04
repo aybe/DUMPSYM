@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using JetBrains.Annotations;
 
-namespace dumpsym.Tests;
+namespace dumpsym.Tests2;
 
 public partial class UnitTestAuto
 {

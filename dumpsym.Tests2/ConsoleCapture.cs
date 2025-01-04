@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace dumpsym.Tests;
+namespace dumpsym.Tests2;
 
 public sealed class ConsoleCapture : TextWriter
 {

@@ -1,4 +1,4 @@
-﻿namespace dumpsym;
+﻿namespace dumpsym_cli;
 
 public readonly struct Symbol
 {

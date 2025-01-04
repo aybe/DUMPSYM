@@ -3,7 +3,7 @@ using System.Text;
 
 // ReSharper disable StringLiteralTypo
 
-namespace dumpsym;
+namespace dumpsym_cli;
 
 public static class Program
 {

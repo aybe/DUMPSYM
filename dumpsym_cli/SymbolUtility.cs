@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace dumpsym;
+namespace dumpsym_cli;
 
 public static class SymbolUtility
 {

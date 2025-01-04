@@ -1,7 +1,7 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
 
-namespace dumpsym.Tests;
+namespace dumpsym.Tests2;
 
 public static class StreamExtensions
 {

@@ -1,4 +1,4 @@
-namespace dumpsym.Tests;
+namespace dumpsym.Tests2;
 
 [TestClass]
 public class UnitTest1

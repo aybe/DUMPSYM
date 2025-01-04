@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using dumpsym;
+using dumpsym_cli;
 
 // ReSharper disable StringLiteralTypo
 
