@@ -1,40 +1,26 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolName, ISymbolDefinition
+public sealed class SymbolRecordDef2(SymbolContext context) : SymbolRecord, ISymbolName, ISymbolDefinition
 {
-    public SymbolRecordDef2(SymbolContext context) : base(context)
+    public SymbolStorageClass Class { get; } = context.Read<SymbolStorageClass>();
+
+    public SymbolType Type { get; } = context.Read<SymbolType>();
+
+    public uint Size { get; } = context.Read<uint>();
+
+    public uint[] Dimensions { get; } = ReadDimensions(context);
+
+    public string Tag { get; } = context.ReadStringAscii();
+
+    public string Name { get; } = context.ReadStringAscii();
+
+    private static uint[] ReadDimensions(SymbolContext context)
     {
-        Class = context.Read<SymbolStorageClass>();
-        Type = context.Read<SymbolType>();
-        Size = context.Read<uint>();
-        Dimensions = ReadDimensions(context.Stream); // TODO
-        Tag = context.ReadStringAscii();
-        Name = context.ReadStringAscii();
-    }
+        var dimensions = new uint[context.Read<ushort>()];
 
-    public SymbolStorageClass Class { get; }
-
-    public SymbolType Type { get; }
-
-    public uint Size { get; }
-
-    public uint[] Dimensions { get; }
-
-    public string Tag { get; }
-
-    public string Name { get; }
-
-    private static uint[] ReadDimensions(Stream stream)
-    {
-        var length = stream.Read<ushort>();
-
-        var dimensions = new uint[length];
-
-        for (var i = 0; i < length; i++)
+        for (var i = 0; i < dimensions.Length; i++)
         {
-            dimensions[i] = stream.Read<uint>();
+            dimensions[i] = context.Read<uint>();
         }
 
         return dimensions;
@@ -42,6 +28,7 @@ public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolName, ISymbolDefinit
 
     public override string ToString()
     {
-        return $"Def2 class {Class} type {Type} size {Size} dims {(Dimensions.Length > 0 ? $"{Dimensions.Length} {string.Join(" ", Dimensions)}" : "0")} tag {Tag} name {Name}";
+        return
+            $"Def2 class {Class} type {Type} size {Size} dims {(Dimensions.Length > 0 ? $"{Dimensions.Length} {string.Join(" ", Dimensions)}" : "0")} tag {Tag} name {Name}";
     }
 }

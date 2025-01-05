@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordOverlay(SymbolContext context) : SymbolRecord(context), ISymbolOverlay
+public sealed class SymbolRecordOverlay(SymbolContext context) : SymbolRecord, ISymbolOverlay
 {
     public uint Length { get; } = context.Read<uint>();
 

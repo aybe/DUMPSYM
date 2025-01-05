@@ -1,13 +1,8 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordBlockStart : SymbolRecord, ISymbolFunctionBlock
+public sealed class SymbolRecordBlockStart(SymbolContext context) : SymbolRecord, ISymbolFunctionBlock
 {
-    public SymbolRecordBlockStart(SymbolContext context) : base(context)
-    {
-        Line = context.Read<uint>();
-    }
-
-    public uint Line { get; }
+    public uint Line { get; } = context.Read<uint>();
 
     public override string ToString()
     {

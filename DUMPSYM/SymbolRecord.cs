@@ -1,12 +1,9 @@
 namespace DUMPSYM;
 
-public abstract class SymbolRecord(SymbolContext context)
+public abstract class SymbolRecord
 {
-    private SymbolHeader Header { get; } = context.Header;
-
     public override string ToString()
     {
-        return "";
-        return Header.ToString();
+        return string.Empty;
     }
 }

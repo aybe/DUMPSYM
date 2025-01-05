@@ -1,18 +1,10 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordSetSldToLineOfFile : SymbolRecord, ISymbolLineModifier
+public sealed class SymbolRecordSetSldToLineOfFile(SymbolContext context) : SymbolRecord, ISymbolLineModifier
 {
-    public SymbolRecordSetSldToLineOfFile(SymbolContext context) : base(context)
-    {
-        Line = context.Read<uint>();
-        File = context.ReadStringAscii();
+    public uint Line { get; } = context.Line = context.Read<uint>();
 
-        context.Line = Line;
-    }
-
-    public uint Line { get; }
-
-    public string File { get; }
+    public string File { get; } = context.ReadStringAscii();
 
     public override string ToString()
     {

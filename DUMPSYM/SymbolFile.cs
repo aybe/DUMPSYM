@@ -5,7 +5,7 @@ namespace DUMPSYM;
 
 public sealed class SymbolFile : IEnumerable<SymbolRecord>
 {
-    public SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
+    private SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
     {
         Header = header;
         Version = version;
@@ -73,42 +73,38 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
 
         var symbols = new List<Symbol>();
 
-        var context = new SymbolContext(stream);
+        var ctx = new SymbolContext(stream);
 
         while (stream.Position < stream.Length)
         {
-            var symbolPosition = stream.Position;
+            var hdr = new SymbolHeader(stream);
 
-            var symbolHeader = new SymbolHeader(stream);
+            ctx.Header = hdr;
 
-            context.Header = symbolHeader;
-
-            SymbolRecord symbolRecord = symbolHeader.Type switch
+            SymbolRecord rec = hdr.Type switch
             {
-                0x01 => new SymbolRecordName(context),
-                0x02 => new SymbolRecordName(context),
-                0x06 => new SymbolRecordName(context),
-                0x88 => new SymbolRecordSetSldToLineOfFile(context),
-                0x82 => new SymbolRecordIncSldLineNumByByte(context),
-                0x84 => new SymbolRecordIncSldLineNumByWord(context),
-                0x80 => new SymbolRecordIncSldLineNum(context),
-                0x86 => new SymbolRecordSetSldLineNum(context),
-                0x8A => new SymbolRecordEndSldInfo(context),
-                0x8C => new SymbolRecordFunctionStart(context),
-                0x8E => new SymbolRecordFunctionEnd(context),
-                0x94 => new SymbolRecordDef(context),
-                0x96 => new SymbolRecordDef2(context),
-                0x98 => new SymbolRecordOverlay(context),
-                0x90 => new SymbolRecordBlockStart(context),
-                0x92 => new SymbolRecordBlockEnd(context),
-                0x9A => new SymbolRecordSetOverlay(context),
-                0x9C => new SymbolRecordFunction2Start(context),
-                _ => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition:X8}")
+                0x01 => new SymbolRecordName(ctx),
+                0x02 => new SymbolRecordName(ctx),
+                0x06 => new SymbolRecordName(ctx),
+                0x88 => new SymbolRecordSetSldToLineOfFile(ctx),
+                0x82 => new SymbolRecordIncSldLineNumByByte(ctx),
+                0x84 => new SymbolRecordIncSldLineNumByWord(ctx),
+                0x80 => new SymbolRecordIncSldLineNum(ctx),
+                0x86 => new SymbolRecordSetSldLineNum(ctx),
+                0x8A => new SymbolRecordEndSldInfo(),
+                0x8C => new SymbolRecordFunctionStart(ctx),
+                0x8E => new SymbolRecordFunctionEnd(ctx),
+                0x94 => new SymbolRecordDef(ctx),
+                0x96 => new SymbolRecordDef2(ctx),
+                0x98 => new SymbolRecordOverlay(ctx),
+                0x90 => new SymbolRecordBlockStart(ctx),
+                0x92 => new SymbolRecordBlockEnd(ctx),
+                0x9A => new SymbolRecordSetOverlay(),
+                0x9C => new SymbolRecordFunction2Start(ctx),
+                _    => throw new NotImplementedException($"0x{hdr.Type:x2} @ {stream.Position - 5:X8}")
             };
 
-            var symbol = new Symbol(symbolHeader, symbolRecord);
-
-            symbols.Add(symbol);
+            symbols.Add(new Symbol(hdr, rec));
         }
 
         return new SymbolFile(header, version, targetUnit, symbols);

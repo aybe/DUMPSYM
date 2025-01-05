@@ -6,6 +6,7 @@ if (args.Length != 1)
                       dumpsym 2.02 (c) 1997 SN Systems Software Ltd
                       Usage: dumpsym sym_file
                       """);
+
     return 1;
 }
 
@@ -14,6 +15,7 @@ var path = args[0];
 if (!File.Exists(path))
 {
     Console.WriteLine($"Error: Can't open file '{path}' for input");
+
     return 1;
 }
 
@@ -33,5 +35,6 @@ catch (Exception e)
 {
     Console.WriteLine("Failed to parse .SYM file:");
     Console.WriteLine(e);
+
     return 1;
 }

@@ -1,10 +1,8 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
 public sealed class SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLineModifier
 {
-    public SymbolRecordIncSldLineNumByWord(SymbolContext context) : base(context)
+    public SymbolRecordIncSldLineNumByWord(SymbolContext context)
     {
         Increment = context.Read<ushort>();
 
@@ -13,7 +11,7 @@ public sealed class SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLineM
         context.Line += Increment;
     }
 
-    public uint Line { get; set; }
+    public uint Line { get; }
 
     public ushort Increment { get; }
 

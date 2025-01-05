@@ -4,7 +4,8 @@ namespace DUMPSYM;
 
 public readonly struct SymbolType
 {
-    [UsedImplicitly] public readonly ushort Value;
+    [UsedImplicitly]
+    private ushort Value { get; }
 
     public SymbolTypeKind Kind => (SymbolTypeKind)(Value & 0xF);
 

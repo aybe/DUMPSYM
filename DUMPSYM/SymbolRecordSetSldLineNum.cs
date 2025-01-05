@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordSetSldLineNum(SymbolContext context) : SymbolRecord(context), ISymbolLineModifier
+public sealed class SymbolRecordSetSldLineNum(SymbolContext context) : SymbolRecord, ISymbolLineModifier
 {
     public uint Line { get; } = context.Line = context.Read<uint>();
 
