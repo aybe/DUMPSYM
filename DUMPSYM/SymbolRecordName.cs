@@ -1,15 +1,11 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordName(Stream stream) : SymbolRecord, ISymbolName
+public sealed class SymbolRecordName(SymbolContext context) : SymbolRecord(context), ISymbolName
 {
-    public string Name { get; } = stream.ReadStringAscii(stream.Read<byte>());
+    public string Name { get; } = context.ReadStringAscii();
 
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public override string ToString()
     {
-        header.WriteHeaderPositionAddressType(writer);
-
-        writer.WriteLine($"{Name}");
+        return $"{Name}";
     }
 }

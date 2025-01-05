@@ -1,15 +1,16 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordBlockStart(Stream stream) : SymbolRecord, ISymbolFunctionBlock
+public sealed class SymbolRecordBlockStart : SymbolRecord, ISymbolFunctionBlock
 {
-    public uint Line { get; } = stream.Read<uint>();
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordBlockStart(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+        Line = context.Read<uint>();
+    }
 
-        writer.WriteLine($"Block start  line = {Line}");
+    public uint Line { get; }
+
+    public override string ToString()
+    {
+        return $"Block_start  line = {Line}";
     }
 }

@@ -1,43 +1,38 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordFunction2Start(Stream stream) : SymbolRecord, ISymbolFunction, ISymbolName
+public sealed class SymbolRecordFunction2Start : SymbolRecord, ISymbolFunction, ISymbolName
 {
-    public ushort FramePointer { get; } = stream.Read<ushort>();
-
-    public uint Size { get; } = stream.Read<uint>();
-
-    public ushort ReturnAddressRegister { get; } = stream.Read<ushort>();
-
-    public uint Mask { get; } = stream.Read<uint>();
-
-    public int MaskOffset { get; } = stream.Read<int>();
-
-    public uint FMask { get; } = stream.Read<uint>();
-
-    public int FMaskOffset { get; } = stream.Read<int>();
-
-    public uint Line { get; } = stream.Read<uint>();
-
-    public string File { get; } = stream.ReadStringAscii(stream.Read<byte>());
-
-    public string Name { get; } = stream.ReadStringAscii(stream.Read<byte>());
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordFunction2Start(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
-
-        writer.WriteLine("Function2 start");
-        writer.WriteLine($"    fp = {FramePointer}");
-        writer.WriteLine($"    fsize = {Size}");
-        writer.WriteLine($"    retreg = {ReturnAddressRegister}");
-        writer.WriteLine($"    mask = ${Mask:x8}");
-        writer.WriteLine($"    maskoffs = {MaskOffset}");
-        writer.WriteLine($"    fmask = ${FMask:x8}");
-        writer.WriteLine($"    fmaskoffs = {FMaskOffset}");
-        writer.WriteLine($"    line = {Line}");
-        writer.WriteLine($"    file = {File}");
-        writer.WriteLine($"    name = {Name}");
+        FramePointer = context.Read<ushort>();
+        Size = context.Read<uint>();
+        ReturnAddressRegister = context.Read<ushort>();
+        Mask = context.Read<uint>();
+        MaskOffset = context.Read<int>();
+        FMask = context.Read<uint>();
+        FMaskOffset = context.Read<int>();
+        Line = context.Read<uint>();
+        File = context.ReadStringAscii();
+        Name = context.ReadStringAscii();
     }
+
+    public uint FMask { get; }
+
+    public int FMaskOffset { get; }
+
+    public ushort FramePointer { get; }
+
+    public uint Size { get; }
+
+    public ushort ReturnAddressRegister { get; }
+
+    public uint Mask { get; }
+
+    public int MaskOffset { get; }
+
+    public uint Line { get; }
+
+    public string File { get; }
+
+    public string Name { get; }
 }

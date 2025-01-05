@@ -2,29 +2,23 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolHeader(Stream stream)
+public readonly struct SymbolHeader
 {
-    public long Position { get; } = stream.Position;
+    public SymbolHeader(Stream stream)
+    {
+        Position = stream.Position;
+        Address = stream.Read<uint>();
+        Type = stream.Read<byte>();
+    }
 
-    public uint Address { get; } = stream.Read<uint>();
+    public long Position { get; }
 
-    public byte Type { get; } = stream.Read<byte>();
+    public uint Address { get; }
+
+    public byte Type { get; }
 
     public override string ToString()
     {
         return $"{Position:x6}: ${Address:x8} {Type:x}";
-    }
-
-    public void WriteHeaderPositionAddress(TextWriter writer)
-    {
-        writer.Write($"{Position:x6}: ");
-        writer.Write($"${Address:x8} ");
-    }
-
-    public void WriteHeaderPositionAddressType(TextWriter writer) // TODO let users add space instead?
-    {
-        WriteHeaderPositionAddress(writer);
-
-        writer.Write($"{Type:x} ");
     }
 }

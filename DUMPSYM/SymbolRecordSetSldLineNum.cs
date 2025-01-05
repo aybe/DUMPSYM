@@ -1,15 +1,11 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordSetSldLineNum(Stream stream) : SymbolRecord, ISymbolLineModifier
+public sealed class SymbolRecordSetSldLineNum(SymbolContext context) : SymbolRecord(context), ISymbolLineModifier
 {
-    public uint Line { get; } = stream.Read<uint>();
+    public uint Line { get; } = context.Line = context.Read<uint>();
 
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public override string ToString()
     {
-        header.WriteHeaderPositionAddressType(writer);
-
-        writer.WriteLine($"Set SLD linenum to {line}");
+        return $"Set SLD linenum to {Line}";
     }
 }

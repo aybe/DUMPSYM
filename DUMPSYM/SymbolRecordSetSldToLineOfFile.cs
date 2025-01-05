@@ -1,17 +1,21 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordSetSldToLineOfFile(Stream stream) : SymbolRecord, ISymbolLineModifier
+public sealed class SymbolRecordSetSldToLineOfFile : SymbolRecord, ISymbolLineModifier
 {
-    public uint Line { get; } = stream.Read<uint>();
-
-    public string File { get; } = stream.ReadStringAscii(stream.Read<byte>());
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordSetSldToLineOfFile(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+        Line = context.Read<uint>();
+        File = context.ReadStringAscii();
 
-        writer.WriteLine($"Set SLD to line {Line} of file {File}");
+        context.Line = Line;
+    }
+
+    public uint Line { get; }
+
+    public string File { get; }
+
+    public override string ToString()
+    {
+        return $"Set SLD to line {Line} of file {File}";
     }
 }

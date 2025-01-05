@@ -2,14 +2,23 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolRecordIncSldLineNumByWord(Stream stream) : SymbolRecord, ISymbolLineModifier
+public sealed class SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLineModifier
 {
-    public ushort Line { get; } = stream.Read<ushort>();
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordIncSldLineNumByWord(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+        Increment = context.Read<ushort>();
 
-        writer.WriteLine($"Inc SLD linenum by word {Line} (to {line})");
+        Line = context.Line;
+
+        context.Line += Increment;
+    }
+
+    public uint Line { get; set; }
+
+    public ushort Increment { get; }
+
+    public override string ToString()
+    {
+        return $"Inc SLD linenum by word {Increment} (to {Line + Increment})";
     }
 }

@@ -2,10 +2,12 @@ namespace DUMPSYM;
 
 public sealed class SymbolRecordEndSldInfo : SymbolRecord
 {
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordEndSldInfo(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+    }
 
-        writer.WriteLine("End SLD info");
+    public override string ToString()
+    {
+        return $"End SLD info";
     }
 }

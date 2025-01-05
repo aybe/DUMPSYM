@@ -1,17 +1,8 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordOverlay(Stream stream) : SymbolRecord, ISymbolOverlay
+public sealed class SymbolRecordOverlay(SymbolContext context) : SymbolRecord(context), ISymbolOverlay
 {
-    public uint Length { get; } = stream.Read<uint>();
+    public uint Length { get; } = context.Read<uint>();
 
-    public uint Id { get; } = stream.Read<uint>();
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
-    {
-        header.WriteHeaderPositionAddress(writer);
-
-        writer.WriteLine($"overlay length ${Length:x8} id ${Id:x}");
-    }
+    public uint Id { get; } = context.Read<uint>();
 }

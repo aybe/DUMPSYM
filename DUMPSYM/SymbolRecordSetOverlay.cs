@@ -2,10 +2,7 @@ namespace DUMPSYM;
 
 public sealed class SymbolRecordSetOverlay : SymbolRecord, ISymbolOverlay
 {
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordSetOverlay(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddress(writer);
-
-        writer.WriteLine("set overlay");
     }
 }

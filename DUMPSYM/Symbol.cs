@@ -1,10 +1,16 @@
 namespace DUMPSYM;
 
-public sealed class Symbol(SymbolHeader header, SymbolRecord record)
+public sealed class Symbol
 {
-    public SymbolHeader Header { get; } = header;
+    public Symbol(SymbolHeader header, SymbolRecord record)
+    {
+        Header = header;
+        Record = record;
+    }
 
-    public SymbolRecord Record { get; } = record;
+    public SymbolHeader Header { get; }
+
+    public SymbolRecord Record { get; }
 
     public override string ToString()
     {

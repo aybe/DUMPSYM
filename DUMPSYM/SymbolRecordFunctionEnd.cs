@@ -1,15 +1,16 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordFunctionEnd(Stream stream) : SymbolRecord, ISymbolFunctionEnd
+public sealed class SymbolRecordFunctionEnd : SymbolRecord, ISymbolFunctionEnd
 {
-    public uint Line { get; } = stream.Read<uint>();
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordFunctionEnd(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+        Line = context.Read<uint>();
+    }
 
-        writer.WriteLine($"Function end   line {Line}");
+    public uint Line { get; }
+
+    public override string ToString()
+    {
+        return $"Function_end   line {Line}";
     }
 }

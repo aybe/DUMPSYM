@@ -3,16 +3,23 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public sealed class SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
-    : IEnumerable<SymbolRecord>
+public sealed class SymbolFile : IEnumerable<SymbolRecord>
 {
-    public string Header { get; } = header;
+    public SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
+    {
+        Header = header;
+        Version = version;
+        TargetUnit = targetUnit;
+        Symbols = symbols;
+    }
 
-    public int Version { get; } = version;
+    public string Header { get; }
 
-    public int TargetUnit { get; } = targetUnit;
+    public int Version { get; }
 
-    public IList<Symbol> Symbols { get; } = symbols;
+    public int TargetUnit { get; }
+
+    public IList<Symbol> Symbols { get; }
 
     public IEnumerator<SymbolRecord> GetEnumerator()
     {
@@ -32,34 +39,9 @@ public sealed class SymbolFile(string header, int version, int targetUnit, IList
         writer.WriteLine($"Header : {Header} version {Version}");
         writer.WriteLine($"Target unit {TargetUnit}");
 
-        var line = 0u;
-
         foreach (var symbol in Symbols)
         {
-            var header = symbol.Header;
-
-            var record = symbol.Record;
-
-            switch (record) // TODO update using ISymbolLineModifier instead
-            {
-                case SymbolRecordIncSldLineNum:
-                    line += 1;
-                    break;
-                case SymbolRecordIncSldLineNumByByte a:
-                    line += a.Line;
-                    break;
-                case SymbolRecordIncSldLineNumByWord b:
-                    line += b.Line;
-                    break;
-                case SymbolRecordSetSldLineNum c:
-                    line = c.Line;
-                    break;
-                case SymbolRecordSetSldToLineOfFile d:
-                    line = d.Line;
-                    break;
-            }
-
-            record.Write(header, writer, line);
+            writer.WriteLine(symbol.ToString());
         }
 
         var result = writer.ToString();
@@ -91,36 +73,42 @@ public sealed class SymbolFile(string header, int version, int targetUnit, IList
 
         var symbols = new List<Symbol>();
 
+        var context = new SymbolContext(stream);
+
         while (stream.Position < stream.Length)
         {
             var symbolPosition = stream.Position;
 
             var symbolHeader = new SymbolHeader(stream);
 
+            context.Header = symbolHeader;
+
             SymbolRecord symbolRecord = symbolHeader.Type switch
             {
-                0x01 => new SymbolRecordName(stream),
-                0x02 => new SymbolRecordName(stream),
-                0x06 => new SymbolRecordName(stream),
-                0x88 => new SymbolRecordSetSldToLineOfFile(stream),
-                0x82 => new SymbolRecordIncSldLineNumByByte(stream),
-                0x84 => new SymbolRecordIncSldLineNumByWord(stream),
-                0x80 => new SymbolRecordIncSldLineNum(),
-                0x86 => new SymbolRecordSetSldLineNum(stream),
-                0x8A => new SymbolRecordEndSldInfo(),
-                0x8C => new SymbolRecordFunctionStart(stream),
-                0x8E => new SymbolRecordFunctionEnd(stream),
-                0x94 => new SymbolRecordDef(stream),
-                0x96 => new SymbolRecordDef2(stream),
-                0x98 => new SymbolRecordOverlay(stream),
-                0x90 => new SymbolRecordBlockStart(stream),
-                0x92 => new SymbolRecordBlockEnd(stream),
-                0x9A => new SymbolRecordSetOverlay(),
-                0x9C => new SymbolRecordFunction2Start(stream),
-                _    => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition}")
+                0x01 => new SymbolRecordName(context),
+                0x02 => new SymbolRecordName(context),
+                0x06 => new SymbolRecordName(context),
+                0x88 => new SymbolRecordSetSldToLineOfFile(context),
+                0x82 => new SymbolRecordIncSldLineNumByByte(context),
+                0x84 => new SymbolRecordIncSldLineNumByWord(context),
+                0x80 => new SymbolRecordIncSldLineNum(context),
+                0x86 => new SymbolRecordSetSldLineNum(context),
+                0x8A => new SymbolRecordEndSldInfo(context),
+                0x8C => new SymbolRecordFunctionStart(context),
+                0x8E => new SymbolRecordFunctionEnd(context),
+                0x94 => new SymbolRecordDef(context),
+                0x96 => new SymbolRecordDef2(context),
+                0x98 => new SymbolRecordOverlay(context),
+                0x90 => new SymbolRecordBlockStart(context),
+                0x92 => new SymbolRecordBlockEnd(context),
+                0x9A => new SymbolRecordSetOverlay(context),
+                0x9C => new SymbolRecordFunction2Start(context),
+                _ => throw new NotImplementedException($"0x{symbolHeader.Type:x2} @ {symbolPosition:X8}")
             };
 
-            symbols.Add(new Symbol(symbolHeader, symbolRecord));
+            var symbol = new Symbol(symbolHeader, symbolRecord);
+
+            symbols.Add(symbol);
         }
 
         return new SymbolFile(header, version, targetUnit, symbols);

@@ -2,10 +2,15 @@ namespace DUMPSYM;
 
 public sealed class SymbolRecordIncSldLineNum : SymbolRecord, ISymbolLineModifier
 {
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordIncSldLineNum(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+        Line = context.Line += 1;
+    }
 
-        writer.WriteLine($"Inc SLD linenum (to {line})");
+    private uint Line { get; }
+
+    public override string ToString()
+    {
+        return $"Inc SLD linenum (to {Line})";
     }
 }

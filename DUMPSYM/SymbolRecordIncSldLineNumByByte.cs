@@ -1,15 +1,20 @@
-using Whatever.Extensions;
-
 namespace DUMPSYM;
 
-public sealed class SymbolRecordIncSldLineNumByByte(Stream stream) : SymbolRecord, ISymbolLineModifier
+public sealed class SymbolRecordIncSldLineNumByByte : SymbolRecord, ISymbolLineModifier
 {
-    public byte Line { get; } = stream.Read<byte>();
-
-    public override void Write(SymbolHeader header, TextWriter writer, uint line)
+    public SymbolRecordIncSldLineNumByByte(SymbolContext context) : base(context)
     {
-        header.WriteHeaderPositionAddressType(writer);
+        Increment = context.Read<byte>();
+        Line = context.Line;
+        context.Line += Increment;
+    }
 
-        writer.WriteLine($"Inc SLD linenum by byte {Line} (to {line})");
+    public uint Line { get; set; }
+
+    public byte Increment { get; }
+
+    public override string ToString()
+    {
+        return $"Inc SLD linenum by byte {Increment} (to {Line + Increment})";
     }
 }

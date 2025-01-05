@@ -2,11 +2,17 @@
 
 namespace DUMPSYM.Output;
 
-public sealed class MemberCollection(string keyword, string name)
+public sealed class MemberCollection
 {
-    public string Keyword { get; } = keyword;
+    public MemberCollection(string keyword, string name)
+    {
+        Keyword = keyword;
+        Name = name;
+    }
 
-    public string Name { get; } = name;
+    public string Keyword { get; }
+
+    public string Name { get; }
 
     public IList<Member> Members { get; } = new List<Member>();
 
