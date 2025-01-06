@@ -1,7 +1,7 @@
-namespace dumpsym.Tests2;
+namespace DUMPSYM.Tests;
 
 [TestClass]
-public class UnitTest1
+public class UnitTest2
 {
     public required TestContext TestContext { get; set; }
 

@@ -1,9 +1,7 @@
-﻿using DUMPSYM;
-
-namespace Tests;
+﻿namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed class Test1
+public sealed class UnitTest1
 {
     [TestMethod]
     public void TestMethod1()

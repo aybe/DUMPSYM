@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using JetBrains.Annotations;
 
-namespace dumpsym.Tests2;
+namespace DUMPSYM.Tests;
 
 public partial class UnitTestAuto
 {
@@ -40,6 +40,6 @@ public partial class UnitTestAuto
         // 
         // TestContext.WriteLine(txt);
 
-        UnitTest1.CompareDumps(symPath, txtPath);
+        UnitTest2.CompareDumps(symPath, txtPath);
     }
 }

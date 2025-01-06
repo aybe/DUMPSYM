@@ -3,7 +3,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
 
-namespace dumpsym.Tests2;
+namespace DUMPSYM.Tests;
 
 public static class Globals
 {
