@@ -6,14 +6,69 @@ namespace DUMPSYM.Tests;
 [TestClass]
 public sealed class UnitTestGenerate : UnitTestBase
 {
+    private static bool PrintRemaining => true;
+
     private static bool PrintTypedefs => false;
+
+    private static bool RemoveLineModifiers => true;
+
+    private static bool RemoveUnions => true;
+
+    private static bool RemoveFunctions => true;
+
+    private static bool RemoveNames => true;
 
     [TestMethod]
     public void TestTypedefs()
     {
         var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
 
-        PrintCount(list);
+        {
+            Console.WriteLine("Reading symbols...");
+            PrintCount(list);
+            Console.WriteLine();
+        }
+
+        if (RemoveLineModifiers)
+        {
+            Console.WriteLine("Removing line modifiers...");
+            RemoveWhere(list, s => s is ISymbolLineModifier);
+            PrintCount(list);
+            Console.WriteLine();
+        }
+
+        if (RemoveUnions)
+        {
+            Console.WriteLine("Removing unions...");
+
+            while (Remove(list, s => s is ISymbolDefinition { Class: SymbolStorageClass.UNTAG },
+                       s => s is ISymbolDefinition { Class: SymbolStorageClass.EOS }) != null)
+            {
+            }
+
+            PrintCount(list);
+            Console.WriteLine();
+        }
+
+        if (RemoveFunctions)
+        {
+            Console.WriteLine("Removing functions...");
+
+            while (Remove(list, s => s is SymbolRecordFunctionStart, s => s is SymbolRecordFunctionEnd) != null)
+            {
+            }
+
+            PrintCount(list);
+            Console.WriteLine();
+        }
+
+        if (RemoveNames)
+        {
+            Console.WriteLine("Removing names...");
+            RemoveWhere(list, s => s is SymbolRecordName);
+            PrintCount(list);
+            Console.WriteLine();
+        }
 
         var typedefs = list.OfType<SymbolRecordDef>().Where(s => s.Class is SymbolStorageClass.TPDEF).ToArray();
 
@@ -57,9 +112,12 @@ public sealed class UnitTestGenerate : UnitTestBase
 
         PrintCount(list);
 
-        foreach (var record in list)
+        if (PrintRemaining)
         {
-            Console.WriteLine(record);
+            foreach (var record in list)
+            {
+                Console.WriteLine(record);
+            }
         }
     }
 
@@ -140,6 +198,60 @@ public sealed class UnitTestGenerate : UnitTestBase
             SymbolTypeKind.ULONG  => "unsigned long",
             _                     => null
         } ?? throw new NotSupportedException(kind.ToString());
+    }
+
+    private static LinkedListNode<T>? Remove<T>(LinkedList<T> list, Func<T, bool> head, Func<T, bool> tail)
+    {
+        var first = list.First;
+
+        if (first == null)
+        {
+            return null;
+        }
+
+        if (!TryFindNode(first, out var headNode, head))
+        {
+            return null;
+        }
+
+        if (!TryFindNode(headNode, out var tailNode, tail))
+        {
+            return null;
+        }
+
+        var node = headNode;
+
+        while (node != null && node != tailNode)
+        {
+            var next = node.Next;
+
+            list.Remove(node);
+
+            node = next;
+        }
+
+        node = tailNode.Next;
+
+        list.Remove(tailNode);
+
+        return node;
+    }
+
+    private static void RemoveWhere<T>(LinkedList<T> list, Func<T, bool> predicate)
+    {
+        var current = list.First;
+
+        while (current != null)
+        {
+            var next = current.Next;
+
+            if (predicate(current.Value))
+            {
+                list.Remove(current);
+            }
+
+            current = next;
+        }
     }
 
     private static bool TryFindNode<T>(
