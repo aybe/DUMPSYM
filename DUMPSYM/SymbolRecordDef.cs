@@ -8,10 +8,6 @@ public sealed class SymbolRecordDef(SymbolContext context) : SymbolRecord, ISymb
 
     public uint Size { get; } = context.Read<uint>();
 
-    uint[] ISymbolDefinition.Dimensions => []; // TODO see if there's a better way to do this
-
-    string ISymbolDefinition.Tag => string.Empty; // TODO see if there's a better way to do this
-
     public string Name { get; } = context.ReadStringAscii();
 
     public override string ToString()

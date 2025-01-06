@@ -6,11 +6,7 @@ public interface ISymbolDefinition
 
     SymbolType Type { get; }
 
-    uint[] Dimensions { get; }
-
     uint Size { get; }
-
-    string Tag { get; }
 
     string Name { get; }
 }

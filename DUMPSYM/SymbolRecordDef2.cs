@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordDef2(SymbolContext context) : SymbolRecord, ISymbolName, ISymbolDefinition
+public sealed class SymbolRecordDef2(SymbolContext context) : SymbolRecord, ISymbolName, ISymbolDefinition2
 {
     public SymbolStorageClass Class { get; } = context.Read<SymbolStorageClass>();
 

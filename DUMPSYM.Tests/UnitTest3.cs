@@ -44,7 +44,7 @@ public sealed class UnitTest3 : UnitTestBase
 
             switch (record)
             {
-                case ISymbolDefinition:
+                case ISymbolDefinition2:
                     node = ParseDefinition(node, registry);
                     continue;
                 case SymbolRecordEndSldInfo:
@@ -81,7 +81,7 @@ public sealed class UnitTest3 : UnitTestBase
                 case ISymbolFunctionBlock:
                     list.AddLast(symbol);
                     continue;
-                case ISymbolDefinition:
+                case ISymbolDefinition2:
                     list.AddLast(symbol); // TODO should use ParseDefinition
                     continue;
                 case ISymbolFunctionEnd:
@@ -103,7 +103,7 @@ public sealed class UnitTest3 : UnitTestBase
     {
         var symbol = node.Value;
 
-        if (symbol.Record is not ISymbolDefinition def)
+        if (symbol.Record is not ISymbolDefinition2 def)
         {
             throw new ArgumentOutOfRangeException(nameof(node));
         }
@@ -152,13 +152,13 @@ public sealed class UnitTest3 : UnitTestBase
 
             switch (symbol.Record)
             {
-                case ISymbolDefinition { Class: SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG }:
+                case ISymbolDefinition2 { Class: SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG }:
                     list.AddLast(symbol);
                     continue;
-                case ISymbolDefinition { Class: SymbolStorageClass.FIELD or SymbolStorageClass.MOE or SymbolStorageClass.MOS or SymbolStorageClass.MOU }:
+                case ISymbolDefinition2 { Class: SymbolStorageClass.FIELD or SymbolStorageClass.MOE or SymbolStorageClass.MOS or SymbolStorageClass.MOU }:
                     list.AddLast(symbol);
                     continue;
-                case ISymbolDefinition { Class: SymbolStorageClass.EOS }:
+                case ISymbolDefinition2 { Class: SymbolStorageClass.EOS }:
                     list.AddLast(symbol);
                     target.Add(list);
                     return node;
