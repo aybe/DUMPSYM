@@ -1,16 +1,19 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace DUMPSYM.Tests;
 
 [TestClass]
 public sealed class UnitTestGenerate : UnitTestBase
 {
+    private static bool PrintTypedefs => false;
+
     [TestMethod]
     public void TestTypedefs()
     {
         var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
 
-        Console.WriteLine($"Records: {list.Count}");
+        PrintCount(list);
 
         var typedefs = list.OfType<SymbolRecordDef>().Where(s => s.Class is SymbolStorageClass.TPDEF).ToArray();
 
@@ -22,12 +25,47 @@ public sealed class UnitTestGenerate : UnitTestBase
 
         Console.WriteLine($"Typedefs (distinct): {typedefs.Length}");
 
-        Console.WriteLine($"Records: {list.Count}");
+        PrintCount(list);
 
-        foreach (var def in typedefs)
+        if (PrintTypedefs)
         {
-            Console.WriteLine(GetTypedefString(def));
+            foreach (var def in typedefs)
+            {
+                Console.WriteLine(GetTypedefString(def));
+            }
         }
+
+        // TODO Def2 after structs
+
+        var result = new List<LinkedListNode<SymbolRecord>>();
+
+        var node = list.First;
+
+        while (node != null)
+        {
+            if (!TryFindStruct(node, result))
+            {
+                break;
+            }
+
+            node = result.Last().Next;
+
+            result.ForEach(list.Remove);
+
+            result.Clear();
+        }
+
+        PrintCount(list);
+
+        foreach (var record in list)
+        {
+            Console.WriteLine(record);
+        }
+    }
+
+    private static void PrintCount<T>(ICollection<T> collection)
+    {
+        Console.WriteLine($"Count: {collection.Count}");
     }
 
     private static string GetTypedefString(SymbolRecordDef def)
@@ -102,5 +140,56 @@ public sealed class UnitTestGenerate : UnitTestBase
             SymbolTypeKind.ULONG  => "unsigned long",
             _                     => null
         } ?? throw new NotSupportedException(kind.ToString());
+    }
+
+    private static bool TryFindNode<T>(
+        LinkedListNode<T> node, [MaybeNullWhen(false)] out LinkedListNode<T> result, Func<T, bool> predicate)
+    {
+        result = default;
+
+        var current = node;
+
+        while (current != null)
+        {
+            if (predicate(current.Value))
+            {
+                result = current;
+
+                return true;
+            }
+
+            current = current.Next;
+        }
+
+        return false;
+    }
+
+    private static bool TryFindStruct(
+        LinkedListNode<SymbolRecord> node, List<LinkedListNode<SymbolRecord>> list)
+    {
+        if (!TryFindNode(node, out var head, s => s is ISymbolDefinition { Class: SymbolStorageClass.STRTAG }))
+        {
+            return false;
+        }
+
+        if (!TryFindNode(head, out var tail, s => s is ISymbolDefinition { Class: SymbolStorageClass.EOS }))
+        {
+            return false;
+        }
+
+        list.Clear();
+
+        var next = head;
+
+        while (next != null && next != tail)
+        {
+            list.Add(next);
+
+            next = next.Next;
+        }
+
+        list.Add(tail);
+
+        return true;
     }
 }
