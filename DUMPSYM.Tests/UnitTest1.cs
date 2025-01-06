@@ -6,12 +6,9 @@ public sealed class UnitTest1
     [TestMethod]
     public void TestMethod1()
     {
-        const string sym = """C:\Files\GitHub\psx_mnd_sym\cmd\sym_dump\main.sym""";
+        var file = GetSample();
+
         const string txt = """C:\Files\GitHub\psx_mnd_sym\cmd\sym_dump\main.txt""";
-
-        using var stream = File.OpenRead(sym);
-
-        var file = SymbolFile.Dump(stream);
 
         var expected = File.ReadAllText(txt);
         var actual = file.ToString();
@@ -37,5 +34,16 @@ public sealed class UnitTest1
 
             line++;
         }
+    }
+
+    public static SymbolFile GetSample() // TODO more
+    {
+        const string pa = """C:\Files\GitHub\psx_mnd_sym\cmd\sym_dump\main.sym""";
+
+        using var stream = File.OpenRead(pa);
+
+        var file = SymbolFile.Dump(stream);
+
+        return file;
     }
 }

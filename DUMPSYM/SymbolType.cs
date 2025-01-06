@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace DUMPSYM;
 
-public readonly struct SymbolType
+public readonly record struct SymbolType
 {
     [UsedImplicitly]
     private ushort Value { get; }
