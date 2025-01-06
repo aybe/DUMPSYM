@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.CodeDom.Compiler;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace DUMPSYM.Tests;
@@ -6,7 +7,7 @@ namespace DUMPSYM.Tests;
 [TestClass]
 public sealed class UnitTestGenerate : UnitTestBase
 {
-    private static bool PrintRemaining => true;
+    private static bool PrintRemaining => false;
 
     private static bool PrintTypedefs => false;
 
@@ -103,6 +104,8 @@ public sealed class UnitTestGenerate : UnitTestBase
                 break;
             }
 
+            Console.WriteLine(GetStructString(result));
+
             node = result.Last().Next;
 
             result.ForEach(list.Remove);
@@ -119,6 +122,90 @@ public sealed class UnitTestGenerate : UnitTestBase
                 Console.WriteLine(record);
             }
         }
+    }
+
+    private static string GetStructString(List<LinkedListNode<SymbolRecord>> result)
+    {
+        var first = result.First();
+
+        var head = first.Value as ISymbolDefinition ?? throw new InvalidOperationException();
+
+        using var sw = new StringWriter();
+        using var tw = new IndentedTextWriter(sw);
+
+        tw.WriteLine($"struct {head.Name}");
+        tw.WriteLine("{");
+
+        tw.Indent = 1;
+
+        for (var node = first.Next; node != null && node != result.Last(); node = node.Next)
+        {
+            var def1 = node.Value as ISymbolDefinition ?? throw new InvalidOperationException();
+
+            var def2 = def1 as ISymbolDefinition2;
+
+            if (head.Name.Contains(".1fake"))
+            {
+            }
+
+            tw.Write(GetKindString(def1.Type.Kind));
+
+            if (def2 != null && !string.IsNullOrWhiteSpace(def2.Tag))
+            {
+                tw.Write($" {def2.Tag}");
+            }
+
+            var mod = def1.Type.Modifiers.ToArray();
+
+            var fcn = mod.Any(s => s == SymbolTypeModifier.FCN);
+
+            if (fcn)
+            {
+                tw.Write(" (");
+            }
+
+            foreach (var modifier in mod)
+            {
+                if (modifier == SymbolTypeModifier.PTR)
+                {
+                    tw.Write("*");
+                }
+            }
+
+            if (!fcn)
+            {
+                tw.Write(" ");
+            }
+
+            tw.Write($"{def1.Name}");
+
+            if (fcn)
+            {
+                tw.Write(")(void)");
+            }
+
+            if (def2 != null)
+            {
+                var length = def2.Dimensions.Length;
+
+                if (length != 0)
+                {
+                    Assert.AreEqual(length, mod.Count(s => s == SymbolTypeModifier.ARY));
+
+                    foreach (var dimension in def2.Dimensions)
+                    {
+                        tw.Write($"[{dimension}]");
+                    }
+                }
+            }
+
+            tw.WriteLine(";");
+        }
+
+        tw.Indent = 0;
+        tw.WriteLine("};");
+
+        return sw.ToString();
     }
 
     private static void PrintCount<T>(ICollection<T> collection)
@@ -188,8 +275,8 @@ public sealed class UnitTestGenerate : UnitTestBase
             SymbolTypeKind.LONG   => "long",
             SymbolTypeKind.FLOAT  => "float",
             SymbolTypeKind.DOUBLE => "double",
-            SymbolTypeKind.STRUCT => null,
-            SymbolTypeKind.UNION  => null,
+            SymbolTypeKind.STRUCT => "struct",
+            SymbolTypeKind.UNION  => "union",
             SymbolTypeKind.ENUM   => null,
             SymbolTypeKind.MOE    => null,
             SymbolTypeKind.UCHAR  => "unsigned char",
