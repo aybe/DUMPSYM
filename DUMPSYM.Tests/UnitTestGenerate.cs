@@ -27,6 +27,99 @@ public sealed class UnitTestGenerate : UnitTestBase
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$");
 
     [TestMethod]
+    public void FindDuplicateTypes()
+    {
+        var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
+
+        var current = list.First;
+
+        while (current != null)
+        {
+            if (!TryFindStructHeader(current, out current, out var header))
+            {
+                continue;
+            }
+
+            if (!TryFindStructFooter(current, out current, out var footer))
+            {
+                continue;
+            }
+
+            WriteLineVar(header);
+            WriteLineVar(footer);
+            WriteLine();
+        }
+    }
+
+    private static bool TryFindStructHeader(
+        LinkedListNode<SymbolRecord>? from, out LinkedListNode<SymbolRecord>? next, out ISymbolDefinition? header)
+    {
+        next = default;
+
+        header = default;
+
+        for (var node = from; node != null; node = node.Next)
+        {
+            if (!IsStructHeader(node.Value, out header))
+            {
+                continue;
+            }
+
+            next = node;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryFindStructFooter(
+        LinkedListNode<SymbolRecord>? from, out LinkedListNode<SymbolRecord>? next, out ISymbolDefinition2? footer)
+    {
+        next = default;
+
+        footer = default;
+
+        for (var node = from; node != null; node = node.Next)
+        {
+            if (!IsStructFooter(node.Value, out footer))
+            {
+                continue;
+            }
+
+            next = node;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsStructHeader(SymbolRecord record, out ISymbolDefinition? result)
+    {
+        result = default;
+
+        if (record is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT } def)
+        {
+            result = def;
+        }
+
+        return result != default;
+    }
+
+    private static bool IsStructFooter(SymbolRecord record, out ISymbolDefinition2? result)
+    {
+        result = default;
+
+        if (record is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def)
+        {
+            result = def;
+        }
+
+        return result != default;
+    }
+
+    [TestMethod]
     public void PrintTypesOfSymbols()
     {
         var file = UnitTest1.GetSample();
@@ -134,7 +227,7 @@ public sealed class UnitTestGenerate : UnitTestBase
 
             node = result.Last().Next;
 
-            result.ForEach(list.Remove);
+            result.ForEach(list.Remove); // BUG why does removing this makes it much longer?
 
             result.Clear();
         }
