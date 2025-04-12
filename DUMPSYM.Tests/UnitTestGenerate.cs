@@ -159,6 +159,27 @@ public sealed partial class UnitTestGenerate : UnitTestBase
         return result != null;
     }
 
+    private static LinkedListNode<TNode>? Search<TNode, TData>(
+        LinkedListNode<TNode> node, 
+        Func<LinkedListNode<TNode>, LinkedListNode<TNode>?> next, 
+        Func<LinkedListNode<TNode>, TData, bool> predicate,
+        TData userData)
+    {
+        var current = node;
+
+        while (current != null)
+        {
+            if (predicate(current, userData))
+            {
+                return current;
+            }
+
+            current = next(current);
+        }
+
+        return null;
+    }
+
     private static string GetStructString(List<LinkedListNode<SymbolRecord>> result)
     {
         var first = result.First();
@@ -182,7 +203,7 @@ public sealed partial class UnitTestGenerate : UnitTestBase
         {
             var def1 = node.Value as ISymbolDefinition ?? throw new InvalidOperationException();
 
-            var def2 = def1 as ISymbolDefinition2;
+            var def2 = def1 as ISymbolDefinition2; // array and/or tagged
 
             var kindString = GetKindString(def1.Type.Kind, GetKindStringRemap);
 
@@ -190,7 +211,18 @@ public sealed partial class UnitTestGenerate : UnitTestBase
 
             if (def2 != null && !string.IsNullOrWhiteSpace(def2.Tag))
             {
-                tw.Write($" {def2.Tag}");
+                var fake = Search(first, s => s.Previous, IsRealStructMemberName, def2)!;
+
+                if (fake != null)
+                {
+                    var def3 = (ISymbolDefinition2)fake.Value;
+
+                    tw.Write($" {def3.Name}");
+                }
+                else
+                {
+                    tw.Write($" {def2.Tag}");
+                }
             }
 
             var mod = def1.Type.Modifiers.ToArray();
@@ -244,6 +276,11 @@ public sealed partial class UnitTestGenerate : UnitTestBase
         tw.WriteLine("};");
 
         return sw.ToString();
+    }
+
+    private static bool IsRealStructMemberName(LinkedListNode<SymbolRecord> node, ISymbolDefinition2 data)
+    {
+        return node.Value is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF } d && d.Tag == data.Tag;
     }
 
     private static void PrintCount<T>(ICollection<T> collection)
