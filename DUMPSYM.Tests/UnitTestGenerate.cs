@@ -1,13 +1,15 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed class UnitTestGenerate : UnitTestBase
+public sealed partial class UnitTestGenerate : UnitTestBase
 {
     private static bool PrintRemaining => false;
 
@@ -20,6 +22,9 @@ public sealed class UnitTestGenerate : UnitTestBase
     private static bool RemoveFunctions => true;
 
     private static bool RemoveNames => true;
+
+    [GeneratedRegex(@"^\.\d+fake$")]
+    private static partial Regex RegexFakeName();
 
     [TestMethod]
     public void TestTypedefs()
@@ -126,6 +131,34 @@ public sealed class UnitTestGenerate : UnitTestBase
         }
     }
 
+    private static bool TryGetFakeRealName(
+            ISymbolDefinition head, List<LinkedListNode<SymbolRecord>> list, [MaybeNullWhen(false)] out string result)
+        // TODO cache
+    {
+        result = default;
+
+        var name = head.Name;
+
+        if (!RegexFakeName().IsMatch(name))
+        {
+            return false;
+        }
+
+        var fake = list.Last().Next;
+
+        if (fake is not { Value: ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF, Type.Kind: SymbolTypeKind.STRUCT } def })
+        {
+            return false;
+        }
+
+        if (def.Size == head.Size && def.Tag == name)
+        {
+            result = def.Name;
+        }
+
+        return result != null;
+    }
+
     private static string GetStructString(List<LinkedListNode<SymbolRecord>> result)
     {
         var first = result.First();
@@ -135,7 +168,12 @@ public sealed class UnitTestGenerate : UnitTestBase
         using var sw = new StringWriter();
         using var tw = new IndentedTextWriter(sw);
 
-        tw.WriteLine($"struct {head.Name}");
+        if (!TryGetFakeRealName(head, result, out var name)) // TODO struct members, e.g. struct .7fake r0;
+        {
+            name = head.Name;
+        }
+
+        tw.WriteLine($"struct {name}");
         tw.WriteLine("{");
 
         tw.Indent = 1;
@@ -145,10 +183,6 @@ public sealed class UnitTestGenerate : UnitTestBase
             var def1 = node.Value as ISymbolDefinition ?? throw new InvalidOperationException();
 
             var def2 = def1 as ISymbolDefinition2;
-
-            if (head.Name.Contains(".1fake"))
-            {
-            }
 
             var kindString = GetKindString(def1.Type.Kind, GetKindStringRemap);
 
