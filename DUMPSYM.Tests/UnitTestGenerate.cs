@@ -1,6 +1,8 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+// ReSharper disable StringLiteralTypo
+// ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
 
@@ -9,7 +11,7 @@ public sealed class UnitTestGenerate : UnitTestBase
 {
     private static bool PrintRemaining => false;
 
-    private static bool PrintTypedefs => false;
+    private static bool PrintTypedefs => true;
 
     private static bool RemoveLineModifiers => true;
 
@@ -148,7 +150,9 @@ public sealed class UnitTestGenerate : UnitTestBase
             {
             }
 
-            tw.Write(GetKindString(def1.Type.Kind));
+            var kindString = GetKindString(def1.Type.Kind, GetKindStringRemap);
+
+            tw.Write(kindString);
 
             if (def2 != null && !string.IsNullOrWhiteSpace(def2.Tag))
             {
@@ -263,8 +267,15 @@ public sealed class UnitTestGenerate : UnitTestBase
         return str;
     }
 
-    private static string GetKindString(SymbolTypeKind kind)
+    private static string GetKindString(SymbolTypeKind kind, Func<SymbolTypeKind, string?>? func = null)
     {
+        var text = func?.Invoke(kind);
+
+        if (text != null)
+        {
+            return text;
+        }
+
         return kind switch
         {
             SymbolTypeKind.NULL   => null,
@@ -285,6 +296,22 @@ public sealed class UnitTestGenerate : UnitTestBase
             SymbolTypeKind.ULONG  => "unsigned long",
             _                     => null
         } ?? throw new NotSupportedException(kind.ToString());
+    }
+
+    private static string? GetKindStringRemap(SymbolTypeKind kind)
+    {
+        // TODO typedefs can be searched but what when multiple match? e.g. UCHAR is BBOOL or UBYTE
+
+        // for now, this trivial mechanism allows one to override language keywords
+
+        return kind switch
+        {
+            SymbolTypeKind.UCHAR  => "byte",
+            SymbolTypeKind.USHORT => "ushort",
+            SymbolTypeKind.UINT   => "uint",
+            SymbolTypeKind.ULONG  => "ulong",
+            _                     => null
+        };
     }
 
     private static LinkedListNode<T>? Remove<T>(LinkedList<T> list, Func<T, bool> head, Func<T, bool> tail)
