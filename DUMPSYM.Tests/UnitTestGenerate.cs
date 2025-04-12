@@ -53,25 +53,23 @@ public sealed class UnitTestGenerate : UnitTestBase
         }
     }
 
-    private delegate T? NodeSelector<out T>(SymbolRecord record);
+    private delegate T? NodeSelector<in TNode, out T>(TNode node);
 
-    private static bool TryFindNode<T>(
-        NodeSelector<T> selector, LinkedListNode<SymbolRecord>? from, out LinkedListNode<SymbolRecord>? next, out T? header)
+    private static bool TryFindNode<TNode, TResult>(
+        NodeSelector<TNode, TResult> selector, LinkedListNode<TNode>? from, out LinkedListNode<TNode>? next, out TResult? result)
     {
         next = default;
 
-        header = default;
+        result = default;
 
         for (var node = from; node != null; node = node.Next)
         {
-            var result = selector(node.Value);
+            result = selector(node.Value);
 
             if (result == null)
             {
                 continue;
             }
-
-            header = result;
 
             next = node;
 
