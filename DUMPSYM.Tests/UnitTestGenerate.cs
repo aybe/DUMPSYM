@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed partial class UnitTestGenerate : UnitTestBase
+public sealed class UnitTestGenerate : UnitTestBase
 {
     private static bool PrintRemaining => false;
 
@@ -23,8 +23,8 @@ public sealed partial class UnitTestGenerate : UnitTestBase
 
     private static bool RemoveNames => true;
 
-    [GeneratedRegex(@"^\.\d+fake$")]
-    private static partial Regex RegexFakeName();
+    [SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "R#")]
+    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$");
 
     [TestMethod]
     public void TestTypedefs()
@@ -139,7 +139,7 @@ public sealed partial class UnitTestGenerate : UnitTestBase
 
         var name = head.Name;
 
-        if (!RegexFakeName().IsMatch(name))
+        if (!RegexFakeName.IsMatch(name))
         {
             return false;
         }
