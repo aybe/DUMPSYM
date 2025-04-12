@@ -26,6 +26,8 @@ public sealed class UnitTestGenerate : UnitTestBase
     [SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "R#")]
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$");
 
+    #region New region
+
     [TestMethod]
     public void FindDuplicateTypes()
     {
@@ -35,12 +37,12 @@ public sealed class UnitTestGenerate : UnitTestBase
 
         while (current != null)
         {
-            if (!TryFindStructHeader(current, out current, out var header))
+            if (!TryFindNode(IsStructHeader, current, out current, out var header))
             {
                 continue;
             }
 
-            if (!TryFindStructFooter(current, out current, out var footer))
+            if (!TryFindNode(IsStructFooter, current, out current, out var footer))
             {
                 continue;
             }
@@ -51,8 +53,10 @@ public sealed class UnitTestGenerate : UnitTestBase
         }
     }
 
-    private static bool TryFindStructHeader(
-        LinkedListNode<SymbolRecord>? from, out LinkedListNode<SymbolRecord>? next, out ISymbolDefinition? header)
+    private delegate T? NodeSelector<out T>(SymbolRecord record);
+
+    private static bool TryFindNode<T>(
+        NodeSelector<T> selector, LinkedListNode<SymbolRecord>? from, out LinkedListNode<SymbolRecord>? next, out T? header)
     {
         next = default;
 
@@ -60,10 +64,14 @@ public sealed class UnitTestGenerate : UnitTestBase
 
         for (var node = from; node != null; node = node.Next)
         {
-            if (!IsStructHeader(node.Value, out header))
+            var result = selector(node.Value);
+
+            if (result == null)
             {
                 continue;
             }
+
+            header = result;
 
             next = node;
 
@@ -73,51 +81,17 @@ public sealed class UnitTestGenerate : UnitTestBase
         return false;
     }
 
-    private static bool TryFindStructFooter(
-        LinkedListNode<SymbolRecord>? from, out LinkedListNode<SymbolRecord>? next, out ISymbolDefinition2? footer)
+    private static ISymbolDefinition? IsStructHeader(SymbolRecord record)
     {
-        next = default;
-
-        footer = default;
-
-        for (var node = from; node != null; node = node.Next)
-        {
-            if (!IsStructFooter(node.Value, out footer))
-            {
-                continue;
-            }
-
-            next = node;
-
-            return true;
-        }
-
-        return false;
+        return record is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT } def ? def : null;
     }
 
-    private static bool IsStructHeader(SymbolRecord record, out ISymbolDefinition? result)
+    private static ISymbolDefinition2? IsStructFooter(SymbolRecord record)
     {
-        result = default;
-
-        if (record is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT } def)
-        {
-            result = def;
-        }
-
-        return result != default;
+        return record is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def ? def : null;
     }
 
-    private static bool IsStructFooter(SymbolRecord record, out ISymbolDefinition2? result)
-    {
-        result = default;
-
-        if (record is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def)
-        {
-            result = def;
-        }
-
-        return result != default;
-    }
+    #endregion
 
     [TestMethod]
     public void PrintTypesOfSymbols()
