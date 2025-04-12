@@ -377,10 +377,10 @@ public sealed partial class UnitTestGenerate : UnitTestBase
 
         return kind switch
         {
-            SymbolTypeKind.UCHAR  => "byte",
-            SymbolTypeKind.USHORT => "ushort",
-            SymbolTypeKind.UINT   => "uint",
-            SymbolTypeKind.ULONG  => "ulong",
+            SymbolTypeKind.UCHAR  => "u_char",
+            SymbolTypeKind.USHORT => "u_short",
+            SymbolTypeKind.UINT   => "u_int",
+            SymbolTypeKind.ULONG  => "u_long",
             _                     => null
         };
     }
