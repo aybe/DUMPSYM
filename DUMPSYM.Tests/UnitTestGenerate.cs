@@ -27,6 +27,25 @@ public sealed class UnitTestGenerate : UnitTestBase
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$");
 
     [TestMethod]
+    public void PrintTypesOfSymbols()
+    {
+        var file = UnitTest1.GetSample();
+
+        var lookup = file.ToLookup(s => s.GetType());
+
+        var total = file.Count();
+
+        WriteLineVar(total);
+
+        foreach (var records in lookup.OrderBy(s => s.Key.Name))
+        {
+            var count = records.Count();
+
+            WriteLine($"{records.Key.Name}: {count} ({(double)count / total:P})");
+        }
+    }
+
+    [TestMethod]
     public void TestTypedefs()
     {
         var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());

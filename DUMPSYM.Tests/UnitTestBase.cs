@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
 namespace DUMPSYM.Tests;
@@ -38,5 +39,10 @@ public abstract class UnitTestBase // TODO move to library
         var message = $"{me.Member.Name}: {valueValue}";
 
         WriteLine(message);
+    }
+
+    protected void WriteLineVar(object? value, [CallerArgumentExpression(nameof(value))] string valueName = null!)
+    {
+        WriteLine($"{valueName}: {value}");
     }
 }
