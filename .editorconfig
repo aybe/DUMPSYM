@@ -4,4 +4,5 @@
 dotnet_remove_unnecessary_suppression_exclusions=category:ReSharper
 
 # ReSharper properties
+resharper_csharp_max_line_length=150
 resharper_int_align_fields=true
