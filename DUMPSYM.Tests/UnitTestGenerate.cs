@@ -27,44 +27,12 @@ public sealed class UnitTestGenerate : UnitTestBase
     [SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "R#")]
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$");
 
-    #region New region
-
     [TestMethod]
     public void FindDuplicateTypes()
     {
         var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
 
-        var current = list.First;
-
-        var types = new List<LinkedList<SymbolRecord>>();
-
-        while (current != null)
-        {
-            if (!TryFindNode(IsStructHeader, current, out current, out var header))
-            {
-                continue;
-            }
-
-            var headerNode = current!;
-
-            if (!TryFindNode(IsStructFooter, current, out current, out var footer))
-            {
-                continue;
-            }
-
-            var footerNode = current!;
-
-            Assert.AreEqual(header!.Name, footer!.Tag);
-
-            var type = new LinkedList<SymbolRecord>();
-
-            for (var node = headerNode; node != null && node != footerNode.Next; node = node.Next)
-            {
-                type.AddLast(node.Value);
-            }
-
-            types.Add(type);
-        }
+        var types = SymbolExtensions.GetTypes(list);
 
         WriteLineVar(types.Count);
 
@@ -91,44 +59,6 @@ public sealed class UnitTestGenerate : UnitTestBase
 
         // BUG this doesn't add up, 288 by name, 299 by json
     }
-
-    private delegate T? NodeSelector<in TNode, out T>(TNode node);
-
-    private static bool TryFindNode<TNode, TResult>(
-        NodeSelector<TNode, TResult> selector, LinkedListNode<TNode>? from, out LinkedListNode<TNode>? next, out TResult? result)
-    {
-        next = default;
-
-        result = default;
-
-        for (var node = from; node != null; node = node.Next)
-        {
-            result = selector(node.Value);
-
-            if (result == null)
-            {
-                continue;
-            }
-
-            next = node;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private static ISymbolDefinition? IsStructHeader(SymbolRecord record)
-    {
-        return record is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT } def ? def : null;
-    }
-
-    private static ISymbolDefinition2? IsStructFooter(SymbolRecord record)
-    {
-        return record is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def ? def : null;
-    }
-
-    #endregion
 
     [TestMethod]
     public void PrintTypesOfSymbols()

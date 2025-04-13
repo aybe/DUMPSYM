@@ -4,6 +4,20 @@ namespace DUMPSYM.Tests;
 
 public static class LinkedListExtensions
 {
+    public static void CopyFrom<T>(this LinkedList<T> list, LinkedListNode<T> head, LinkedListNode<T> tail)
+        // TODO this assumes next is the next one
+    {
+        if (head.List != tail.List)
+        {
+            throw new InvalidOperationException();
+        }
+
+        for (var node = head; node != null && node != tail.Next; node = node.Next)
+        {
+            list.AddLast(node.Value);
+        }
+    }
+
     public static LinkedListNode<T>? Remove<T>(this LinkedList<T> list, Func<T, bool> head, Func<T, bool> tail)
     {
         var first = list.First;
