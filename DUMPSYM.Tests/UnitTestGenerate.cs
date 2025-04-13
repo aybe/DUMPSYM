@@ -178,7 +178,7 @@ public sealed class UnitTestGenerate : UnitTestBase
         if (RemoveLineModifiers)
         {
             Console.WriteLine("Removing line modifiers...");
-            RemoveWhere(list, s => s is ISymbolLineModifier);
+            list.RemoveWhere(s => s is ISymbolLineModifier);
             PrintCount(list);
             Console.WriteLine();
         }
@@ -187,7 +187,7 @@ public sealed class UnitTestGenerate : UnitTestBase
         {
             Console.WriteLine("Removing unions...");
 
-            while (Remove(list, s => s is ISymbolDefinition { Class: SymbolStorageClass.UNTAG },
+            while (list.Remove(s => s is ISymbolDefinition { Class: SymbolStorageClass.UNTAG },
                        s => s is ISymbolDefinition { Class: SymbolStorageClass.EOS }) != null)
             {
             }
@@ -200,7 +200,7 @@ public sealed class UnitTestGenerate : UnitTestBase
         {
             Console.WriteLine("Removing functions...");
 
-            while (Remove(list, s => s is SymbolRecordFunctionStart, s => s is SymbolRecordFunctionEnd) != null)
+            while (list.Remove(s => s is SymbolRecordFunctionStart, s => s is SymbolRecordFunctionEnd) != null)
             {
             }
 
@@ -211,7 +211,7 @@ public sealed class UnitTestGenerate : UnitTestBase
         if (RemoveNames)
         {
             Console.WriteLine("Removing names...");
-            RemoveWhere(list, s => s is SymbolRecordName);
+            list.RemoveWhere(s => s is SymbolRecordName);
             PrintCount(list);
             Console.WriteLine();
         }
@@ -523,91 +523,15 @@ public sealed class UnitTestGenerate : UnitTestBase
         };
     }
 
-    private static LinkedListNode<T>? Remove<T>(LinkedList<T> list, Func<T, bool> head, Func<T, bool> tail)
-    {
-        var first = list.First;
-
-        if (first == null)
-        {
-            return null;
-        }
-
-        if (!TryFindNode(first, out var headNode, head))
-        {
-            return null;
-        }
-
-        if (!TryFindNode(headNode, out var tailNode, tail))
-        {
-            return null;
-        }
-
-        var node = headNode;
-
-        while (node != null && node != tailNode)
-        {
-            var next = node.Next;
-
-            list.Remove(node);
-
-            node = next;
-        }
-
-        node = tailNode.Next;
-
-        list.Remove(tailNode);
-
-        return node;
-    }
-
-    private static void RemoveWhere<T>(LinkedList<T> list, Func<T, bool> predicate)
-    {
-        var current = list.First;
-
-        while (current != null)
-        {
-            var next = current.Next;
-
-            if (predicate(current.Value))
-            {
-                list.Remove(current);
-            }
-
-            current = next;
-        }
-    }
-
-    private static bool TryFindNode<T>(
-        LinkedListNode<T> node, [MaybeNullWhen(false)] out LinkedListNode<T> result, Func<T, bool> predicate)
-    {
-        result = default;
-
-        var current = node;
-
-        while (current != null)
-        {
-            if (predicate(current.Value))
-            {
-                result = current;
-
-                return true;
-            }
-
-            current = current.Next;
-        }
-
-        return false;
-    }
-
     private static bool TryFindStruct(
         LinkedListNode<SymbolRecord> node, List<LinkedListNode<SymbolRecord>> list)
     {
-        if (!TryFindNode(node, out var head, s => s is ISymbolDefinition { Class: SymbolStorageClass.STRTAG }))
+        if (!node.TryFindNode(out var head, s => s is ISymbolDefinition { Class: SymbolStorageClass.STRTAG }))
         {
             return false;
         }
 
-        if (!TryFindNode(head, out var tail, s => s is ISymbolDefinition { Class: SymbolStorageClass.EOS }))
+        if (!head.TryFindNode(out var tail, s => s is ISymbolDefinition { Class: SymbolStorageClass.EOS }))
         {
             return false;
         }
