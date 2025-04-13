@@ -1,22 +1,39 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordFunctionStart(SymbolContext context) : SymbolRecord, ISymbolFunction, ISymbolName
+[Serializable]
+public sealed class SymbolRecordFunctionStart : SymbolRecord, ISymbolFunction, ISymbolName
 {
-    public ushort FramePointer { get; } = context.Read<ushort>();
+    public SymbolRecordFunctionStart()
+    {
+    }
 
-    public uint Size { get; } = context.Read<uint>();
+    public SymbolRecordFunctionStart(SymbolContext context)
+    {
+        FramePointer = context.Read<ushort>();
+        Size = context.Read<uint>();
+        ReturnAddressRegister = context.Read<ushort>();
+        Mask = context.Read<uint>();
+        MaskOffset = context.Read<int>();
+        Line = context.Read<uint>();
+        File = context.ReadStringAscii();
+        Name = context.ReadStringAscii();
+    }
 
-    public ushort ReturnAddressRegister { get; } = context.Read<ushort>();
+    public ushort FramePointer { get; set; }
 
-    public uint Mask { get; } = context.Read<uint>();
+    public uint Size { get; set; }
 
-    public int MaskOffset { get; } = context.Read<int>();
+    public ushort ReturnAddressRegister { get; set; }
 
-    public uint Line { get; } = context.Read<uint>();
+    public uint Mask { get; set; }
 
-    public string File { get; } = context.ReadStringAscii();
+    public int MaskOffset { get; set; }
 
-    public string Name { get; } = context.ReadStringAscii();
+    public uint Line { get; set; }
+
+    public string File { get; set; } = null!;
+
+    public string Name { get; set; } = null!;
 
     public override string ToString()
     {

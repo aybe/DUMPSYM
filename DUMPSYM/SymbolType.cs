@@ -1,14 +1,16 @@
-using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace DUMPSYM;
 
-public readonly record struct SymbolType
+[Serializable]
+public record struct SymbolType
 {
-    [UsedImplicitly]
-    private ushort Value { get; }
+    public ushort Value { get; set; }
 
+    [JsonIgnore]
     public SymbolTypeKind Kind => (SymbolTypeKind)(Value & 0xF);
 
+    [JsonIgnore]
     public IEnumerable<SymbolTypeModifier> Modifiers
     {
         get

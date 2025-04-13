@@ -1,8 +1,18 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordName(SymbolContext context) : SymbolRecord, ISymbolName
+[Serializable]
+public sealed class SymbolRecordName : SymbolRecord, ISymbolName
 {
-    public string Name { get; } = context.ReadStringAscii();
+    public SymbolRecordName()
+    {
+    }
+
+    public SymbolRecordName(SymbolContext context)
+    {
+        Name = context.ReadStringAscii();
+    }
+
+    public string Name { get; set; } = null!;
 
     public override string ToString()
     {

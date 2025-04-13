@@ -3,9 +3,14 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
+[Serializable]
 public sealed class SymbolFile : IEnumerable<SymbolRecord>
 {
-    private SymbolFile(string header, int version, int targetUnit, IList<Symbol> symbols)
+    public SymbolFile()
+    {
+    }
+
+    private SymbolFile(string header, int version, int targetUnit, List<Symbol> symbols)
     {
         Header = header;
         Version = version;
@@ -13,13 +18,13 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
         Symbols = symbols;
     }
 
-    public string Header { get; }
+    public string Header { get; set; } = null!;
 
-    public int Version { get; }
+    public int Version { get; set; }
 
-    public int TargetUnit { get; }
+    public int TargetUnit { get; set; }
 
-    public IList<Symbol> Symbols { get; }
+    public List<Symbol> Symbols { get; set; } = null!;
 
     public IEnumerator<SymbolRecord> GetEnumerator()
     {

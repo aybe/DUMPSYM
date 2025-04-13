@@ -2,13 +2,25 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-public readonly struct SymbolHeader(Stream stream)
+[Serializable]
+public struct SymbolHeader
 {
-    public long Position { get; } = stream.Position;
+    public SymbolHeader()
+    {
+    }
 
-    public uint Address { get; } = stream.Read<uint>();
+    public SymbolHeader(Stream stream)
+    {
+        Position = stream.Position;
+        Address = stream.Read<uint>();
+        Type = stream.Read<byte>();
+    }
 
-    public byte Type { get; } = stream.Read<byte>();
+    public long Position { get; set; }
+
+    public uint Address { get; set; }
+
+    public byte Type { get; set; }
 
     public override string ToString()
     {

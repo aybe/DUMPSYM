@@ -1,8 +1,18 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordIncSldLineNum(SymbolContext context) : SymbolRecord, ISymbolLineModifier
+[Serializable]
+public sealed class SymbolRecordIncSldLineNum : SymbolRecord, ISymbolLineModifier
 {
-    private uint Line { get; } = context.Line += 1;
+    public SymbolRecordIncSldLineNum()
+    {
+    }
+
+    public SymbolRecordIncSldLineNum(SymbolContext context)
+    {
+        Line = context.Line += 1;
+    }
+
+    private uint Line { get; set; }
 
     public override string ToString()
     {

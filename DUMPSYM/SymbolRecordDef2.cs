@@ -1,18 +1,33 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordDef2(SymbolContext context) : SymbolRecord, ISymbolName, ISymbolDefinition2
+[Serializable]
+public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolName, ISymbolDefinition2
 {
-    public SymbolStorageClass Class { get; } = context.Read<SymbolStorageClass>();
+    public SymbolRecordDef2()
+    {
+    }
 
-    public SymbolType Type { get; } = context.Read<SymbolType>();
+    public SymbolRecordDef2(SymbolContext context)
+    {
+        Class = context.Read<SymbolStorageClass>();
+        Type = context.Read<SymbolType>();
+        Size = context.Read<uint>();
+        Dimensions = ReadDimensions(context);
+        Tag = context.ReadStringAscii();
+        Name = context.ReadStringAscii();
+    }
 
-    public uint Size { get; } = context.Read<uint>();
+    public SymbolStorageClass Class { get; set; }
 
-    public uint[] Dimensions { get; } = ReadDimensions(context);
+    public SymbolType Type { get; set; }
 
-    public string Tag { get; } = context.ReadStringAscii();
+    public uint Size { get; set; }
 
-    public string Name { get; } = context.ReadStringAscii();
+    public uint[] Dimensions { get; set; } = null!;
+
+    public string Tag { get; set; } = null!;
+
+    public string Name { get; set; } = null!;
 
     private static uint[] ReadDimensions(SymbolContext context)
     {

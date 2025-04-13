@@ -1,24 +1,43 @@
 namespace DUMPSYM;
 
-public sealed class SymbolRecordFunction2Start(SymbolContext context) : SymbolRecord, ISymbolFunction, ISymbolName
+[Serializable]
+public sealed class SymbolRecordFunction2Start : SymbolRecord, ISymbolFunction, ISymbolName
 {
-    public uint FMask { get; } = context.Read<uint>();
+    public SymbolRecordFunction2Start()
+    {
+    }
 
-    public int FMaskOffset { get; } = context.Read<int>();
+    public SymbolRecordFunction2Start(SymbolContext context)
+    {
+        FMask = context.Read<uint>();
+        FMaskOffset = context.Read<int>();
+        FramePointer = context.Read<ushort>();
+        Size = context.Read<uint>();
+        ReturnAddressRegister = context.Read<ushort>();
+        Mask = context.Read<uint>();
+        MaskOffset = context.Read<int>();
+        Line = context.Read<uint>();
+        File = context.ReadStringAscii();
+        Name = context.ReadStringAscii();
+    }
 
-    public ushort FramePointer { get; } = context.Read<ushort>();
+    public uint FMask { get; set; }
 
-    public uint Size { get; } = context.Read<uint>();
+    public int FMaskOffset { get; set; }
 
-    public ushort ReturnAddressRegister { get; } = context.Read<ushort>();
+    public ushort FramePointer { get; set; }
 
-    public uint Mask { get; } = context.Read<uint>();
+    public uint Size { get; set; }
 
-    public int MaskOffset { get; } = context.Read<int>();
+    public ushort ReturnAddressRegister { get; set; }
 
-    public uint Line { get; } = context.Read<uint>();
+    public uint Mask { get; set; }
 
-    public string File { get; } = context.ReadStringAscii();
+    public int MaskOffset { get; set; }
 
-    public string Name { get; } = context.ReadStringAscii();
+    public uint Line { get; set; }
+
+    public string File { get; set; } = null!;
+
+    public string Name { get; set; } = null!;
 }
