@@ -150,6 +150,21 @@ public sealed class UnitTestGenerate : UnitTestBase
     }
 
     [TestMethod]
+    public void TestSplitByFile()
+    {
+        var file = UnitTest1.GetSample();
+
+        var records = new LinkedList<SymbolRecord>(file);
+
+        var split = records.Split(s => s is SymbolRecordSetSldToLineOfFile);
+
+        foreach (var item in split)
+        {
+            WriteLine($"size = {item.Count}, name = {item.First!.Value}");
+        }
+    }
+
+    [TestMethod]
     public void TestTypedefs()
     {
         var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
