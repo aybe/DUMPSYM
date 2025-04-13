@@ -35,6 +35,8 @@ public sealed class UnitTestGenerate : UnitTestBase
 
         var current = list.First;
 
+        var types = new List<LinkedList<SymbolRecord>>();
+
         while (current != null)
         {
             if (!TryFindNode(IsStructHeader, current, out current, out var header))
@@ -42,14 +44,27 @@ public sealed class UnitTestGenerate : UnitTestBase
                 continue;
             }
 
+            var headerNode = current!;
+
             if (!TryFindNode(IsStructFooter, current, out current, out var footer))
             {
                 continue;
             }
 
+            var footerNode = current!;
+
             WriteLineVar(header);
             WriteLineVar(footer);
             WriteLine();
+
+            var type = new LinkedList<SymbolRecord>();
+
+            for (var node = headerNode; node != null && node != footerNode.Next; node = node.Next)
+            {
+                type.AddLast(node.Value);
+            }
+
+            types.Add(type);
         }
     }
 
