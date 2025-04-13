@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
@@ -53,9 +54,7 @@ public sealed class UnitTestGenerate : UnitTestBase
 
             var footerNode = current!;
 
-            WriteLineVar(header);
-            WriteLineVar(footer);
-            WriteLine();
+            Assert.AreEqual(header!.Name, footer!.Tag);
 
             var type = new LinkedList<SymbolRecord>();
 
@@ -66,6 +65,31 @@ public sealed class UnitTestGenerate : UnitTestBase
 
             types.Add(type);
         }
+
+        WriteLineVar(types.Count);
+
+        var distinctByName = types.DistinctBy(s => ((ISymbolDefinition)s.First!.Value).Name).ToArray();
+
+        WriteLineVar(distinctByName.Length);
+
+        var distinctByJson = types.DistinctBy(JsonConvert.SerializeObject).ToArray();
+
+        WriteLineVar(distinctByJson.Length);
+
+        var types1 = distinctByName.Select(s => (s.First!.Value as ISymbolDefinition)?.Name).ToArray();
+        var types2 = distinctByJson.Select(s => (s.First!.Value as ISymbolDefinition)?.Name).ToArray();
+
+        for (var i = 0; i < Math.Max(types1.Length, types2.Length); i++)
+        {
+            var type1 = i < types1.Length ? types1[i] : null;
+            var type2 = i < types2.Length ? types2[i] : null;
+            WriteLine($"[{i}] {type1}, {type2}, {type1 == type2}");
+        }
+
+        var join1 = string.Join(Environment.NewLine, types1);
+        var join2 = string.Join(Environment.NewLine, types2);
+
+        // BUG this doesn't add up, 288 by name, 299 by json
     }
 
     private delegate T? NodeSelector<in TNode, out T>(TNode node);
