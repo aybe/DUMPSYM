@@ -1,0 +1,11 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+static class Solution
+{
+	public static string Directory { get; } = @"<#= Path.GetFullPath(this.Host.ResolvePath(".")) #>";
+}

@@ -406,3 +406,4 @@ FodyWeavers.xsd
 DUMPSYM/Properties/launchSettings.json
 *.cd
 *.g.cs
+test_data
