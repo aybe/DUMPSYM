@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public abstract class SymbolRecord : ISymbol
+public abstract class SymbolRecord
 {
     public override string ToString()
     {
