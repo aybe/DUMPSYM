@@ -99,6 +99,19 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         Assert.AreEqual(0, symbols2.Count, string.Join(Environment.NewLine, symbols2));
 
+        var registry = new SymbolRegistry
+        {
+            Externals = externals,
+            Files = files,
+            Functions = functions,
+            Names = names,
+            Statics = statics,
+            Structs = structs,
+            Typedefs = typedefs,
+            Unions = unions
+        };
+
+        registry.Parse();
     }
 
     public static IEnumerable<object[]> TestSldFileData()
