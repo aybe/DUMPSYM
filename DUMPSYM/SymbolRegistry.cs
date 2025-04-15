@@ -20,5 +20,27 @@ public sealed class SymbolRegistry
 
     public void Parse()
     {
+        ParseTypedefs();
+    }
+
+    private void ParseTypedefs()
+    {
+        if (false)
+        {
+            foreach (var def in Typedefs.Where(s => s is ISymbolDefinition and not ISymbolDefinition2).Cast<ISymbolDefinition>()) // TODO sucks
+            {
+                var str = TypedefUtility.Parse(def);
+
+                Console.WriteLine($"{def,-70} -> {str}");
+            }
+        }
+
+        foreach (var def in Typedefs.OfType<ISymbolDefinition2>())
+        {
+            var str = TypedefUtility.Parse(def);
+
+            continue;
+            Console.WriteLine($"{def,-80} -> {str}");
+        }
     }
 }
