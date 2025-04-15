@@ -16,7 +16,7 @@ public static class SymbolExtensions // TODO move
 
     public static List<ISymbol> GetLineModifiers(List<ISymbol> symbols)
     {
-        return Where(symbols, s => s is ISymbolLineModifier);
+        return Where(symbols, s => s is ISymbolFileEnd);
     }
 
     public static List<ISymbol> GetStatics(List<ISymbol> symbols)

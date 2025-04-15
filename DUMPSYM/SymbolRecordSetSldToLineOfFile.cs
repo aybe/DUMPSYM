@@ -1,7 +1,7 @@
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordSetSldToLineOfFile : SymbolRecord, ISymbolLineModifierStart
+public sealed class SymbolRecordSetSldToLineOfFile : SymbolRecord, ISymbolFileStart
 {
     public SymbolRecordSetSldToLineOfFile()
     {
