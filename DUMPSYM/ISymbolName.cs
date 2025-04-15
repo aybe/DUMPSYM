@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public interface ISymbolName
+public interface ISymbolName : ISymbol
 {
     string Name { get; }
 }

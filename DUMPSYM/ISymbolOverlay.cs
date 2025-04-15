@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public interface ISymbolOverlay
+public interface ISymbolOverlay : ISymbol
 {
     // TODO add members
 }

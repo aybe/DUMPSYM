@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public interface ISymbolFunctionBlock
+public interface ISymbolFunctionBlock : ISymbol
 {
     uint Line { get; }
 }

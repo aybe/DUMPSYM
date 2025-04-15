@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public interface ISymbolDefinition
+public interface ISymbolDefinition : ISymbol
 {
     SymbolStorageClass Class { get; }
 

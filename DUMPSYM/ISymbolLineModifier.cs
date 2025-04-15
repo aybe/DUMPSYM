@@ -1,5 +1,5 @@
 namespace DUMPSYM;
 
-public interface ISymbolLineModifier
+public interface ISymbolLineModifier : ISymbol
 {
 }

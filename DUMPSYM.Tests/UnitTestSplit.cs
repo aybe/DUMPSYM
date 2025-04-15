@@ -57,7 +57,53 @@ public sealed class UnitTestSplit222 : UnitTestBase
     [DynamicData(nameof(TestSldFileData), DynamicDataDisplayName = nameof(TestSldFileName))]
     public void TestSldFile(string path)
     {
-        var symbols = SymbolUtility.DeserializeList(File.ReadAllText(path));
+        var symbols1 = SymbolUtility.DeserializeList(File.ReadAllText(path));
+
+        var symbols2 = symbols1.Select(s => s.Record).Cast<ISymbol>().ToList(); // TODO sucks
+
+        var structs = SymbolExtensions.GetStructs(symbols2);
+
+        Remove(symbols2, structs);
+
+        var unions = SymbolExtensions.GetUnions(symbols2);
+
+        Remove(symbols2, unions);
+
+        var typedefs = SymbolExtensions.GetTypedefs(symbols2);
+
+        Remove(symbols2, typedefs);
+
+        var externals = SymbolExtensions.GetExternals(symbols2);
+
+        Remove(symbols2, externals);
+
+        var statics = SymbolExtensions.GetStatics(symbols2);
+
+        Remove(symbols2, statics);
+
+        var functions = SymbolExtensions.GetFunctions(symbols2);
+
+        Remove(symbols2, functions);
+
+        var lineModifiers = SymbolExtensions.GetLineModifiers(symbols2);
+
+        Remove(symbols2, lineModifiers);
+
+        var names = SymbolExtensions.GetVariables(symbols2);
+
+        Remove(symbols2, names);
+
+        Assert.AreEqual(0, symbols2.Count);
+    }
+
+    private static void Remove<T>(List<T> list, List<T> items)
+    {
+        items.ForEach(s => list.Remove(s));
+    }
+
+    private static void Remove<T>(List<T> list, List<List<T>> items)
+    {
+        items.ForEach(s => Remove(list, s));
     }
 
     public static IEnumerable<object[]> TestSldFileData()

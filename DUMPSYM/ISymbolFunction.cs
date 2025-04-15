@@ -1,6 +1,6 @@
 namespace DUMPSYM;
 
-public interface ISymbolFunction
+public interface ISymbolFunction : ISymbol
 {
     ushort FramePointer { get; }
 

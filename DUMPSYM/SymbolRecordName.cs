@@ -1,7 +1,7 @@
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordName : SymbolRecord, ISymbolName
+public sealed class SymbolRecordName : SymbolRecord, ISymbolVariable
 {
     public SymbolRecordName()
     {
