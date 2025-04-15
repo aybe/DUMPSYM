@@ -63,51 +63,42 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         var structs = SymbolExtensions.GetStructs(symbols2);
 
-        Remove(symbols2, structs);
+        symbols2.Remove(structs);
 
         var unions = SymbolExtensions.GetUnions(symbols2);
 
-        Remove(symbols2, unions);
+        symbols2.Remove(unions);
 
         var typedefs = SymbolExtensions.GetTypedefs(symbols2);
 
-        Remove(symbols2, typedefs);
+        symbols2.Remove(typedefs);
 
         var externals = SymbolExtensions.GetExternals(symbols2);
 
-        Remove(symbols2, externals);
+        symbols2.Remove(externals);
 
         var statics = SymbolExtensions.GetStatics(symbols2);
 
-        Remove(symbols2, statics);
+        symbols2.Remove(statics);
 
         var functions = SymbolExtensions.GetFunctions(symbols2);
 
-        Remove(symbols2, functions);
+        symbols2.Remove(functions);
 
         var files = SymbolExtensions.GetFiles(symbols2);
 
-        Remove(symbols2, files);
+        symbols2.Remove(files);
 
         var filesOrphans = SymbolExtensions.GetFilesOrphans(symbols2);
 
-        Remove(symbols2, filesOrphans);
+        symbols2.Remove(filesOrphans);
 
         var names = SymbolExtensions.GetVariables(symbols2);
 
-        Remove(symbols2, names);
+        symbols2.Remove(names);
 
         Assert.AreEqual(0, symbols2.Count, string.Join(Environment.NewLine, symbols2));
-    }
 
-    private static void Remove<T>(List<T> list, List<T> items)
-    {
-        items.ForEach(s => list.Remove(s));
-    }
-
-    private static void Remove<T>(List<T> list, List<List<T>> items)
-    {
-        items.ForEach(s => Remove(list, s));
     }
 
     public static IEnumerable<object[]> TestSldFileData()
