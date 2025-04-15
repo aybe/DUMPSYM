@@ -14,7 +14,7 @@ public static class SymbolExtensions // TODO move
         return Where(symbols, s => s is ISymbolDefinition { Class: SymbolStorageClass.EXT });
     }
 
-    public static List<ISymbol> GetLineModifiers(List<ISymbol> symbols)
+    public static List<ISymbol> GetFilesOrphans(List<ISymbol> symbols)
     {
         return Where(symbols, s => s is ISymbolFileEnd);
     }
@@ -67,6 +67,11 @@ public static class SymbolExtensions // TODO move
         return lists;
     }
 
+    public static List<List<ISymbol>> GetFiles(List<ISymbol> symbols)
+    {
+        return GetSymbols(symbols, s => s.IsFileHeader(), s => s.IsFileFooter());
+    }
+
     public static List<List<ISymbol>> GetFunctions(List<ISymbol> symbols)
     {
         return GetSymbols(symbols, s => s.IsFunctionHeader(), s => s.IsFunctionFooter());
@@ -80,6 +85,16 @@ public static class SymbolExtensions // TODO move
     public static List<List<ISymbol>> GetUnions(List<ISymbol> symbols)
     {
         return GetSymbols(symbols, s => s.IsUnionHeader(), s => s.IsTypeFooter());
+    }
+
+    public static bool IsFileHeader(this ISymbol symbol)
+    {
+        return symbol is ISymbolFileStart;
+    }
+
+    public static bool IsFileFooter(this ISymbol symbol)
+    {
+        return symbol is ISymbolFileEnd;
     }
 
     public static bool IsFunctionHeader(this ISymbol symbol)

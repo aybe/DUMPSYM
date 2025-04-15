@@ -85,9 +85,13 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         Remove(symbols2, functions);
 
-        var lineModifiers = SymbolExtensions.GetLineModifiers(symbols2);
+        var files = SymbolExtensions.GetFiles(symbols2);
 
-        Remove(symbols2, lineModifiers);
+        Remove(symbols2, files);
+
+        var filesOrphans = SymbolExtensions.GetFilesOrphans(symbols2);
+
+        Remove(symbols2, filesOrphans);
 
         var names = SymbolExtensions.GetVariables(symbols2);
 
