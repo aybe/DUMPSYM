@@ -97,7 +97,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         Remove(symbols2, names);
 
-        Assert.AreEqual(0, symbols2.Count);
+        Assert.AreEqual(0, symbols2.Count, string.Join(Environment.NewLine, symbols2));
     }
 
     private static void Remove<T>(List<T> list, List<T> items)
