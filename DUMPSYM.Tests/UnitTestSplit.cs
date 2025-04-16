@@ -25,7 +25,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         Directory.CreateDirectory(directory);
 
-        var input = UnitTest1.GetSample();
+        var input = Sample.Default;
 
         var lists = input.Symbols.Split(s => s.Record is SymbolRecordSetSldToLineOfFile);
 

@@ -30,7 +30,7 @@ public sealed class UnitTestGenerate : UnitTestBase
     [TestMethod]
     public void FindDuplicateTypes()
     {
-        var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
+        var list = new LinkedList<SymbolRecord>(Sample.Default);
 
         var types = SymbolExtensions.GetTypes(list);
 
@@ -63,7 +63,7 @@ public sealed class UnitTestGenerate : UnitTestBase
     [TestMethod]
     public void PrintTypesOfSymbols()
     {
-        var file = UnitTest1.GetSample();
+        var file = Sample.Default;
 
         var lookup = file.ToLookup(s => s.GetType());
 
@@ -82,7 +82,7 @@ public sealed class UnitTestGenerate : UnitTestBase
     [TestMethod]
     public void TestSplitByFile()
     {
-        var file = UnitTest1.GetSample();
+        var file = Sample.Default;
 
         var records = new LinkedList<SymbolRecord>(file);
 
@@ -97,7 +97,7 @@ public sealed class UnitTestGenerate : UnitTestBase
     [TestMethod]
     public void TestTypedefs()
     {
-        var list = new LinkedList<SymbolRecord>(UnitTest1.GetSample());
+        var list = new LinkedList<SymbolRecord>(Sample.Default);
 
         {
             Console.WriteLine("Reading symbols...");

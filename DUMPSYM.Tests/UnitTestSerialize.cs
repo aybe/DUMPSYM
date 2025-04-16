@@ -8,7 +8,7 @@ public sealed class UnitTestSerialize : UnitTestBase
     [TestMethod]
     public void TestSerializeFile()
     {
-        var file = UnitTest1.GetSample();
+        var file = Sample.Default;
 
         TestSerialization(o => SymbolUtility.SerializeFile((SymbolFile)o, Formatting.Indented), SymbolUtility.DeserializeFile, file);
     }
@@ -16,7 +16,7 @@ public sealed class UnitTestSerialize : UnitTestBase
     [TestMethod]
     public void TestSerializeSymbols()
     {
-        var file = UnitTest1.GetSample();
+        var file = Sample.Default;
 
         TestSerialization(s => SymbolUtility.SerializeList((List<Symbol>)s, Formatting.Indented), SymbolUtility.DeserializeList, file.Symbols);
     }
