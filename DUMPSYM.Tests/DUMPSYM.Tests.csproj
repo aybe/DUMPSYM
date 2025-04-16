@@ -61,9 +61,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update=".SYM file list.txt">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
 		<None Update="Solution.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>Solution.g.cs</LastGenOutput>
