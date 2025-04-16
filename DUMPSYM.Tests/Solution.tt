@@ -1,11 +1,19 @@
 ﻿<#@ template debug="true" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".g.cs" #>
+<#
+var serviceProvider = this.Host as IServiceProvider;
+var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+var directory = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
+#>
+namespace DUMPSYM.Tests;
+
 static class Solution
 {
-	public static string Directory { get; } = @"<#= Path.GetFullPath(this.Host.ResolvePath(".")) #>";
+	public const string Directory = @"<#= directory #>";
 }
