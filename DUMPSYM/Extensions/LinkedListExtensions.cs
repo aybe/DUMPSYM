@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace DUMPSYM.Tests;
+namespace DUMPSYM.Extensions;
 
 public static class LinkedListExtensions
 {

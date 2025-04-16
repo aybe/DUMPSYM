@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using DUMPSYM.Extensions;
 using Newtonsoft.Json;
 
 namespace DUMPSYM.Tests;

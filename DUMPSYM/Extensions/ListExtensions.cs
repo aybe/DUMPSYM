@@ -1,4 +1,4 @@
-﻿namespace DUMPSYM.Tests;
+﻿namespace DUMPSYM.Extensions;
 
 public static class ListExtensions
 {

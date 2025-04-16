@@ -1,4 +1,6 @@
-﻿namespace DUMPSYM.Tests;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace DUMPSYM.Extensions;
 
 public static class SymbolExtensions // TODO move
 {
