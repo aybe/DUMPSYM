@@ -11,19 +11,19 @@ namespace DUMPSYM.Tests;
 // https://github.com/microsoft/testfx/issues/1767#issuecomment-1794345657
 public sealed class UnitTestSplit222 : UnitTestBase
 {
-    private static string TestDataPath { get; } = Path.Combine(Solution.Directory, "test_data");
-
     [ClassInitialize]
     public static void ClassInitialize(TestContext context) // very slow
     {
-        if (Directory.Exists(TestDataPath))
+        var directory = Constants.TestDataDirectory;
+
+        if (Directory.Exists(directory))
         {
             return;
         }
 
-        Console.WriteLine($"Generating test data in '{TestDataPath}'...");
+        Console.WriteLine($"Generating test data in '{directory}'...");
 
-        Directory.CreateDirectory(TestDataPath);
+        Directory.CreateDirectory(directory);
 
         var input = UnitTest1.GetSample();
 
@@ -45,7 +45,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
             var name = ((SymbolRecordSetSldToLineOfFile)symbols[0].Record).File;
 
-            var path = Path.Combine(TestDataPath, $"{Path.GetFileName(name)}.json");
+            var path = Path.Combine(directory, $"{Path.GetFileName(name)}.json");
 
             File.WriteAllText(path, json);
         }
@@ -116,7 +116,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
     public static IEnumerable<object[]> TestSldFileData()
     {
-        return Directory.GetFiles(TestDataPath, "*.json").Select(s => (object[]) [s]);
+        return Directory.GetFiles(Constants.TestDataDirectory, "*.json").Select(s => (object[]) [s]);
     }
 
     public static string TestSldFileName(MethodInfo info, object[] data)
