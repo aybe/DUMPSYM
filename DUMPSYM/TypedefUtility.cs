@@ -79,7 +79,7 @@ public static class TypedefUtility
         return handler.ToStringAndClear();
     }
 
-    private static string GetKindString(SymbolTypeKind kind)
+    public static string GetKindString(SymbolTypeKind kind)
     {
         return kind switch
         {
