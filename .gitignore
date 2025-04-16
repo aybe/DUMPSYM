@@ -404,7 +404,9 @@ FodyWeavers.xsd
 # DUMPSYM
 ################################################################################
 DUMPSYM/Properties/launchSettings.json
+*.c
 *.cd
+*.h
 *.g.cs
 *.sym
 *.sym.txt
