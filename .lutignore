@@ -96,3 +96,6 @@ _ReSharper*/
 $RECYCLE.BIN/
 .DS_Store
 *wpftmp.*
+
+# DUMPSYM.csproj
+!Microsoft.VisualStudio.TestPlatform.TestFramework.dll
