@@ -4,17 +4,7 @@ namespace DUMPSYM;
 
 public static class TypedefUtility
 {
-    public static string Parse(ISymbolDefinition def)
-    {
-        if (def is ISymbolDefinition2 def2)
-        {
-            return ParseComplex(def2);
-        }
-
-        return ParseSimple(def);
-    }
-
-    private static string ParseSimple(ISymbolDefinition def)
+    public static string ParseSimple(ISymbolDefinition def)
     {
         var handler = new DefaultInterpolatedStringHandler();
 
@@ -66,7 +56,7 @@ public static class TypedefUtility
         return result;
     }
 
-    private static string ParseComplex(ISymbolDefinition2 def)
+    public static string ParseComplex(ISymbolDefinition2 def)
     {
         var handler = new DefaultInterpolatedStringHandler();
 
@@ -85,8 +75,6 @@ public static class TypedefUtility
                 handler.AppendLiteral(";");
             }
         }
-
-        Console.WriteLine($"{def}\t\t\t{handler.ToStringAndClear()}");
 
         return handler.ToStringAndClear();
     }

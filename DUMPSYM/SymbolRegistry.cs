@@ -1,4 +1,8 @@
-﻿namespace DUMPSYM;
+﻿#define LOG
+using System.Diagnostics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace DUMPSYM;
 
 public sealed class SymbolRegistry
 {
@@ -21,26 +25,89 @@ public sealed class SymbolRegistry
     public void Parse()
     {
         ParseTypedefs();
+
+        // TODO convert structs/unions using typedefs if needed
     }
 
     private void ParseTypedefs()
     {
-        if (false)
-        {
-            foreach (var def in Typedefs.Where(s => s is ISymbolDefinition and not ISymbolDefinition2).Cast<ISymbolDefinition>()) // TODO sucks
-            {
-                var str = TypedefUtility.Parse(def);
+        var basics = ParseTypedefsBasic();
 
-                Console.WriteLine($"{def,-70} -> {str}");
-            }
+        foreach (var source in basics)
+        {
+            Log(source);
         }
 
-        foreach (var def in Typedefs.OfType<ISymbolDefinition2>())
-        {
-            var str = TypedefUtility.Parse(def);
+        Assert.IsTrue(Typedefs.All(s => s is ISymbolDefinition2));
 
-            continue;
-            Console.WriteLine($"{def,-80} -> {str}");
+        var pointers = ParseTypedefsPointer();
+
+        foreach (var source in pointers)
+        {
+            Log(source);
         }
+
+        Log($"Remaining typedefs: {Typedefs.Count}");
+
+        foreach (var symbol in Typedefs)
+        {
+            Log(symbol);
+        }
+    }
+
+    private Source[] ParseTypedefsBasic()
+    {
+        var definitions = Typedefs
+            .Cast<ISymbolDefinition>()
+            .Where(s => s is not ISymbolDefinition2)
+            .ToArray();
+
+        var sources = definitions.Select(s => new Source([s], TypedefUtility.ParseSimple(s))).ToArray();
+
+        Log($"Parsed {definitions.Length} basic typedefs out of {Typedefs.Count}");
+
+        Typedefs.RemoveAll(s => definitions.Contains(s));
+
+        return sources;
+    }
+
+    private Source[] ParseTypedefsPointer()
+    {
+        var definitions = Typedefs
+            .Cast<ISymbolDefinition2>()
+            .Where(s => s.Type.Kind == SymbolTypeKind.STRUCT && s.Type.Modifiers.Contains(SymbolTypeModifier.PTR))
+            .ToArray();
+
+        var sources = definitions.Select(s => new Source([s], TypedefUtility.ParseComplex(s))).ToArray();
+
+        Log($"Parsed {definitions.Length} pointer typedefs out of {Typedefs.Count}");
+
+        Typedefs.RemoveAll(s => definitions.Contains(s));
+
+        return sources;
+    }
+
+    [Conditional("LOG")]
+    private static void Log(object? value)
+    {
+        Console.WriteLine(value?.ToString());
+    }
+}
+
+public class Source
+{
+    public Source(List<ISymbol> symbols, string text)
+    {
+        Symbols = symbols;
+        Text = text;
+    }
+
+    public List<ISymbol> Symbols { get; init; }
+
+    public string Text { get; init; }
+
+    public override string ToString()
+    {
+        return $"{Text}";
     }
 }
