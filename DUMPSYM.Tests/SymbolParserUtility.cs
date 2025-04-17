@@ -1,10 +1,8 @@
 ﻿#define FIX_FAKE_NAME
-//#define DEBUG_MEMBERS
+#define DEBUG_MEMBERS
 using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using DUMPSYM.Extensions;
-
-// ReSharper disable ExtractCommonBranchingCode
 
 namespace DUMPSYM.Tests;
 
@@ -210,57 +208,41 @@ public static class SymbolParserUtility
                     if (typedef != null)
                     {
 #if DEBUG_MEMBERS
-                        writer.Write("/* TD FOUND 1 */");
-                        writer.Write(" ");
+                        writer.Write("/* TD CASE 1 */ ");
 #endif
                         writer.Write(((ISymbolDefinition)typedef.Record).Name);
-                        TryWritePointers(memberDef, writer);
-                        writer.Write(" ");
-                        writer.Write(memberDef.Name);
-                        TryWriteArray(memberDef, writer);
-                        writer.Write(";");
-                        writer.WriteLine($" // {memberSymbol}");
                     }
                     else
                     {
                         var type = node.List!.FirstOrDefault(s =>
                             s.Record is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } d
                             && d.Type.Kind == memberType.Kind
-                            && d.Type.Modifiers.Any() is false); // avoid wrong things like SpuIRQCallbackProc
+                            && d.Type.Modifiers.Any() is false); // avoid wrong stuff, e.g. typedef void (*SpuIRQCallbackProc)();
 
                         // TODO arrays/pointers/functions
 
                         if (type == null)
                         {
 #if DEBUG_MEMBERS
-                            writer.Write("/* TD NOT FOUND 2 */");
-                            writer.Write(" ");
-                            writer.Write("ERR_NO_TYPE");
-                            writer.Write(" ");
+                            writer.Write("/* TD CASE 2 */ ");
 #endif
                             writer.Write(TypedefUtility.GetKindString(memberType.Kind));
-                            TryWritePointers(memberDef, writer);
-                            writer.Write(" ");
-                            writer.Write(memberDef.Name);
-                            TryWriteArray(memberDef, writer);
-                            writer.Write(";");
-                            writer.WriteLine($" // {memberSymbol}");
                         }
                         else
                         {
 #if DEBUG_MEMBERS
-                            writer.Write("/* TD FOUND 2 */");
-                            writer.Write(" ");
+                            writer.Write("/* TD CASE 3 */ ");
 #endif
                             writer.Write(((ISymbolDefinition)type.Record).Name);
-                            TryWritePointers(memberDef, writer);
-                            writer.Write(" ");
-                            writer.Write(memberDef.Name);
-                            TryWriteArray(memberDef, writer);
-                            writer.Write(";");
-                            writer.WriteLine($" // {memberSymbol}");
                         }
                     }
+
+                    TryWritePointers(memberDef, writer);
+                    writer.Write(" ");
+                    writer.Write(memberDef.Name);
+                    TryWriteArray(memberDef, writer);
+                    writer.Write(";");
+                    writer.WriteLine($" // {memberSymbol}");
                 }
             }
 
