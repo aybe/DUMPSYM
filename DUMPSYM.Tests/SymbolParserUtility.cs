@@ -221,19 +221,19 @@ public static class SymbolParserUtility
 
                         // TODO arrays/pointers/functions
 
-                        if (type == null)
+                        if (type != null)
                         {
 #if DEBUG_MEMBERS
                             writer.Write("/* TD CASE 2 */ ");
 #endif
-                            writer.Write(TypedefUtility.GetKindString(memberType.Kind));
+                            writer.Write(((ISymbolDefinition)type.Record).Name);
                         }
                         else
                         {
 #if DEBUG_MEMBERS
                             writer.Write("/* TD CASE 3 */ ");
 #endif
-                            writer.Write(((ISymbolDefinition)type.Record).Name);
+                            writer.Write(TypedefUtility.GetKindString(memberType.Kind));
                         }
                     }
 
