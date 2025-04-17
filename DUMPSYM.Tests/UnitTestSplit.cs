@@ -54,6 +54,16 @@ public sealed class UnitTestSplit222 : UnitTestBase
         Console.WriteLine($"Generating data for all tests took {total}");
     }
 
+    public static IEnumerable<object[]> GetFileTestJson()
+    {
+        return Directory.GetFiles(Constants.TestDataDirectory, "*.json").Select(s => (object[]) [s]);
+    }
+
+    public static string GetFileTestName(MethodInfo info, object[] data)
+    {
+        return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
+    }
+
     [TestMethod]
     [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
     public void TestSldFile(string path)
@@ -117,16 +127,6 @@ public sealed class UnitTestSplit222 : UnitTestBase
         return;
 
         registry.Parse(); // TODO
-    }
-
-    public static IEnumerable<object[]> GetFileTestJson()
-    {
-        return Directory.GetFiles(Constants.TestDataDirectory, "*.json").Select(s => (object[]) [s]);
-    }
-
-    public static string GetFileTestName(MethodInfo info, object[] data)
-    {
-        return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
     }
 
     private static void Parse(List<Code> lists)
