@@ -64,12 +64,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
         return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
     }
 
-    /// <summary>
-    ///     <see cref="SymbolExtensions" /> methods must find every symbol.
-    /// </summary>
-    [TestMethod]
-    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
-    public void TestSymbolSearch(string path)
+    private static SymbolRegistry GetSymbolRegistry(string path)
     {
         var symbols1 = SymbolUtility.DeserializeList(File.ReadAllText(path));
 
@@ -124,6 +119,18 @@ public sealed class UnitTestSplit222 : UnitTestBase
             Typedefs = typedefs,
             Unions = unions
         };
+
+        return registry;
+    }
+
+    /// <summary>
+    ///     <see cref="SymbolExtensions" /> methods must find every symbol.
+    /// </summary>
+    [TestMethod]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    public void TestSymbolSearch(string path)
+    {
+        var registry = GetSymbolRegistry(path);
 
         Parse(registry.CreateLists());
 
