@@ -131,19 +131,37 @@ public sealed class UnitTestSplit222 : UnitTestBase
     public void TestSymbolSearch(string path)
     {
         var registry = GetSymbolRegistry(path);
-
-        Parse(registry.CreateLists());
-
-        return;
-
-        registry.Parse(); // TODO
     }
 
-    private static void Parse(List<Code> lists)
+    /// <summary>
+    ///     Sorts symbols using a comparer.
+    /// </summary>
+    /// <param name="path"></param>
+    [TestMethod]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    public void TestParseComparer(string path)
     {
-        var array = lists.Order(CodeComparer.Instance).ToList();
+        var registry = GetSymbolRegistry(path);
 
-        var source = string.Join(Environment.NewLine, lists.Select(s => s.ToString().ReplaceLineEndings(" ")));
-        var target = string.Join(Environment.NewLine, array.Select(s => s.ToString().ReplaceLineEndings(" ")));
+        var source = registry.CreateLists();
+
+        var target = source.Order(CodeComparer.Instance).ToList();
+
+        var sourceResult = string.Join(Environment.NewLine, source.Select(s => s.ToString().ReplaceLineEndings(" ")));
+
+        var targetResult = string.Join(Environment.NewLine, target.Select(s => s.ToString().ReplaceLineEndings(" ")));
+    }
+
+    /// <summary>
+    ///     Parses symbols manually.
+    /// </summary>
+    /// <param name="path"></param>
+    [TestMethod]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    public void TestParseManual(string path)
+    {
+        var registry = GetSymbolRegistry(path);
+
+        registry.Parse();
     }
 }
