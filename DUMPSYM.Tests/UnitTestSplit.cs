@@ -55,7 +55,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
     }
 
     [TestMethod]
-    [DynamicData(nameof(TestSldFileData), DynamicDataDisplayName = nameof(TestSldFileName))]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
     public void TestSldFile(string path)
     {
         var symbols1 = SymbolUtility.DeserializeList(File.ReadAllText(path));
@@ -119,12 +119,12 @@ public sealed class UnitTestSplit222 : UnitTestBase
         registry.Parse(); // TODO
     }
 
-    public static IEnumerable<object[]> TestSldFileData()
+    public static IEnumerable<object[]> GetFileTestJson()
     {
         return Directory.GetFiles(Constants.TestDataDirectory, "*.json").Select(s => (object[]) [s]);
     }
 
-    public static string TestSldFileName(MethodInfo info, object[] data)
+    public static string GetFileTestName(MethodInfo info, object[] data)
     {
         return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
     }
