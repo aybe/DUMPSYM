@@ -124,16 +124,6 @@ public sealed class UnitTestSplit222 : UnitTestBase
     }
 
     /// <summary>
-    ///     <see cref="SymbolExtensions" /> methods must find every symbol.
-    /// </summary>
-    [TestMethod]
-    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
-    public void TestSymbolSearch(string path)
-    {
-        var registry = GetSymbolRegistry(path);
-    }
-
-    /// <summary>
     ///     Sorts symbols using a comparer.
     /// </summary>
     /// <param name="path"></param>
@@ -163,5 +153,15 @@ public sealed class UnitTestSplit222 : UnitTestBase
         var registry = GetSymbolRegistry(path);
 
         registry.Parse();
+    }
+
+    /// <summary>
+    ///     <see cref="SymbolExtensions" /> methods must find every symbol.
+    /// </summary>
+    [TestMethod]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    public void TestSymbolSearch(string path)
+    {
+        var registry = GetSymbolRegistry(path);
     }
 }
