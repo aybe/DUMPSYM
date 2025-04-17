@@ -44,7 +44,7 @@ public static class SymbolParserUtility
                     ? $"{"// WARNING: EMPTY RESULT",-Padding}// {wrong}"
                     : result;
 
-                if (!output.StartsWith("typedef")) // TODO delete
+                //if (!output.StartsWith("typedef")) // TODO delete
                 {
                     writer.WriteLine(output);
                 }
@@ -177,7 +177,10 @@ public static class SymbolParserUtility
         {
             using var writer = GetWriter();
 
-            writer.Write($"{GetString(def.Class)} {SymbolRegistry.GetSafeName(def.Name)}".PadRight(Padding)); // TODO parse typedef
+            var safeName = SymbolRegistry.GetSafeName(def.Name);
+
+
+            writer.Write($"{GetString(def.Class)} {safeName}".PadRight(Padding)); // TODO parse typedef
             writer.Write($"// {node.Value}");
             writer.WriteLine();
 
@@ -198,44 +201,8 @@ public static class SymbolParserUtility
 
                     var memberDef = (ISymbolDefinition)memberSymbol.Record; // TODO parse members, either MOS or MOU
 
-                    var memberType = memberDef.Type;
-
-                    var where = node.List!.Where(s =>
-                        s.Record is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } d && d.Type == memberType);
-
-                    var typedef = where.FirstOrDefault();
-
-                    if (typedef != null)
-                    {
-#if DEBUG_MEMBERS
-                        writer.Write("/* TD CASE 1 */ ");
-#endif
-                        writer.Write(((ISymbolDefinition)typedef.Record).Name);
-                    }
-                    else
-                    {
-                        var type = node.List!.FirstOrDefault(s =>
-                            s.Record is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } d
-                            && d.Type.Kind == memberType.Kind
-                            && d.Type.Modifiers.Any() is false); // avoid wrong stuff, e.g. typedef void (*SpuIRQCallbackProc)();
-
-                        // TODO arrays/pointers/functions
-
-                        if (type != null)
-                        {
-#if DEBUG_MEMBERS
-                            writer.Write("/* TD CASE 2 */ ");
-#endif
-                            writer.Write(((ISymbolDefinition)type.Record).Name);
-                        }
-                        else
-                        {
-#if DEBUG_MEMBERS
-                            writer.Write("/* TD CASE 3 */ ");
-#endif
-                            writer.Write(TypedefUtility.GetKindString(memberType.Kind));
-                        }
-                    }
+                    var memberTypeName = GetMemberTypeName(node);
+                    writer.Write(memberTypeName);
 
                     TryWritePointers(memberDef, writer);
                     writer.Write(" ");
@@ -249,6 +216,57 @@ public static class SymbolParserUtility
             writer.Write("};");
 
             return writer.InnerWriter.ToString()!;
+        }
+
+        public static TOut? TryFind<TIn, TOut>(LinkedList<TIn> list, Func<TIn, TOut?> selector, Func<TOut, bool> predicate)
+            where TOut : class
+        {
+            for (var node = list.First; node != null; node = node.Next)
+            {
+                if (selector(node.Value) is not { } result)
+                {
+                    continue;
+                }
+
+                if (predicate(result))
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private static string GetMemberTypeName(LinkedListNode<Symbol> node)
+        {
+            var md = (ISymbolDefinition)node.Value.Record;
+
+            var mt = md.Type;
+
+            var perfect = TryFind(node.List!, s => s.Record as ISymbolDefinition, s => s.IsTypedef(mt));
+
+            if (perfect != null)
+            {
+                return perfect.Name;
+            }
+
+            var mk = mt.Kind;
+
+            var partial = TryFind(node.List!, s => s.Record as ISymbolDefinition, s => s.IsTypedef(mk) && !s.Type.Modifiers.Any());
+
+            if (partial != null)
+            {
+                return partial.Name; // skip shit like SpuIRQCallbackProc
+            }
+
+            var manual = TypedefUtility.GetKindString(mk);
+
+            if (mk is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
+            {
+                manual += $" {SymbolRegistry.GetSafeName(((ISymbolDefinition2)md).Tag)}";
+            }
+
+            return manual;
         }
 
         private static void TryWriteArray(ISymbolDefinition def, IndentedTextWriter writer)
@@ -280,6 +298,7 @@ public static class SymbolParserUtility
             return padding;
         }
     }
+
 
     private sealed class SymbolParserTypedef : SymbolParser
     {
@@ -334,5 +353,19 @@ public static class SymbolParserUtility
 
             return writer.InnerWriter.ToString()!;
         }
+    }
+}
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public static class ISymbolExtensions
+{
+    public static bool IsTypedef(this ISymbolDefinition def, SymbolType? type = null)
+    {
+        return def.Class == SymbolStorageClass.TPDEF && (type == null || type == def.Type);
+    }
+
+    public static bool IsTypedef(this ISymbolDefinition def, SymbolTypeKind? kind = null)
+    {
+        return def.Class == SymbolStorageClass.TPDEF && (kind == null || kind == def.Type.Kind);
     }
 }

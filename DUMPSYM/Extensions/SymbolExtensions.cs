@@ -197,7 +197,5 @@ public static class SymbolExtensions // TODO move
         return false;
     }
 
-    private delegate T? Selector<in TNode, out T>(TNode node);
-
     #endregion
 }
