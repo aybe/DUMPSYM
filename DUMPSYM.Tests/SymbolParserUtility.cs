@@ -1,8 +1,10 @@
 ﻿#define FIX_FAKE_NAME
-
+//#define DEBUG_MEMBERS
 using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using DUMPSYM.Extensions;
+
+// ReSharper disable ExtractCommonBranchingCode
 
 namespace DUMPSYM.Tests;
 
@@ -44,7 +46,10 @@ public static class SymbolParserUtility
                     ? $"{"// WARNING: EMPTY RESULT",-Padding}// {wrong}"
                     : result;
 
-                writer.WriteLine(output);
+                if (!output.StartsWith("typedef")) // TODO delete
+                {
+                    writer.WriteLine(output);
+                }
 
                 break;
             }
@@ -190,13 +195,107 @@ public static class SymbolParserUtility
                     {
                         break;
                     }
-                    // TODO parse members, either MOS or MOU
+
+                    var memberSymbol = node.Value;
+
+                    var memberDef = (ISymbolDefinition)memberSymbol.Record; // TODO parse members, either MOS or MOU
+
+                    var memberType = memberDef.Type;
+
+                    var where = node.List!.Where(s =>
+                        s.Record is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } d && d.Type == memberType);
+
+                    var typedef = where.FirstOrDefault();
+
+                    if (typedef != null)
+                    {
+#if DEBUG_MEMBERS
+                        writer.Write("/* TD FOUND 1 */");
+                        writer.Write(" ");
+#endif
+                        writer.Write(((ISymbolDefinition)typedef.Record).Name);
+                        TryWritePointers(memberDef, writer);
+                        writer.Write(" ");
+                        writer.Write(memberDef.Name);
+                        TryWriteArray(memberDef, writer);
+                        writer.Write(";");
+                        writer.WriteLine($" // {memberSymbol}");
+                    }
+                    else
+                    {
+                        var type = node.List!.FirstOrDefault(s =>
+                            s.Record is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } d
+                            && d.Type.Kind == memberType.Kind
+                            && d.Type.Modifiers.Any() is false); // avoid wrong things like SpuIRQCallbackProc
+
+                        // TODO arrays/pointers/functions
+
+                        if (type == null)
+                        {
+#if DEBUG_MEMBERS
+                            writer.Write("/* TD NOT FOUND 2 */");
+                            writer.Write(" ");
+                            writer.Write("ERR_NO_TYPE");
+                            writer.Write(" ");
+#endif
+                            writer.Write(TypedefUtility.GetKindString(memberType.Kind));
+                            TryWritePointers(memberDef, writer);
+                            writer.Write(" ");
+                            writer.Write(memberDef.Name);
+                            TryWriteArray(memberDef, writer);
+                            writer.Write(";");
+                            writer.WriteLine($" // {memberSymbol}");
+                        }
+                        else
+                        {
+#if DEBUG_MEMBERS
+                            writer.Write("/* TD FOUND 2 */");
+                            writer.Write(" ");
+#endif
+                            writer.Write(((ISymbolDefinition)type.Record).Name);
+                            TryWritePointers(memberDef, writer);
+                            writer.Write(" ");
+                            writer.Write(memberDef.Name);
+                            TryWriteArray(memberDef, writer);
+                            writer.Write(";");
+                            writer.WriteLine($" // {memberSymbol}");
+                        }
+                    }
                 }
             }
 
             writer.Write("};");
 
             return writer.InnerWriter.ToString()!;
+        }
+
+        private static void TryWriteArray(ISymbolDefinition def, IndentedTextWriter writer)
+        {
+            if (def.Type.Modifiers.Contains(SymbolTypeModifier.ARY))
+            {
+                foreach (var dimension in ((ISymbolDefinition2)def).Dimensions)
+                {
+                    writer.Write($"[{dimension}]");
+                }
+            }
+        }
+
+        private static void TryWritePointers(ISymbolDefinition def, IndentedTextWriter writer)
+        {
+            foreach (var modifier in def.Type.Modifiers)
+            {
+                if (modifier is SymbolTypeModifier.PTR)
+                {
+                    writer.Write("*");
+                }
+            }
+        }
+
+        private static int GetPadding(IndentedTextWriter writer)
+        {
+            var padding = Padding - writer.Indent * IndentedTextWriter.DefaultTabString.Length;
+
+            return padding;
         }
     }
 
