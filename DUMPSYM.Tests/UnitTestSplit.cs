@@ -64,9 +64,12 @@ public sealed class UnitTestSplit222 : UnitTestBase
         return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
     }
 
+    /// <summary>
+    ///     <see cref="SymbolExtensions" /> methods must find every symbol.
+    /// </summary>
     [TestMethod]
     [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
-    public void TestSldFile(string path)
+    public void TestSymbolSearch(string path)
     {
         var symbols1 = SymbolUtility.DeserializeList(File.ReadAllText(path));
 
