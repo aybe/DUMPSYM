@@ -129,7 +129,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
     /// <param name="path"></param>
     [TestMethod]
     [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
-    public void TestParseComparer(string path)
+    public void TestSortingWithCustomComparer(string path)
     {
         var registry = GetSymbolRegistry(path);
 
@@ -148,7 +148,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
     /// <param name="path"></param>
     [TestMethod]
     [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
-    public void TestParseManual(string path)
+    public void TestParsingWithCustomLogic(string path)
     {
         var registry = GetSymbolRegistry(path);
 
