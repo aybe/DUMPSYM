@@ -124,6 +124,19 @@ public sealed class UnitTestSplit222 : UnitTestBase
     }
 
     /// <summary>
+    ///     Parses symbols manually.
+    /// </summary>
+    /// <param name="path"></param>
+    [TestMethod]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    public void TestParsingWithCustomLogic(string path)
+    {
+        var registry = GetSymbolRegistry(path);
+
+        registry.Parse();
+    }
+
+    /// <summary>
     ///     Sorts symbols using a comparer.
     /// </summary>
     /// <param name="path"></param>
@@ -140,19 +153,6 @@ public sealed class UnitTestSplit222 : UnitTestBase
         var sourceResult = string.Join(Environment.NewLine, source.Select(s => s.ToString().ReplaceLineEndings(" ")));
 
         var targetResult = string.Join(Environment.NewLine, target.Select(s => s.ToString().ReplaceLineEndings(" ")));
-    }
-
-    /// <summary>
-    ///     Parses symbols manually.
-    /// </summary>
-    /// <param name="path"></param>
-    [TestMethod]
-    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
-    public void TestParsingWithCustomLogic(string path)
-    {
-        var registry = GetSymbolRegistry(path);
-
-        registry.Parse();
     }
 
     /// <summary>
