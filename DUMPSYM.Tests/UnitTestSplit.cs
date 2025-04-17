@@ -64,9 +64,16 @@ public sealed class UnitTestSplit222 : UnitTestBase
         return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
     }
 
+    private static List<Symbol> GetSymbols(string path)
+    {
+        var symbols = SymbolUtility.DeserializeList(File.ReadAllText(path));
+
+        return symbols;
+    }
+
     private static SymbolRegistry GetSymbolRegistry(string path)
     {
-        var symbols1 = SymbolUtility.DeserializeList(File.ReadAllText(path));
+        var symbols1 = GetSymbols(path);
 
         var symbols2 = symbols1.Select(s => s.Record).Cast<ISymbol>().ToList(); // TODO sucks
 
@@ -134,6 +141,22 @@ public sealed class UnitTestSplit222 : UnitTestBase
         var registry = GetSymbolRegistry(path);
 
         registry.Parse();
+    }
+    /// <summary>
+    ///     Parses symbols in file order.
+    /// </summary>
+    /// <param name="path"></param>
+    [TestMethod]
+    [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    public void TestParsingUsingFileOrder(string path)
+    {
+        var symbols = GetSymbols(path);
+
+        var parse = SymbolParserUtility.Parse(symbols);
+
+        WriteLine(parse);
+
+        Assert.IsTrue(string.IsNullOrWhiteSpace(parse));
     }
 
     /// <summary>

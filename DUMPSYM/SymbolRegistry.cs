@@ -43,7 +43,7 @@ public sealed class SymbolRegistry
         return codes;
     }
 
-    private static string GetSafeName(string name)
+    public static string GetSafeName(string name)
     {
         return RegexFakeName.Match(name) is { Success: true } m ? $"_{m.Groups[1].Value}" : name;
     }
