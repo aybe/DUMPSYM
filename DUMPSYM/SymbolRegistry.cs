@@ -27,6 +27,22 @@ public sealed class SymbolRegistry
 
     public required List<List<ISymbol>> Unions { get; init; }
 
+    public List<Code> CreateLists()
+    {
+        var codes = new List<Code>();
+
+        codes.AddRange(Externals.Select(s => new Code(s)));
+        codes.AddRange(Files.Select(s => new Code(s)));
+        codes.AddRange(Functions.Select(s => new Code(s)));
+        codes.AddRange(Names.Select(s => new Code(s)));
+        codes.AddRange(Statics.Select(s => new Code(s)));
+        codes.AddRange(Structs.Select(s => new Code(s)));
+        codes.AddRange(Typedefs.Select(s => new Code(s)));
+        codes.AddRange(Unions.Select(s => new Code(s)));
+
+        return codes;
+    }
+
     private static string GetSafeName(string name)
     {
         return RegexFakeName.Match(name) is { Success: true } m ? $"_{m.Groups[1].Value}" : name;

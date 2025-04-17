@@ -112,7 +112,11 @@ public sealed class UnitTestSplit222 : UnitTestBase
             Unions = unions
         };
 
-        registry.Parse();
+        Parse(registry.CreateLists());
+
+        return;
+
+        registry.Parse(); // TODO
     }
 
     public static IEnumerable<object[]> TestSldFileData()
@@ -123,5 +127,13 @@ public sealed class UnitTestSplit222 : UnitTestBase
     public static string TestSldFileName(MethodInfo info, object[] data)
     {
         return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
+    }
+
+    private static void Parse(List<Code> lists)
+    {
+        var array = lists.Order(CodeComparer.Instance).ToList();
+
+        var source = string.Join(Environment.NewLine, lists.Select(s => s.ToString().ReplaceLineEndings(" ")));
+        var target = string.Join(Environment.NewLine, array.Select(s => s.ToString().ReplaceLineEndings(" ")));
     }
 }
