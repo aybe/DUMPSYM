@@ -177,11 +177,10 @@ public static class SymbolParserUtility
         {
             using var writer = GetWriter();
 
-            var safeName = SymbolRegistry.GetSafeName(def.Name);
+            writer.Write($"{GetString(def.Class)} {SymbolRegistry.GetSafeName(def.Name)}".PadRight(GetPadding(writer))); // TODO parse typedef
 
-
-            writer.Write($"{GetString(def.Class)} {safeName}".PadRight(Padding)); // TODO parse typedef
             writer.Write($"// {node.Value}");
+
             writer.WriteLine();
 
             writer.WriteLine("{");
@@ -201,15 +200,15 @@ public static class SymbolParserUtility
 
                     var memberDef = (ISymbolDefinition)memberSymbol.Record; // TODO parse members, either MOS or MOU
 
-                    var memberTypeName = GetMemberTypeName(node);
-                    writer.Write(memberTypeName);
+                    var name = GetMemberTypeName(node);
 
-                    TryWritePointers(memberDef, writer);
-                    writer.Write(" ");
-                    writer.Write(memberDef.Name);
-                    TryWriteArray(memberDef, writer);
-                    writer.Write(";");
-                    writer.WriteLine($" // {memberSymbol}");
+                    var pointers = GetMemberPointers(memberDef);
+
+                    var dimensions = GetMemberDimensions(memberDef);
+
+                    var text = $"{name}{pointers} {memberDef.Name}{dimensions};";
+
+                    writer.WriteLine($"{text.PadRight(GetPadding(writer))}// {memberSymbol}");
                 }
             }
 
@@ -235,6 +234,18 @@ public static class SymbolParserUtility
             }
 
             return null;
+        }
+
+        private static string GetMemberDimensions(ISymbolDefinition def)
+        {
+            return def.Type.Modifiers.Contains(SymbolTypeModifier.ARY)
+                ? string.Concat(((ISymbolDefinition2)def).Dimensions.Select(s => $"[{s}]"))
+                : string.Empty;
+        }
+
+        private static string GetMemberPointers(ISymbolDefinition def)
+        {
+            return string.Concat(def.Type.Modifiers.Where(s => s == SymbolTypeModifier.PTR).Select(_ => "*"));
         }
 
         private static string GetMemberTypeName(LinkedListNode<Symbol> node)
@@ -267,28 +278,6 @@ public static class SymbolParserUtility
             }
 
             return manual;
-        }
-
-        private static void TryWriteArray(ISymbolDefinition def, IndentedTextWriter writer)
-        {
-            if (def.Type.Modifiers.Contains(SymbolTypeModifier.ARY))
-            {
-                foreach (var dimension in ((ISymbolDefinition2)def).Dimensions)
-                {
-                    writer.Write($"[{dimension}]");
-                }
-            }
-        }
-
-        private static void TryWritePointers(ISymbolDefinition def, IndentedTextWriter writer)
-        {
-            foreach (var modifier in def.Type.Modifiers)
-            {
-                if (modifier is SymbolTypeModifier.PTR)
-                {
-                    writer.Write("*");
-                }
-            }
         }
 
         private static int GetPadding(IndentedTextWriter writer)
