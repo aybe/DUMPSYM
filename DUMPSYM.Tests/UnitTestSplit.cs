@@ -142,6 +142,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         registry.Parse();
     }
+
     /// <summary>
     ///     Parses symbols in file order.
     /// </summary>
@@ -171,11 +172,25 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         var source = registry.CreateLists();
 
-        var target = source.Order(CodeComparer.Instance).ToList();
+        var comparer = CodeComparer.Instance;
 
-        var sourceResult = string.Join(Environment.NewLine, source.Select(s => s.ToString().ReplaceLineEndings(" ")));
+        comparer.Count = 0;
+        var target = source.Order(comparer).ToList();
 
-        var targetResult = string.Join(Environment.NewLine, target.Select(s => s.ToString().ReplaceLineEndings(" ")));
+        WriteLineVar(comparer.Count);
+        WriteLineVar(source.Count);
+        WriteLineVar(source.Sum(s => s.Count));
+
+        var verbose = false;
+
+        if (verbose)
+        {
+            WriteLine(string.Join(Environment.NewLine, target.SelectMany(s => s.Symbols)));
+        }
+        else
+        {
+            WriteLine(string.Join(Environment.NewLine, target.Select(s => s.Symbols[0].ToString()?.ReplaceLineEndings(" "))));
+        }
     }
 
     /// <summary>

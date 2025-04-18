@@ -38,5 +38,9 @@ public sealed class Code : IReadOnlyList<ISymbol>
     public override string ToString()
     {
         return this[0].ToString()!;
+
+        var concat = string.Concat(this.Select(s => s.ToString()));
+
+        return concat;
     }
 }
