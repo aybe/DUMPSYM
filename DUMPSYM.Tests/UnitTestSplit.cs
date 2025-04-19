@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using DUMPSYM.Extensions;
 using Newtonsoft.Json;
@@ -166,6 +167,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
     /// <param name="path"></param>
     [TestMethod]
     [DynamicData(nameof(GetFileTestJson), DynamicDataDisplayName = nameof(GetFileTestName))]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public void TestSortingUsingCustomComparer(string path)
     {
         var registry = GetSymbolRegistry(path);
@@ -183,13 +185,56 @@ public sealed class UnitTestSplit222 : UnitTestBase
 
         var verbose = false;
 
-        if (verbose)
+        var output = verbose
+            ? string.Join(Environment.NewLine, target.SelectMany(s => s.Symbols))
+            : string.Join(Environment.NewLine, target.Select(s => s.Symbols[0].ToString()?.ReplaceLineEndings(" ")));
+
+        string filter;
+        filter = "STRTAG";
+        filter = null!;
+
+        output = $"{DateTime.Now:O}{Environment.NewLine}{output}";
+
+        if (string.IsNullOrWhiteSpace(filter))
         {
-            WriteLine(string.Join(Environment.NewLine, target.SelectMany(s => s.Symbols)));
+            WriteLine(output);
         }
         else
         {
-            WriteLine(string.Join(Environment.NewLine, target.Select(s => s.Symbols[0].ToString()?.ReplaceLineEndings(" "))));
+            using var reader = new StringReader(output);
+
+            while (true)
+            {
+                var line = reader.ReadLine();
+
+                if (line == null)
+                {
+                    break;
+                }
+
+                if (line.Contains(filter))
+                {
+                    WriteLine(line);
+                }
+            }
+        }
+
+        string combine;
+        // bug not working even with .runsettings
+        // https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-mstest-configure
+        combine = Path.Combine(TestContext.TestRunResultsDirectory!, $"sort for {Path.GetFileName(path)}.txt");
+        combine = Path.Combine(TestContext.TestResultsDirectory!, $"sort for {Path.GetFileName(path)}.txt");
+        combine = Path.Combine(TestContext.TestRunDirectory!, $"sort for {Path.GetFileName(path)}.txt");
+        combine = Path.ChangeExtension(path, ".result");
+        File.WriteAllText(combine, output);
+        TestContext.AddResultFile(combine);
+        if (false)
+        if (path is @"C:\Files\GitHub\! PSX\DUMPSYM\TestData\AFFECT.C.json")
+        {
+            Assert.IsTrue(
+                output.IndexOf("Def class STRTAG type STRUCT size 32 name .1fake", StringComparison.Ordinal) <
+                output.IndexOf("Def2 class TPDEF type STRUCT size 32 dims 0 tag .1fake name MATRIX", StringComparison.Ordinal)
+            );
         }
     }
 

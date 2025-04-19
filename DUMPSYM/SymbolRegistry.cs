@@ -48,7 +48,7 @@ public sealed class SymbolRegistry
         return RegexFakeName.Match(name) is { Success: true } m ? $"_{m.Groups[1].Value}" : name;
     }
 
-    private static bool HasFakeName(string name)
+    public static bool HasFakeName(string name)
     {
         return RegexFakeName.IsMatch(name);
     }
