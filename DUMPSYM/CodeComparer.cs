@@ -1,6 +1,4 @@
-﻿// ReSharper disable RedundantIfElseBlock
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DUMPSYM;
 
@@ -25,21 +23,6 @@ public sealed class CodeComparer : Comparer<Code>
 
         if (xIsType && yIsType)
         {
-            if (xType.Name.Contains("Sprite"))
-            {
-                var z = 0;
-            }
-
-            if (yType.Name.Contains("Sprite"))
-            {
-                var z = 0;
-            }
-
-            if (xType.Name.Contains("Sprite") && yType.Name.Contains("Sprite"))
-            {
-                var z = 0;
-            }
-
             var xFake = SymbolRegistry.HasFakeName(xType.Name);
             var yFake = SymbolRegistry.HasFakeName(yType.Name);
 
@@ -88,22 +71,25 @@ public sealed class CodeComparer : Comparer<Code>
                 return +1; // ok
             }
 
+            if (TypeDependsOnTypedef(x, yTypedef))
+            {
+                return +1;
+            }
+
             if (TypedefDependsOnType(yTypedef, xType))
             {
                 return -1; // ok // TODO never reached on some tests
             }
-            else
+
+            var xFake = SymbolRegistry.HasFakeName(xType.Name);
+            var yFake = SymbolRegistry.HasFakeName(yDef2.Tag);
+
+            if (yFake && !xFake)
             {
-                var xFake = SymbolRegistry.HasFakeName(xType.Name);
-                var yFake = SymbolRegistry.HasFakeName(yDef2.Tag);
-
-                if (yFake && !xFake)
-                {
-                    return +1; // ok
-                }
-
-                return -1; // ok
+                return +1; // ok
             }
+
+            return -1; // ok
         }
 
         // BUG SpriteData requires Sprite
@@ -116,22 +102,25 @@ public sealed class CodeComparer : Comparer<Code>
                 return -1; // ok
             }
 
+            if (TypeDependsOnTypedef(y, xTypedef))
+            {
+                return -1;
+            }
+
             if (TypedefDependsOnType(xTypedef, yType))
             {
                 return +1; // ok // TODO never reached on some tests
             }
-            else
+
+            var xFake = SymbolRegistry.HasFakeName(xDef2.Tag);
+            var yFake = SymbolRegistry.HasFakeName(yType.Name);
+
+            if (xFake && !yFake)
             {
-                var xFake = SymbolRegistry.HasFakeName(xDef2.Tag);
-                var yFake = SymbolRegistry.HasFakeName(yType.Name);
-
-                if (xFake && !yFake)
-                {
-                    return -1; // ok
-                }
-
-                return +1; // ok
+                return -1; // ok
             }
+
+            return +1; // ok
         }
 
         return 0;
@@ -149,28 +138,21 @@ public sealed class CodeComparer : Comparer<Code>
         return typedef is ISymbolDefinition2 d && d.Tag == type.Name;
     }
 
+    private static bool TypeDependsOnTypedef(Code type, ISymbolDefinition typedef)
+    {
+        var b = type.OfType<ISymbolDefinition2>().Any(s => s.Tag == ((ISymbolDefinition2)typedef).Tag);
+
+        if (type.ToString().EndsWith("Def class STRTAG type STRUCT size 1803672 name Editor") &&
+            typedef.ToString()!.Contains("Def2 class MOS type ARY STRUCT size 32 dims 1 4 tag Coord3D name RecordPosition"))
+        {
+            Assert.IsTrue(b); // TODO delete
+        }
+
+        return b;
+    }
+
     private static bool TypeDependsOnType(Code source, ISymbolDefinition target)
     {
-        if (source.ToString().Contains("Sprite"))
-        {
-            var zero = 0;
-        }
-
-        if (target.Name.Contains("Sprite"))
-        {
-            var zero = 0;
-        }
-
-        if (source.ToString().Contains("Sprite") && target.ToString().Contains("SpriteData"))
-        {
-            var zero = 0; // BUG should be reached
-        }
-
-        if (source.ToString().Contains("SpriteData") && target.ToString().Contains("Sprite"))
-        {
-            var zero = 0; // BUG should be reached
-        }
-
         return source.OfType<ISymbolDefinition2>().Any(s => s.Tag == target.Name);
     }
 }
