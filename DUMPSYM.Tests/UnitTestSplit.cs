@@ -72,7 +72,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
         return symbols;
     }
 
-    private static SymbolRegistry GetSymbolRegistry(string path)
+    public static SymbolRegistry GetSymbolRegistry(string path)
     {
         var symbols1 = GetSymbols(path);
 

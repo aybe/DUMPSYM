@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+// ReSharper disable GrammarMistakeInComment
+
 namespace DUMPSYM;
 
 public sealed class CodeComparer : Comparer<Code>
@@ -14,7 +16,27 @@ public sealed class CodeComparer : Comparer<Code>
 
         ArgumentNullException.ThrowIfNull(x);
         ArgumentNullException.ThrowIfNull(y);
-
+        /*
+         * RULES
+         *
+         * type
+         *      can be fake
+         *          must be before real type and real typedef
+         *      can be real
+         *          must be after fake type and before its eventual typedef
+         *      can be dependent on type
+         *          must be after that type
+         *      can be dependent on typedef
+         *          must be after that typedef
+         *
+         * typedef
+         *      can map a fake type
+         *          must be after that fake type
+         *      can map a real type
+         *          must be after that real type
+         *      can be dependent on real type
+         *          must be after that real type
+         */
         var xIsType = x.IsType(out var xType);
         var yIsType = y.IsType(out var yType);
 
@@ -71,12 +93,20 @@ public sealed class CodeComparer : Comparer<Code>
                 return +1; // ok
             }
 
-            if (TypeDependsOnTypedef(x, yTypedef))
+            var a = TypeDependsOnTypedef(x, yTypedef);
+            var b = TypedefDependsOnType(yTypedef, xType);
+
+            if (a && b)
             {
-                return +1;
+                return +1; // kkkkkkk
             }
 
-            if (TypedefDependsOnType(yTypedef, xType))
+            if (a)
+            {
+                return -1;
+            }
+
+            if (b)
             {
                 return -1; // ok // TODO never reached on some tests
             }
@@ -102,12 +132,21 @@ public sealed class CodeComparer : Comparer<Code>
                 return -1; // ok
             }
 
-            if (TypeDependsOnTypedef(y, xTypedef))
+            var a = TypeDependsOnTypedef(y, xTypedef);
+
+            var b = TypedefDependsOnType(xTypedef, yType);
+
+            if (a && b)
+            {
+                return +1;
+            }
+
+            if (a)
             {
                 return -1;
             }
 
-            if (TypedefDependsOnType(xTypedef, yType))
+            if (b)
             {
                 return +1; // ok // TODO never reached on some tests
             }
