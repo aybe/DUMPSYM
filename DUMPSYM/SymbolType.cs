@@ -5,6 +5,20 @@ namespace DUMPSYM;
 [Serializable]
 public record struct SymbolType
 {
+    public SymbolType(SymbolTypeKind kind, params SymbolTypeModifier[] modifiers)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(modifiers.Length, 6, nameof(modifiers));
+
+        var output = (int)kind & 0xF;
+
+        for (var i = 0; i < modifiers.Length; i++)
+        {
+            output |= ((int)modifiers[i] & 0b11) << (4 + 2 * i);
+        }
+
+        Value = (ushort)output;
+    }
+
     public ushort Value { get; set; }
 
     [JsonIgnore]
