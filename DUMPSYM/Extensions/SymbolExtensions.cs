@@ -4,6 +4,35 @@ namespace DUMPSYM.Extensions;
 
 public static class SymbolExtensions // TODO move
 {
+    #region Is*
+
+    public static bool IsExternal(this ISymbol symbol)
+    {
+        return symbol is ISymbolDefinition { Class: SymbolStorageClass.EXT };
+    }
+
+    public static bool IsFileEnd(this ISymbol symbol)
+    {
+        return symbol is ISymbolFileEnd;
+    }
+
+    public static bool IsName(this ISymbol symbol)
+    {
+        return symbol is ISymbolVariable;
+    }
+
+    public static bool IsStatic(this ISymbol symbol)
+    {
+        return symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT };
+    }
+
+    public static bool IsTypedef(this ISymbol symbol)
+    {
+        return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF };
+    }
+
+    #endregion
+
     #region Single
 
     private static List<ISymbol> Where(List<ISymbol> symbols, Func<ISymbol, bool> predicate)

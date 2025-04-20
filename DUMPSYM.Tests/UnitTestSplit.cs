@@ -65,7 +65,7 @@ public sealed class UnitTestSplit222 : UnitTestBase
         return $"{info.Name} {Path.GetFileNameWithoutExtension((string)data[0])}";
     }
 
-    private static List<Symbol> GetSymbols(string path)
+    public static List<Symbol> GetSymbols(string path)
     {
         var symbols = SymbolUtility.DeserializeList(File.ReadAllText(path));
 
