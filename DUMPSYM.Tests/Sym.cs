@@ -59,14 +59,22 @@ public class Sym
 
     private void ResolveStatic(ISymbolDefinition def)
     {
-        if (def is ISymbolDefinition2)
-        {
-            throw new NotImplementedException(def.ToString());
-        }
-
         Name = new SymKey(def.Class, def.Name);
 
-        Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind.ToString()));
+        if (def is not ISymbolDefinition2 def2)
+        {
+            Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind.ToString()));
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(def2.Tag))
+        {
+            Assert.IsTrue(def2.Type.Modifiers.Contains(SymbolTypeModifier.ARY));
+            Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def2.Type.Kind.ToString()));
+            return;
+        }
+
+        Dependencies.Add(new SymKey(def2.Class, def2.Tag));
     }
 
     private void ResolveTypedef(ISymbolDefinition def)
