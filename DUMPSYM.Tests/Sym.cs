@@ -129,20 +129,13 @@ public class Sym
                 }
                 else
                 {
-                    SymbolStorageClass cClass;
-
-                    if (m.Type.Kind == SymbolTypeKind.STRUCT)
+                    // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+                    var ssc = m.Type.Kind switch
                     {
-                        cClass = SymbolStorageClass.STRTAG;
-                    }
-                    else if (m.Type.Kind == SymbolTypeKind.UNION)
-                    {
-                        cClass = SymbolStorageClass.UNTAG;
-                    }
-                    else
-                    {
-                        cClass = SymbolStorageClass.TPDEF;
-                    }
+                        SymbolTypeKind.STRUCT => SymbolStorageClass.STRTAG,
+                        SymbolTypeKind.UNION  => SymbolStorageClass.UNTAG,
+                        _                     => throw new InvalidDataException("Expected struct or union.")
+                    };
 
                     // Dependencies.Add(new SymKey( m.Type.Kind, m2.Tag));
                     if (m2.Tag == def.Name)
@@ -159,7 +152,7 @@ public class Sym
                         }
                         else
                         {
-                            Dependencies.Add(new SymKey(cClass, m2.Tag));
+                            Dependencies.Add(new SymKey(ssc, m2.Tag));
                         }
                     }
                 }
