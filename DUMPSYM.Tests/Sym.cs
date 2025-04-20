@@ -74,7 +74,15 @@ public class Sym
             return;
         }
 
-        Dependencies.Add(new SymKey(def2.Class, def2.Tag));
+        var kind = def2.Type.Kind;
+
+        var ssc = kind switch
+        {
+            SymbolTypeKind.STRUCT => SymbolStorageClass.STRTAG,
+            _                     => throw new NotImplementedException(kind.ToString())
+        };
+
+        Dependencies.Add(new SymKey(ssc, def2.Tag));
     }
 
     private void ResolveTypedef(ISymbolDefinition def)
