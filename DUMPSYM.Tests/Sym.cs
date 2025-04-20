@@ -1,7 +1,6 @@
 ﻿// ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
-using System.Collections;
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Tests;
@@ -125,22 +124,14 @@ public class Sym
             {
                 if (string.IsNullOrWhiteSpace(m2.Tag))
                 {
-                    Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m.Type.Kind));
+                    Assert.IsTrue(m2.Type.Modifiers.Contains(SymbolTypeModifier.ARY));
+                    Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m.Type.Kind)); // simple type as array
                 }
                 else
                 {
-                    // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-                    var ssc = m.Type.Kind switch
+                    if (m2.Tag == def.Name) // self referencing, e.g. _GsCOORDINATE
                     {
-                        SymbolTypeKind.STRUCT => SymbolStorageClass.STRTAG,
-                        SymbolTypeKind.UNION  => SymbolStorageClass.UNTAG,
-                        _                     => throw new InvalidDataException("Expected struct or union.")
-                    };
-
-                    // Dependencies.Add(new SymKey( m.Type.Kind, m2.Tag));
-                    if (m2.Tag == def.Name)
-                    {
-                        //Console.WriteLine(def); // self referencing, e.g. _GsCOORDINATE
+                        // NOP
                     }
                     else
                     {
@@ -150,14 +141,21 @@ public class Sym
 
                             Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m2.Tag)); // e.g. AFFECT.C/EditorSave/Level
                         }
-                        else
+                        else // typedef is a primitive
                         {
+                            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+                            var ssc = m.Type.Kind switch
+                            {
+                                SymbolTypeKind.STRUCT => SymbolStorageClass.STRTAG,
+                                SymbolTypeKind.UNION  => SymbolStorageClass.UNTAG,
+                                _                     => throw new InvalidDataException("Expected struct or union.")
+                            };
                             Dependencies.Add(new SymKey(ssc, m2.Tag));
                         }
                     }
                 }
             }
-            else
+            else // typedef is a primitive
             {
                 Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m.Type.Kind));
             }
