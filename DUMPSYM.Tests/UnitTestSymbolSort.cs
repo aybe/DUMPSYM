@@ -2,26 +2,15 @@
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable ArrangeTrailingCommaInMultilineLists
-
 // ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public class MyClass
+public sealed class UnitTestSymbolSort : UnitTestBase
 {
     [TestMethod]
-    public void Test11()
-    {
-        for (ushort i = 0; i < ushort.MaxValue; i++)
-        {
-            var type = new SymbolType { Value = i };
-            Console.WriteLine($"{i} {type}");
-        }
-    }
-
-    [TestMethod]
-    public void TestMethod1()
+    public void TopologicalSort()
     {
         // TODO try passing them in original order to preserve initial order, this will require symbol header maybe
         var lists = UnitTestSplit222
