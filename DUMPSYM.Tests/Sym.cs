@@ -166,6 +166,32 @@ public class Sym
     {
         Name = new SymKey(def.Class, def.Name);
 
-        Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind));
+        if (def is ISymbolDefinition2 def2)
+        {
+            var tag = def2.Tag;
+
+            if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u.Name == tag))))
+            {
+                Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, tag));
+            }
+            else
+            {
+                var result = default(ISymbolDefinition); // TODO this syntax sucks
+
+                if (Symbols.Any(s => s.Code.Any(t => t.IsType(u => u.Name == tag, out result)))) // TODO this syntax sucks
+                {
+                    Dependencies.Add(new SymKey(result!.Class, result.Name));
+                }
+                else
+                {
+                    Assert.IsTrue(def2.Type.Modifiers.Contains(SymbolTypeModifier.ARY));
+                    Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def2.Type.Kind));
+                }
+            }
+        }
+        else
+        {
+            Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind));
+        }
     }
 }

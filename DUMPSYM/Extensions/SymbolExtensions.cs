@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DUMPSYM.Extensions;
 
@@ -24,6 +25,18 @@ public static class SymbolExtensions // TODO move
     public static bool IsStatic(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT };
+    }
+
+    public static bool IsType(this ISymbol symbol, Predicate<ISymbolDefinition> predicate, [MaybeNullWhen(false)] out ISymbolDefinition result)
+    {
+        result = null;
+
+        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG } def && predicate(def))
+        {
+            result = def;
+        }
+
+        return result != null;
     }
 
     public static bool IsTypedef(this ISymbol symbol)
