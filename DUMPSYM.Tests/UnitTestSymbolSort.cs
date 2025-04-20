@@ -126,9 +126,38 @@ public sealed class UnitTestSymbolSort : UnitTestBase
     {
         result = null;
 
-        var symbolMap = symbols.ToDictionary(s => s.Name, s => s);
+        Dictionary<SymKey, Sym> symbolMap;
 
-        var inDegree = symbols.ToDictionary(s => s.Name, _ => 0);
+        Dictionary<SymKey, int> inDegree;
+
+        var filter = true;
+
+        if (filter) // BUG defined multiple times in STATS.C/THING.C
+        {
+            symbolMap = new Dictionary<SymKey, Sym>();
+
+            inDegree = new Dictionary<SymKey, int>();
+
+            foreach (var symbol in symbols)
+            {
+                var a = symbolMap.TryAdd(symbol.Name, symbol);
+
+                var b = inDegree.TryAdd(symbol.Name, 0);
+
+                if (a && b)
+                {
+                    continue;
+                }
+
+                Console.WriteLine($"Symbol is already in dictionary: {symbol}");
+            }
+        }
+        else
+        {
+            symbolMap = symbols.ToDictionary(s => s.Name, s => s);
+
+            inDegree = symbols.ToDictionary(s => s.Name, _ => 0);
+        }
 
         var graph = new Dictionary<SymKey, List<SymKey>>();
 
