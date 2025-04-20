@@ -31,6 +31,9 @@ public class Sym
             case ISymbolDefinition { Class: SymbolStorageClass.EXT } def:
                 ResolveExt(def);
                 break;
+            case ISymbolDefinition { Class: SymbolStorageClass.STAT } def:
+                ResolveStatic(def);
+                break;
             case ISymbolDefinition { Class: SymbolStorageClass.STRTAG } def:
                 ResolveType(def);
                 break;
@@ -49,6 +52,18 @@ public class Sym
             default:
                 throw new NotImplementedException(symbol.ToString());
         }
+    }
+
+    private void ResolveStatic(ISymbolDefinition def)
+    {
+        if (def is ISymbolDefinition2)
+        {
+            throw new NotImplementedException(def.ToString());
+        }
+
+        Name = new SymKey(def.Class, def.Name);
+
+        Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind.ToString()));
     }
 
     private void ResolveTypedef(ISymbolDefinition def)
