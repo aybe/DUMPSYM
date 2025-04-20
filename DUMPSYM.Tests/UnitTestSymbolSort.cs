@@ -215,9 +215,9 @@ public sealed class UnitTestSymbolSort : UnitTestBase
         Console.WriteLine($"{nameof(sorted)}: {sorted.Count}");
 
         // Check for cycles
-        if (sorted.Count != symbols.Count)
+        if (sorted.Count != symbolMap.Count)
         {
-            var list = symbols.Where(x => !sorted.Contains(x)).ToList();
+            var list = symbolMap.Values.Where(x => !sorted.Contains(x)).ToList();
             result = list;
 
             return false;
