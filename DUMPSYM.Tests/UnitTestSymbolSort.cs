@@ -107,7 +107,7 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
         foreach (var sym in symbols)
         {
-            sym.ResolveDependencies();
+            sym.ResolveDependencies(symbols);
         }
 
         //Console.WriteLine(symbols.RemoveAll(s => s.Name == new SymKey(SymbolStorageClass.STRTAG, "SpriteData")));

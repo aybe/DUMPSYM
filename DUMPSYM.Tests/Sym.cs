@@ -1,6 +1,9 @@
 ﻿// ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
+using System.Collections;
+using DUMPSYM.Extensions;
+
 namespace DUMPSYM.Tests;
 
 public class Sym
@@ -11,13 +14,17 @@ public class Sym
 
     public required Code Code { get; init; }
 
+    private List<Sym> Symbols { get; set; }
+
     public override string ToString()
     {
         return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}]";
     }
 
-    public void ResolveDependencies()
+    public void ResolveDependencies(List<Sym> symbols)
     {
+        Symbols = symbols;
+
         var symbol = Code[0];
 
         switch (symbol)
@@ -69,6 +76,7 @@ public class Sym
             {
                 cClass = SymbolStorageClass.TPDEF;
             }
+
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
         }
         else
@@ -101,13 +109,18 @@ public class Sym
         // return; // TODO adding a return here makes the test pass, bug below
         var members = Code[1..^1];
 
-        if (def.Name == "PolyPoint")
+        if (def.Name == "EditorSave")
         {
             var w = 0;
         }
 
         foreach (var m in members.Cast<ISymbolDefinition>())
         {
+            if (def.Name == "EditorSave" && m.Name == "Level")
+            {
+                var w = 0;
+            }
+
             if (m is ISymbolDefinition2 m2)
             {
                 if (string.IsNullOrWhiteSpace(m2.Tag))
@@ -138,7 +151,16 @@ public class Sym
                     }
                     else
                     {
-                        Dependencies.Add(new SymKey(cClass, m2.Tag));
+                        if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u.Name == m2.Tag))))
+                        {
+                            // TODO when this is valid then the above could be reworked/simplified
+
+                            Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m2.Tag)); // e.g. AFFECT.C/EditorSave/Level
+                        }
+                        else
+                        {
+                            Dependencies.Add(new SymKey(cClass, m2.Tag));
+                        }
                     }
                 }
             }

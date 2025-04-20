@@ -31,6 +31,11 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF };
     }
 
+    public static bool IsTypedef(this ISymbol symbol, Predicate<ISymbolDefinition> predicate)
+    {
+        return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def && predicate(def);
+    }
+
     #endregion
 
     #region Single
