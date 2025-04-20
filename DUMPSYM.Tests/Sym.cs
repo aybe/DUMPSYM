@@ -44,11 +44,14 @@ public class Sym
                 ResolveTypedef(def);
                 break;
             case ISymbolFileStart file:
-                Name = new SymKey("FILE", ((SymbolRecordSetSldToLineOfFile)file).File); // TODO
+                Name = new SymKey("FILE", ((SymbolRecordSetSldToLineOfFile)file).File); // TODO can't use SymbolStorageClass.FILE here?
                 break; // NONE
             case ISymbolFunction func:
                 Name = new SymKey("FUNC", func.Name); // TODO
                 break; // NONE
+            case ISymbolVariable variable:
+                ResolveVariable(variable);
+                break;
             default:
                 throw new NotImplementedException(symbol.ToString());
         }
@@ -175,6 +178,27 @@ public class Sym
                 Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m.Type.Kind));
             }
         }
+    }
+
+    private void ResolveVariable(ISymbolVariable variable) // TODO rework this crap, could be other than STAT
+    {
+        Name = new SymKey("NAME", variable.Name);
+
+        foreach (var sym in Symbols)
+        {
+            foreach (var symbol in sym.Code)
+            {
+                if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT })
+                {
+                    Dependencies.Add(new SymKey(SymbolStorageClass.STAT, variable.Name));
+                    return;
+                }
+            }
+        }
+
+        // BUG MEMCARD.C/pad_status (and few others) has no corresponding definition, assuming integer for now...
+
+        Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, SymbolTypeKind.LONG));
     }
 
     private void ResolveExt(ISymbolDefinition def)
