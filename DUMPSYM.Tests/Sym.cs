@@ -204,7 +204,7 @@ public class Sym
         {
             foreach (var symbol in sym.Code)
             {
-                if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT })
+                if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT } def && def.Name == variable.Name)
                 {
                     Dependencies.Add(new SymKey(SymbolStorageClass.STAT, variable.Name));
                     return;
