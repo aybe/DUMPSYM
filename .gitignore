@@ -410,4 +410,5 @@ DUMPSYM/Properties/launchSettings.json
 *.g.cs
 *.sym
 *.sym.txt
+*.txt
 TestData
