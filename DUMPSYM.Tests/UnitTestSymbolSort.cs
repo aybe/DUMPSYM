@@ -84,8 +84,8 @@ public sealed class UnitTestSymbolSort : UnitTestBase
             new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 7 }, Name = "DOUBLE" }) }, // none
             new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 12 }, Name = "UCHAR" }) },
             new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 13 }, Name = "USHORT" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 14 }, Name = "UINT" }) }
-            //new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 15 }, Name = "ULONG" }) }, // already
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 14 }, Name = "UINT" }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 15 }, Name = "ULONG" }) }
         ]);
 /*
    1fab97: $00000000 94 Def class STRTAG type STRUCT size 8 name Proportion
