@@ -57,9 +57,17 @@ public sealed class UnitTestSymbolSort : UnitTestBase
     [DataRow(@"C:\Files\GitHub\! PSX\DUMPSYM\TestData\WEATHER.C.json")]
     public void TopologicalSort(string path)
     {
-        // TODO try passing them in original order to preserve initial order, this will require symbol header maybe
-        
+        // BUG Level tpdef is wrong
+
         var lists = UnitTestSplit222.GetSymbolRegistry(path).CreateLists();
+
+        {
+            var list = UnitTestSplit222.GetSymbols(path);
+
+            var split = Symbol.Split(list.ToArray());
+
+            // lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList())).ToList();
+        }
 
         var symbols = lists
             .Select(s => new Sym { Code = s }).ToList();
