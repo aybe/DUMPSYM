@@ -166,32 +166,38 @@ public class Sym
     {
         Name = new SymKey(def.Class, def.Name);
 
-        if (def is ISymbolDefinition2 def2)
-        {
-            var tag = def2.Tag;
-
-            if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u.Name == tag))))
-            {
-                Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, tag));
-            }
-            else
-            {
-                var result = default(ISymbolDefinition); // TODO this syntax sucks
-
-                if (Symbols.Any(s => s.Code.Any(t => t.IsType(u => u.Name == tag, out result)))) // TODO this syntax sucks
-                {
-                    Dependencies.Add(new SymKey(result!.Class, result.Name));
-                }
-                else
-                {
-                    Assert.IsTrue(def2.Type.Modifiers.Contains(SymbolTypeModifier.ARY));
-                    Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def2.Type.Kind));
-                }
-            }
-        }
-        else
+        if (def is not ISymbolDefinition2 def2)
         {
             Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind));
+            return;
         }
+
+        var tag = def2.Tag;
+
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            Assert.IsTrue(def2.Type.Modifiers.Contains(SymbolTypeModifier.ARY));
+            Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, def2.Type.Kind));
+            return;
+        }
+
+        // 1st: typedef (of type), 2nd: type
+
+        if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u.Name == tag))))
+        {
+            Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, tag));
+            return;
+        }
+
+        var result = default(ISymbolDefinition); // TODO this syntax sucks
+
+        // ReSharper disable once InvertIf
+        if (Symbols.Any(s => s.Code.Any(t => t.IsType(u => u.Name == tag, out result)))) // TODO this syntax sucks
+        {
+            Dependencies.Add(new SymKey(result!.Class, result.Name));
+            return;
+        }
+
+        throw new InvalidDataException(def2.ToString());
     }
 }
