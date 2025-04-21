@@ -209,6 +209,8 @@ public class Sym
                     Dependencies.Add(key);
                     //Console.WriteLine(this);
                 }
+
+                Priority = PriorityTypedefBasicEnd; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
             }
         }
     }
@@ -314,7 +316,9 @@ public class Sym
 
             var i = int.Parse(RegexFakeName.Match(def.Name).Groups[1].Value);
 
-            Priority = PriorityTypedefBasicEnd + i;
+            const int extra = 1; // so they end up after non-existing SymbolTypeKind primitives (i.e. game-specific), e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+
+            Priority = PriorityTypedefBasicEnd + i + extra;
         }
     }
 
