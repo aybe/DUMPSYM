@@ -216,6 +216,12 @@ public class Sym
             Assert.AreEqual(0, Priority);
             Priority--;
         }
+
+        if (SymbolRegistry.HasFakeName(def.Name))
+        {
+            // push fake types up
+            Priority--;
+        }
     }
 
     private void ResolveVariable(ISymbolVariable variable) // TODO rework this crap, could be other than STAT
