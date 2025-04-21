@@ -194,6 +194,10 @@ public class Sym
                         else // typedef is a primitive
                         {
                             Dependencies.Add(new SymKey(ssc, m2.Tag));
+                            // this pushes the type further up the list, closer to its dependencies
+                            // it results in the unrelated nodes between them to move somewhere else
+                            // i.e. it's much more tight now
+                            Priority = -1;
                         }
                     }
                 }
