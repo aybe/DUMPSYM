@@ -121,10 +121,8 @@ public class Sym
         {
             if (def.Name == def.Type.Kind.ToString())
             {
-                // no dependency
-                // Def class TPDEF type ULONG size 0 name ULONG
-                //Console.WriteLine(def);
-                _ = 0;
+                // no dependency, e.g. Def class TPDEF type ULONG size 0 name ULONG
+                Priority = -2;
             }
             else
             {
