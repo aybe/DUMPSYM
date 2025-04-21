@@ -178,7 +178,16 @@ public class Sym
                 // this will move all typedefs that rely on fakes up the list and group them together which is great
                 Priority = PriorityTypedefFakeStart;
 #if SORT_TYPEDEFS_OF_FAKES
-                Priority += PrioritiesTypedefFake[t2.Name];
+                var key = t2.Name;
+
+                if (PrioritiesTypedefFake.TryGetValue(key, out var value))
+                {
+                    Priority += value;
+                }
+                else
+                {
+                    Console.WriteLine($"typedef has no symbol and won't be sorted: {key}"); // TODO decide what to do in this case
+                }
 #endif
             }
         }
