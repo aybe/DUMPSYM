@@ -207,6 +207,17 @@ public class Sym
                 Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m.Type.Kind));
             }
         }
+
+        if (members.Any(s => s is ISymbolDefinition2 def2 && !string.IsNullOrEmpty(def2.Tag)))
+        {
+            // type has dependencies to other structs, leave it off like that
+        }
+        else // TODO this a trivial priority adjustment
+        {
+            // type only depends on primitives, it can go further up the list
+            Assert.AreEqual(0, Priority);
+            Priority--;
+        }
     }
 
     private void ResolveVariable(ISymbolVariable variable) // TODO rework this crap, could be other than STAT
