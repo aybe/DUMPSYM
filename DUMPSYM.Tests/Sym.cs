@@ -25,6 +25,8 @@ public class Sym
 
     private int PriorityTypedefBasicEnd { get; set; }
 
+    private static int PriorityTypedefOfFake { get; } = -10;
+
     public override string ToString()
     {
         return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}], {nameof(Priority)}: {Priority}";
@@ -136,6 +138,12 @@ public class Sym
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
 
             Priority = -1;
+
+            if (SymbolRegistry.HasFakeName(t2.Tag))
+            {
+                // this will move all typedefs that rely on fakes up the list and group them together which is great
+                Priority = PriorityTypedefOfFake;
+            }
         }
         else
         {
