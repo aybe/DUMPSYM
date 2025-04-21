@@ -119,6 +119,23 @@ public sealed class UnitTestSymbolSort : UnitTestBase
             Console.WriteLine(sym);
         }
 
+
+        if (false)
+        {
+            List<Sym>? result2 = null;
+
+            if (sort)
+            {
+                sort = TopologicalSort(result, out result2);
+            }
+
+            if (result2 != null)
+            {
+                var sequenceEqual = result.SequenceEqual(result2);
+                Assert.IsTrue(sequenceEqual);
+            }
+        }
+
         Assert.IsTrue(sort, "Topological sort failed.");
     }
 
