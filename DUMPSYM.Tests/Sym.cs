@@ -2,12 +2,14 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
+using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Tests;
 
 public class Sym
 {
+    private const int PriorityTypedefBasic = int.MinValue;
     public SymKey Name { get; set; }
 
     public HashSet<SymKey> Dependencies { get; init; } = [];
@@ -17,6 +19,8 @@ public class Sym
     public int Priority { get; set; }
 
     private List<Sym> Symbols { get; set; }
+
+    private static Regex RegexFakeName { get; } = new(@"^\.(\d+)fake$", RegexOptions.Compiled);
 
     public override string ToString()
     {
@@ -122,7 +126,7 @@ public class Sym
             if (def.Name == def.Type.Kind.ToString())
             {
                 // no dependency, e.g. Def class TPDEF type ULONG size 0 name ULONG
-                Priority = -2;
+                Priority = PriorityTypedefBasic;
             }
             else
             {
@@ -220,7 +224,14 @@ public class Sym
         if (SymbolRegistry.HasFakeName(def.Name))
         {
             // push fake types up
+
             Priority--;
+
+            // ADDED: push them up, sorted by name, assuming compiler did it right
+
+            var i = int.Parse(RegexFakeName.Match(def.Name).Groups[1].Value);
+
+            Priority = PriorityTypedefBasic + i;
         }
     }
 
