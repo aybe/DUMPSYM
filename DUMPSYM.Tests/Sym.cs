@@ -9,7 +9,6 @@ namespace DUMPSYM.Tests;
 
 public class Sym
 {
-    private const int PriorityTypedefBasic = int.MinValue;
     public SymKey Name { get; set; }
 
     public HashSet<SymKey> Dependencies { get; init; } = [];
@@ -22,14 +21,31 @@ public class Sym
 
     private static Regex RegexFakeName { get; } = new(@"^\.(\d+)fake$", RegexOptions.Compiled);
 
+    private int PriorityTypedefBasicStart { get; set; }
+
+    private int PriorityTypedefBasicEnd { get; set; }
+
     public override string ToString()
     {
         return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}], {nameof(Priority)}: {Priority}";
     }
 
+    private void Initialize()
+    {
+        var kinds = Enum.GetValues<SymbolTypeKind>();
+
+        var max = Convert.ToInt32(kinds.Max());
+
+        PriorityTypedefBasicStart = int.MinValue;
+
+        PriorityTypedefBasicEnd = PriorityTypedefBasicStart + max + 1;
+    }
+
     public void ResolveDependencies(List<Sym> symbols)
     {
         Symbols = symbols;
+
+        Initialize();
 
         var symbol = Code[0];
 
@@ -126,7 +142,7 @@ public class Sym
             if (def.Name == def.Type.Kind.ToString())
             {
                 // no dependency, e.g. Def class TPDEF type ULONG size 0 name ULONG
-                Priority = PriorityTypedefBasic;
+                Priority = PriorityTypedefBasicStart + Convert.ToInt32(def.Type.Kind);
             }
             else
             {
@@ -231,7 +247,7 @@ public class Sym
 
             var i = int.Parse(RegexFakeName.Match(def.Name).Groups[1].Value);
 
-            Priority = PriorityTypedefBasic + i;
+            Priority = PriorityTypedefBasicEnd + i;
         }
     }
 
