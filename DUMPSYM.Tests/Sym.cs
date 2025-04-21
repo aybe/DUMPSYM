@@ -105,6 +105,9 @@ public class Sym
             case ISymbolFileStart file:
                 Name = new SymKey("FILE", ((SymbolRecordSetSldToLineOfFile)file).File); // TODO can't use SymbolStorageClass.FILE here?
                 break; // NONE
+            case ISymbolFileEnd:
+                Name = new SymKey("EOF");
+                break;
             case ISymbolFunction func:
                 Name = new SymKey("FUNC", func.Name); // TODO
                 break; // NONE
