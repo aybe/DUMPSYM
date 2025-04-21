@@ -66,7 +66,9 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
             var split = Symbol.Split(list.ToArray());
 
-             lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList())).ToList();
+            split = SymbolCleaner.PreProcessSymbols(split);
+            
+            lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList())).ToList();
         }
 
         var symbols = lists
