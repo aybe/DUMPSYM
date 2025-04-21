@@ -112,7 +112,7 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
         //Console.WriteLine(symbols.RemoveAll(s => s.Name == new SymKey(SymbolStorageClass.STRTAG, "SpriteData")));
 
-        var sort = TopologicalSort(symbols, out var result);
+        var sort = TopologicalSortWithPriority(symbols, out var result);
 
         foreach (var sym in result!)
         {
@@ -126,7 +126,7 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
             if (sort)
             {
-                sort = TopologicalSort(result, out result2);
+                sort = TopologicalSortWithPriority(result, out result2);
             }
 
             if (result2 != null)
@@ -225,6 +225,122 @@ public sealed class UnitTestSymbolSort : UnitTestBase
                 if (inDegree[neighbor] == 0)
                 {
                     queue.Enqueue(neighbor);
+                }
+            }
+        }
+
+        Console.WriteLine($"{nameof(sorted)}: {sorted.Count}");
+
+        // Check for cycles
+        if (sorted.Count != symbolMap.Count)
+        {
+            var list = symbolMap.Values.Where(x => !sorted.Contains(x)).ToList();
+            result = list;
+
+            return false;
+        }
+
+        result = sorted;
+
+        return true;
+    }
+
+    private static bool TopologicalSortWithPriority(List<Sym> symbols, [MaybeNullWhen(false)] out List<Sym> result)
+    {
+        result = null;
+
+        Dictionary<SymKey, Sym> symbolMap;
+
+        Dictionary<SymKey, int> inDegree;
+
+        var filter = true;
+
+        if (filter) // BUG defined multiple times in STATS.C/THING.C
+        {
+            symbolMap = new Dictionary<SymKey, Sym>();
+
+            inDegree = new Dictionary<SymKey, int>();
+
+            foreach (var symbol in symbols)
+            {
+                var a = symbolMap.TryAdd(symbol.Name, symbol);
+
+                var b = inDegree.TryAdd(symbol.Name, 0);
+
+                if (a && b)
+                {
+                    continue;
+                }
+
+                Console.WriteLine($"Symbol is already in dictionary: {symbol}");
+            }
+        }
+        else
+        {
+            symbolMap = symbols.ToDictionary(s => s.Name, s => s);
+
+            inDegree = symbols.ToDictionary(s => s.Name, _ => 0);
+        }
+
+        var graph = new Dictionary<SymKey, List<SymKey>>();
+
+        foreach (var symbol in symbols) // build the graph and in-degree count
+        {
+            foreach (var dependency in symbol.Dependencies)
+            {
+                if (!graph.TryGetValue(dependency, out var list))
+                {
+                    list = graph[dependency] = [];
+                }
+
+                var key = symbol.Name;
+
+                list.Add(key);
+
+                inDegree[key]++;
+            }
+        }
+
+        Console.WriteLine($"{nameof(symbolMap)}: {symbolMap.Count}");
+        Console.WriteLine($"{nameof(inDegree)}: {inDegree.Count}");
+        Console.WriteLine($"{nameof(graph)}: {graph.Count}");
+
+        // queue for symbols with no dependencies
+
+        //var queue = new Queue<SymKey>(inDegree.Where(s => s.Value == 0).Select(kv => kv.Key));
+
+        var queue = new PriorityQueue<SymKey,int>();
+
+        foreach (var pair in inDegree)
+        {
+            if (pair.Value == 0)
+            {
+                queue.Enqueue(pair.Key, symbolMap[pair.Key].Priority);
+            }
+        }
+
+        Console.WriteLine($"{nameof(queue)}: {queue.Count}");
+
+        var sorted = new List<Sym>();
+
+        while (queue.Count > 0)
+        {
+            var key = queue.Dequeue();
+
+            sorted.Add(symbolMap[key]);
+
+            if (!graph.TryGetValue(key, out var neighbors))
+            {
+                continue;
+            }
+
+            foreach (var neighbor in neighbors)
+            {
+                inDegree[neighbor]--;
+
+                if (inDegree[neighbor] == 0)
+                {
+                    queue.Enqueue(neighbor, symbolMap[neighbor].Priority);
                 }
             }
         }

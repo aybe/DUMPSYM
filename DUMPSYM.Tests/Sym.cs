@@ -14,11 +14,13 @@ public class Sym
 
     public required Code Code { get; init; }
 
+    public int Priority { get; set; }
+
     private List<Sym> Symbols { get; set; }
 
     public override string ToString()
     {
-        return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}]";
+        return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}], {nameof(Priority)}: {Priority}";
     }
 
     public void ResolveDependencies(List<Sym> symbols)
@@ -112,6 +114,8 @@ public class Sym
             }
 
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
+
+            Priority = -1;
         }
         else
         {
