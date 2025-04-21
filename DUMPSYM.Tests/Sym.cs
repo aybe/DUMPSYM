@@ -1,7 +1,9 @@
 ﻿#define DEPEND_ON_TYPEDEF_AND_TYPE // adds a dependency to the type in addition to a dependency to the typedef, e.g. AFFECT.C/EditorSave/Level
+#define SORT_TYPEDEFS_OF_FAKES // whether to sort typedefs that represents fake types by name // BUG has duplicate keys somewhere
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
 
@@ -25,7 +27,9 @@ public class Sym
 
     private int PriorityTypedefBasicEnd { get; set; }
 
-    private static int PriorityTypedefOfFake { get; } = -10;
+    private static Dictionary<string, int> PrioritiesTypedefFake { get; set; } = new(); // TODO this must be static atm otherwise it runs for each symbol
+
+    private static int PriorityTypedefFakeStart { get; } = -1_000_000; // TODO adjust
 
     public override string ToString()
     {
@@ -41,6 +45,36 @@ public class Sym
         PriorityTypedefBasicStart = int.MinValue;
 
         PriorityTypedefBasicEnd = PriorityTypedefBasicStart + max + 1;
+
+        InitializeTypedefsFakes();
+    }
+
+    [Conditional("SORT_TYPEDEFS_OF_FAKES")]
+    private void InitializeTypedefsFakes()
+    {
+        // this generates priorities for typedefs of fakes so they can be sorted by name
+
+        if (PrioritiesTypedefFake.Count != 0)
+        {
+            return;
+        }
+
+        var names = new HashSet<string>();
+
+        foreach (var sym in Symbols)
+        {
+            foreach (var symbol in sym.Code)
+            {
+                if (symbol is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF } def2 && SymbolRegistry.HasFakeName(def2.Tag))
+                {
+                    names.Add(def2.Name);
+                }
+
+                break;
+            }
+        }
+
+        PrioritiesTypedefFake = names.OrderBy(s => s).Select((s, t) => (s, t)).ToDictionary(s => s.s, s => s.t);
     }
 
     public void ResolveDependencies(List<Sym> symbols)
@@ -142,7 +176,10 @@ public class Sym
             if (SymbolRegistry.HasFakeName(t2.Tag))
             {
                 // this will move all typedefs that rely on fakes up the list and group them together which is great
-                Priority = PriorityTypedefOfFake;
+                Priority = PriorityTypedefFakeStart;
+#if SORT_TYPEDEFS_OF_FAKES
+                Priority += PrioritiesTypedefFake[t2.Name];
+#endif
             }
         }
         else
