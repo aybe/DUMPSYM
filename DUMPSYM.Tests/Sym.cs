@@ -235,6 +235,19 @@ public class Sym
             // type only depends on primitives, it can go further up the list
             Assert.AreEqual(0, Priority);
             Priority--;
+
+            if (SymbolRegistry.HasFakeName(def.Name))
+            {
+            }
+            // ReSharper disable once RedundantIfElseBlock
+            else
+            {
+                // this one is interesting, it pushes types with no deps up
+                // it fixes noisy symbols between a typedef and its type
+                // but 1st fake priority is LT basic typedef max
+                // then the rest of the list becomes very confusing
+                //Priority--;
+            }
         }
 
         if (SymbolRegistry.HasFakeName(def.Name))
