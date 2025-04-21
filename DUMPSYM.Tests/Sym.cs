@@ -1,4 +1,5 @@
-﻿// ReSharper disable StringLiteralTypo
+﻿#define DEPEND_ON_TYPEDEF_AND_TYPE // adds a dependency to the type in addition to a dependency to the typedef, e.g. AFFECT.C/EditorSave/Level
+// ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
 using DUMPSYM.Extensions;
@@ -169,21 +170,25 @@ public class Sym
                     }
                     else
                     {
+                        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+                        var ssc = m.Type.Kind switch
+                        {
+                            SymbolTypeKind.STRUCT => SymbolStorageClass.STRTAG,
+                            SymbolTypeKind.UNION  => SymbolStorageClass.UNTAG,
+                            _                     => throw new InvalidDataException("Expected struct or union.")
+                        };
+
                         if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u.Name == m2.Tag))))
                         {
+#if DEPEND_ON_TYPEDEF_AND_TYPE // BUG this doesn't change the order, whether done before or after
+                            Dependencies.Add(new SymKey(ssc, m2.Tag));
+#endif
                             // TODO when this is valid then the above could be reworked/simplified
 
                             Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m2.Tag)); // e.g. AFFECT.C/EditorSave/Level
                         }
                         else // typedef is a primitive
                         {
-                            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
-                            var ssc = m.Type.Kind switch
-                            {
-                                SymbolTypeKind.STRUCT => SymbolStorageClass.STRTAG,
-                                SymbolTypeKind.UNION  => SymbolStorageClass.UNTAG,
-                                _                     => throw new InvalidDataException("Expected struct or union.")
-                            };
                             Dependencies.Add(new SymKey(ssc, m2.Tag));
                         }
                     }
