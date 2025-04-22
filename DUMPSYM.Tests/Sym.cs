@@ -1,10 +1,7 @@
 ﻿#define DEPEND_ON_TYPEDEF_AND_TYPE // adds a dependency to the type in addition to a dependency to the typedef, e.g. AFFECT.C/EditorSave/Level
-#define SORT_TYPEDEFS_OF_FAKES // whether to sort typedefs that represents fake types by name // BUG has duplicate keys somewhere
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Tests;
@@ -21,8 +18,6 @@ public class Sym
 
     private List<Sym> Symbols { get; set; }
 
-    private static Regex RegexFakeName { get; } = new(@"^\.(\d+)fake$", RegexOptions.Compiled);
-
     private static int PriorityExternal { get; } = +1_000_000;
 
     private static int PriorityFunction { get; } = +2_000_000;
@@ -33,13 +28,11 @@ public class Sym
 
     private static int PriorityTypedefBasicCursor { get; set; } = PriorityTypedefBasicStart;
 
-    private int PriorityTypedefBasicEnd { get; set; }
-
     public SortingSettings Settings { get; set; }
 
-    private static Dictionary<string, int> PrioritiesTypedefFake { get; set; } = new(); // TODO this must be static atm otherwise it runs for each symbol
-
     private static int PriorityTypedefFakeStart { get; } = -1_000_000; // TODO adjust
+
+    private static int PriorityTypeFakeCursor { get; set; } = PriorityTypedefFakeStart + 100_000;
 
     private static int PriorityGameType { get; } = -5; // TODO adjust
 
@@ -67,41 +60,7 @@ public class Sym
 
     private void Initialize()
     {
-        var kinds = Enum.GetValues<SymbolTypeKind>();
-
-        var max = Convert.ToInt32(kinds.Max());
-
-        PriorityTypedefBasicEnd = PriorityTypedefBasicStart + max + 1;
-
-        InitializeTypedefsFakes();
-    }
-
-    [Conditional("SORT_TYPEDEFS_OF_FAKES")]
-    private void InitializeTypedefsFakes()
-    {
-        // this generates priorities for typedefs of fakes so they can be sorted by name
-
-        if (PrioritiesTypedefFake.Count != 0)
-        {
-            return;
-        }
-
-        var names = new HashSet<string>();
-
-        foreach (var sym in Symbols)
-        {
-            foreach (var symbol in sym.Code)
-            {
-                if (symbol is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF } def2 && SymbolRegistry.HasFakeName(def2.Tag))
-                {
-                    names.Add(def2.Name);
-                }
-
-                break;
-            }
-        }
-
-        PrioritiesTypedefFake = names.OrderBy(s => s).Select((s, t) => (s, t)).ToDictionary(s => s.s, s => s.t);
+        // TODO delete
     }
 
     public void ResolveDependencies(List<Sym> symbols)
@@ -204,24 +163,6 @@ public class Sym
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
 
             Priority = PriorityGameTypeDef;
-
-            if (SymbolRegistry.HasFakeName(t2.Tag))
-            {
-                // this will move all typedefs that rely on fakes up the list and group them together which is great
-                Priority = PriorityTypedefFakeStart;
-#if SORT_TYPEDEFS_OF_FAKES
-                var key = t2.Name;
-
-                if (PrioritiesTypedefFake.TryGetValue(key, out var value))
-                {
-                    Priority += value;
-                }
-                else
-                {
-                    Console.WriteLine($"typedef has no symbol and won't be sorted: {key}"); // TODO decide what to do in this case
-                }
-#endif
-            }
         }
         else
         {
@@ -305,11 +246,13 @@ public class Sym
 
             // ADDED: push them up, sorted by name, assuming compiler did it right
 
-            var i = int.Parse(RegexFakeName.Match(def.Name).Groups[1].Value);
+            //var i = int.Parse(RegexFakeName.Match(def.Name).Groups[1].Value);
+            //
+            //const int extra = 1; // so they end up after non-existing SymbolTypeKind primitives (i.e. game-specific), e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+            //
+            //Priority = PriorityTypedefBasicEnd + i + extra;
 
-            const int extra = 1; // so they end up after non-existing SymbolTypeKind primitives (i.e. game-specific), e.g. Def class TPDEF type UCHAR size 0 name BBOOL
-
-            Priority = PriorityTypedefBasicEnd + i + extra;
+            Priority = PriorityTypeFakeCursor++;
         }
         else
         {
