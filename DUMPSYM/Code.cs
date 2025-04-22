@@ -9,12 +9,15 @@ public sealed class Code : IReadOnlyList<ISymbol>
         Symbols = [symbol];
     }
 
-    public Code(List<ISymbol> symbols)
+    public Code(List<ISymbol> symbols, long position)
     {
         Symbols = symbols;
+        Position = position;
     }
 
     public List<ISymbol> Symbols { get; }
+
+    public long Position { get; }
 
     public IEnumerator<ISymbol> GetEnumerator()
     {

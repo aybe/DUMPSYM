@@ -33,6 +33,8 @@ public class Sym
 
     private int PriorityTypedefBasicEnd { get; set; }
 
+    public SortingSettings Settings { get; set; }
+
     private static Dictionary<string, int> PrioritiesTypedefFake { get; set; } = new(); // TODO this must be static atm otherwise it runs for each symbol
 
     private static int PriorityTypedefFakeStart { get; } = -1_000_000; // TODO adjust
@@ -40,6 +42,8 @@ public class Sym
     private static int PriorityGameType { get; } = -5; // TODO adjust
 
     private static int PriorityGameTypeDef => PsxRuntimeLibrary.StructuresPriority - 2000; // TODO adjust
+
+    private int PriorityWithFilePosition => (int)(Settings.SortByFilePosition ? Code.Position : 0);
 
     public override string ToString()
     {
@@ -225,7 +229,11 @@ public class Sym
                     //Console.WriteLine(this);
                 }
 
-                Priority = PriorityTypedefBasicEnd; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+                Priority = PriorityTypedefBasicEnd; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL // TODO delete
+
+                // this is a new value that uses file position as well // TODO others should be sorted like so
+
+                Priority = PriorityTypedefBasicEnd + PriorityWithFilePosition; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
             }
         }
     }

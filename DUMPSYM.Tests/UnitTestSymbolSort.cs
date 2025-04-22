@@ -9,6 +9,11 @@ namespace DUMPSYM.Tests;
 [TestClass]
 public sealed class UnitTestSymbolSort : UnitTestBase
 {
+    private SortingSettings Settings { get; } = new()
+    {
+        SortByFilePosition = false
+    };
+
     [TestMethod] // TODO dynamic data
     // ReSharper disable StringLiteralTypo
     [DataRow(@"C:\Files\GitHub\! PSX\DUMPSYM\TestData\AFFECT.C.json")]
@@ -64,8 +69,8 @@ public sealed class UnitTestSymbolSort : UnitTestBase
         var split = Symbol.Split(list.ToArray());
 
         split = SymbolCleaner.PreProcessSymbols(split);
-            
-        var lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList())).ToList();
+
+        var lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList(), s[0].Header.Position)).ToList();
 
         var symbols = lists.Select(s => new Sym { Code = s }).ToList();
 
@@ -93,23 +98,33 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
         var sym1 = new Sym
         {
-            Code = new Code([
-                new SymbolRecordDef { Class = SymbolStorageClass.STRTAG, Type = new SymbolType { Value = 8 }, Name = "NCB" },
-                new SymbolRecordDef { Class = SymbolStorageClass.MOS, Type = new SymbolType { Value = 4 }, Name = "BAD_SYMBOL" },
-                new SymbolRecordDef2 { Class = SymbolStorageClass.EOS, Type = new SymbolType { Value = 0 }, Tag = "NCB", Name = ".eos" }
-            ])
+            Code = new Code(
+                [
+                    new SymbolRecordDef { Class = SymbolStorageClass.STRTAG, Type = new SymbolType { Value = 8 }, Name = "NCB" },
+                    new SymbolRecordDef { Class = SymbolStorageClass.MOS, Type = new SymbolType { Value = 4 }, Name = "BAD_SYMBOL" },
+                    new SymbolRecordDef2 { Class = SymbolStorageClass.EOS, Type = new SymbolType { Value = 0 }, Tag = "NCB", Name = ".eos" }
+                ],
+                0
+            )
         };
 
         symbols.Add(sym1);
 
         foreach (var sym in symbols)
         {
+            sym.Settings = Settings;
+
             sym.ResolveDependencies(symbols);
+
+            //  if (settings.SortByFilePosition) // TODO delete
+            // {
+            //     sym.Name.Position = sym.Code.Position; // TODO this sucks
+            // }
         }
 
         //Console.WriteLine(symbols.RemoveAll(s => s.Name == new SymKey(SymbolStorageClass.STRTAG, "SpriteData")));
 
-        var sort = TopologicalSortWithPriority(symbols, out var result);
+        var sort = TopologicalSortWithPriority(symbols, out var result, Settings);
 
         foreach (var sym in result!)
         {
@@ -123,7 +138,7 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
             if (sort)
             {
-                sort = TopologicalSortWithPriority(result, out result2);
+                sort = TopologicalSortWithPriority(result, out result2, Settings);
             }
 
             if (result2 != null)
@@ -242,7 +257,7 @@ public sealed class UnitTestSymbolSort : UnitTestBase
         return true;
     }
 
-    private static bool TopologicalSortWithPriority(List<Sym> symbols, [MaybeNullWhen(false)] out List<Sym> result)
+    private static bool TopologicalSortWithPriority(List<Sym> symbols, [MaybeNullWhen(false)] out List<Sym> result, SortingSettings settings)
     {
         result = null;
 
@@ -304,16 +319,15 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
         // queue for symbols with no dependencies
 
-        //var queue = new Queue<SymKey>(inDegree.Where(s => s.Value == 0).Select(kv => kv.Key));
-
         var queue = new PriorityQueue<SymKey, int>();
 
-        foreach (var (key, degree) in inDegree)
+        var pairs = inDegree
+            .Where(s => s.Value == 0)
+            .OrderBy(s => settings.SortByFilePosition ? symbolMap[s.Key].Code.Position : 0);
+
+        foreach (var (key, _) in pairs)
         {
-            if (degree == 0)
-            {
-                queue.Enqueue(key, symbolMap[key].Priority);
-            }
+            queue.Enqueue(key, symbolMap[key].Priority);
         }
 
         Console.WriteLine($"{nameof(queue)}: {queue.Count}");

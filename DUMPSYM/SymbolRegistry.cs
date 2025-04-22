@@ -32,13 +32,13 @@ public sealed class SymbolRegistry
         var codes = new List<Code>();
 
         codes.AddRange(Externals.Select(s => new Code(s)));
-        codes.AddRange(Files.Select(s => new Code(s)));
-        codes.AddRange(Functions.Select(s => new Code(s)));
+        codes.AddRange(Files.Select(s => new Code(s, 0)));
+        codes.AddRange(Functions.Select(s => new Code(s, 0)));
         codes.AddRange(Names.Select(s => new Code(s)));
         codes.AddRange(Statics.Select(s => new Code(s)));
-        codes.AddRange(Structs.Select(s => new Code(s)));
+        codes.AddRange(Structs.Select(s => new Code(s, 0)));
         codes.AddRange(Typedefs.Select(s => new Code(s)));
-        codes.AddRange(Unions.Select(s => new Code(s)));
+        codes.AddRange(Unions.Select(s => new Code(s, 0)));
 
         return codes;
     }

@@ -25,6 +25,8 @@ public sealed class SymKey : IReadOnlyList<string>, IEquatable<SymKey>
 
     public int Count => Names.Count;
 
+    public long Position { get; set; }
+
     public override bool Equals(object? obj)
     {
         if (obj is null)
