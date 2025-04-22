@@ -23,6 +23,12 @@ public class Sym
 
     private static Regex RegexFakeName { get; } = new(@"^\.(\d+)fake$", RegexOptions.Compiled);
 
+    private static int PriorityExternal { get; } = +1_000_000;
+
+    private static int PriorityFunction { get; } = +2_000_000;
+
+    private static int PriorityFile { get; } = +3_000_000;
+
     private int PriorityTypedefBasicStart { get; set; }
 
     private int PriorityTypedefBasicEnd { get; set; }
@@ -104,12 +110,14 @@ public class Sym
                 break;
             case ISymbolFileStart file:
                 Name = new SymKey("FILE", ((SymbolRecordSetSldToLineOfFile)file).File); // TODO can't use SymbolStorageClass.FILE here?
+                Priority = PriorityFile;
                 break; // NONE
             case ISymbolFileEnd:
                 Name = new SymKey("EOF");
                 break;
             case ISymbolFunction func:
                 Name = new SymKey("FUNC", func.Name); // TODO
+                Priority = PriorityFunction;
                 break; // NONE
             case ISymbolVariable variable:
                 ResolveVariable(variable);
@@ -357,6 +365,8 @@ public class Sym
     private void ResolveExt(ISymbolDefinition def)
     {
         Name = new SymKey(def.Class, def.Name);
+
+        Priority = PriorityExternal;
 
         if (def is not ISymbolDefinition2 def2)
         {
