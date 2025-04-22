@@ -35,7 +35,7 @@ public class Sym
 
     private static int PriorityTypeFakeCursor { get; set; } = PriorityTypedefFakeStart + 100_000;
 
-    private static int PriorityGameType { get; } = -5; // TODO adjust
+    private static int PriorityGameType { get; } = PsxRuntimeLibrary.StructuresPriority / 2; // TODO adjust
 
     private static int PriorityGameTypeDef => PsxRuntimeLibrary.StructuresPriority - 2000; // TODO adjust
 
