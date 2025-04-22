@@ -11,7 +11,7 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
 {
     private SortingSettings Settings { get; } = new()
     {
-        SortByFilePosition = false
+        SortByFilePosition = true
     };
 
     private void TopologicalSort(string path)
