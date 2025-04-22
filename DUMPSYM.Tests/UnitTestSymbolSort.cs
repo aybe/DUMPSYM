@@ -298,7 +298,7 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
     {
         // AFFECT.C
 
-        symbols.AddRange(
+        symbols.InsertRange(0,
         [
             new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.NULL), 0, nameof(SymbolTypeKind.NULL))) },
             new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.VOID), 0, nameof(SymbolTypeKind.VOID))) },
@@ -314,7 +314,7 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
             new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, nameof(SymbolTypeKind.ULONG))) }
         ]);
 
-        var ncb = new Code([
+        var ncb = new Code([ // TODO why is this not at the top of game symbols as it only depends on primitives?
             new SymbolRecordDef(SymbolStorageClass.STRTAG, new SymbolType(SymbolTypeKind.STRUCT), 4, "NCB"),
             new SymbolRecordDef(SymbolStorageClass.MOS, new SymbolType(SymbolTypeKind.INT), 4, "BAD_SYMBOL"),
             new SymbolRecordDef2(SymbolStorageClass.EOS, new SymbolType(SymbolTypeKind.NULL), 4, [], "NCB", ".eos")
