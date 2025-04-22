@@ -13,8 +13,16 @@ public static class SymbolCleaner
         foreach (var list in lists)
         {
             RenameType(list);
-            RenameTypeMembers(list);
+        }
+
+        foreach (var list in lists)
+        {
             RenameTypeDef(list);
+        }
+
+        foreach (var list in lists)
+        {
+            RenameTypeMembers(list);
         }
 
         var changes = new List<Symbol[]>();
