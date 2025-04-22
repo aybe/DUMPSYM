@@ -293,7 +293,6 @@ public class Sym
         {
             // type only depends on primitives, it can go further up the list
             Assert.AreEqual(0, Priority);
-            Priority--;
 
             if (SymbolRegistry.HasFakeName(def.Name))
             {
@@ -322,6 +321,15 @@ public class Sym
             const int extra = 1; // so they end up after non-existing SymbolTypeKind primitives (i.e. game-specific), e.g. Def class TPDEF type UCHAR size 0 name BBOOL
 
             Priority = PriorityTypedefBasicEnd + i + extra;
+        }
+        else
+        {
+
+            if (PsxRuntimeLibrary.Structures.AsSpan().IndexOf(def.Name) is var i && i != -1)
+            {
+                Priority = PsxRuntimeLibrary.StructuresPriority + i;
+            }
+
         }
     }
 
