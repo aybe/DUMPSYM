@@ -9,6 +9,13 @@ public static class SymbolCleaner
 {
     public static Symbol[][] PreProcessSymbols(Symbol[][] lists)
     {
+        foreach (var list in lists)
+        {
+            TryRenameType(list);
+            TryRenameTypeMembers(list);
+            TryRenameTypeDef(list);
+        }
+
         var changes = new List<Symbol[]>();
 
         var pass = 0;
@@ -175,6 +182,86 @@ public static class SymbolCleaner
     {
         // TODO
         Assert.AreNotEqual(1, symbols.Length);
+
+    private static bool TryRenameType(Symbol[] symbols)
+    {
+        if (symbols[0].Record is ISymbolDefinition def)
+        {
+            if (def.Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG)
+            {
+                if (PsxRuntimeLibrary.Names.TryGetValue(def.Name, out var value))
+                {
+                    Console.WriteLine($"OK: {def} -> {value}");
+
+                    def.Name = value;
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private static bool TryRenameTypeMembers(Symbol[] symbols)
+    {
+        if (symbols[0].Record is ISymbolDefinition def)
+        {
+            if (def.Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG)
+            {
+                var changed = false;
+                var members = symbols[1..^1];
+
+                foreach (var member in members)
+                {
+                    if (member.Record is ISymbolDefinition2 member2)
+                    {
+                        if (PsxRuntimeLibrary.Names.TryGetValue(member2.Tag, out var value))
+                        {
+                            Console.WriteLine($"OK: {member2} -> {value}");
+
+                            member2.Tag = value;
+
+                            changed = true;
+                        }
+                    }
+                }
+
+                return changed;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private static bool TryRenameTypeDef(Symbol[] symbols)
+    {
+        if (symbols[0].Record is ISymbolDefinition2 def)
+        {
+            if (def.Class is (SymbolStorageClass.TPDEF))
+            {
+                if (PsxRuntimeLibrary.Names.TryGetValue(def.Tag, out var value))
+                {
+                    Console.WriteLine($"OK: {def} -> {value}");
+
+                    def.Tag = value;
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
+        return false;
     }
 
     private static void ParseTypeUnion(Symbol[] symbols)

@@ -5,6 +5,12 @@ namespace DUMPSYM;
 
 public static class PsxRuntimeLibrary
 {
+    public static Dictionary<string, string> Names { get; } = new()
+    {
+        { "_GsCOORDINATE", "GsCOORDINATE" },
+        { "_GsCOORDINATE2", "GsCOORDINATE2" }
+    };
+
     public static string[] Structures { get; } = new[]
     {
         // Chapter 1: Kernel Library
