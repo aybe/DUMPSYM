@@ -59,20 +59,15 @@ public sealed class UnitTestSymbolSort : UnitTestBase
     {
         // BUG Level tpdef is wrong
 
-        var lists = UnitTestSplit222.GetSymbolRegistry(path).CreateLists();
+        var list = UnitTestSplit222.GetSymbols(path);
 
-        {
-            var list = UnitTestSplit222.GetSymbols(path);
+        var split = Symbol.Split(list.ToArray());
 
-            var split = Symbol.Split(list.ToArray());
-
-            split = SymbolCleaner.PreProcessSymbols(split);
+        split = SymbolCleaner.PreProcessSymbols(split);
             
-            lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList())).ToList();
-        }
+        var lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList())).ToList();
 
-        var symbols = lists
-            .Select(s => new Sym { Code = s }).ToList();
+        var symbols = lists.Select(s => new Sym { Code = s }).ToList();
 
         // AFFECT.C
         symbols.AddRange([
