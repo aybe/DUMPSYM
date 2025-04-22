@@ -29,7 +29,9 @@ public class Sym
 
     private static int PriorityFile { get; } = +3_000_000;
 
-    private int PriorityTypedefBasicStart { get; } = -2_000_000;
+    private static int PriorityTypedefBasicStart { get; } = -2_000_000;
+
+    private static int PriorityTypedefBasicCursor { get; set; } = PriorityTypedefBasicStart;
 
     private int PriorityTypedefBasicEnd { get; set; }
 
@@ -223,7 +225,7 @@ public class Sym
         }
         else
         {
-            Priority = PriorityTypedefBasicStart + PriorityWithFilePosition; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+            Priority = PriorityTypedefBasicCursor++; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
         }
     }
 
