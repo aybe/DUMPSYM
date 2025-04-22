@@ -24,7 +24,7 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
 
         split = SymbolCleaner.PreProcessSymbols(split);
 
-        var lists = split.Select(s => new Code(s.Select(t => (ISymbol)t.Record).ToList(), s[0].Header.Position)).ToList();
+        var lists = split.Select((s, t) => new Code(s.Select(u => (ISymbol)u.Record).ToList(), t)).ToList();
 
         var symbols = lists.Select(s => new Sym { Code = s }).ToList();
 
