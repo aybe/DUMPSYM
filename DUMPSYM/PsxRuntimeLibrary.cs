@@ -8,7 +8,8 @@ public static class PsxRuntimeLibrary
     public static Dictionary<string, string> Names { get; } = new()
     {
         { "_GsCOORDINATE", "GsCOORDINATE" },
-        { "_GsCOORDINATE2", "GsCOORDINATE2" }
+        { "_GsCOORDINATE2", "GsCOORDINATE2" },
+        { "_GsPOSITION", "GsPOSITION" } // doesn't exist in SDK
     };
 
     public static string[] Structures { get; } = new[]
