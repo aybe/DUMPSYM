@@ -306,13 +306,13 @@ public sealed class UnitTestSymbolSort : UnitTestBase
 
         //var queue = new Queue<SymKey>(inDegree.Where(s => s.Value == 0).Select(kv => kv.Key));
 
-        var queue = new PriorityQueue<SymKey,int>();
+        var queue = new PriorityQueue<SymKey, int>();
 
-        foreach (var pair in inDegree)
+        foreach (var (key, degree) in inDegree)
         {
-            if (pair.Value == 0)
+            if (degree == 0)
             {
-                queue.Enqueue(pair.Key, symbolMap[pair.Key].Priority);
+                queue.Enqueue(key, symbolMap[key].Priority);
             }
         }
 
