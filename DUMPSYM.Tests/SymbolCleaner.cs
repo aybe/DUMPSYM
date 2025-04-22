@@ -207,7 +207,7 @@ public static class SymbolCleaner
 
     #region Rename
 
-    private static bool TryRenameType(Symbol[] symbols)
+    private static void TryRenameType(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition def)
         {
@@ -218,26 +218,17 @@ public static class SymbolCleaner
                     Console.WriteLine($"OK: {def} -> {value}");
 
                     def.Name = value;
-
-                    return true;
                 }
-
-                return false;
             }
-
-            return false;
         }
-
-        return false;
     }
 
-    private static bool TryRenameTypeMembers(Symbol[] symbols)
+    private static void TryRenameTypeMembers(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition def)
         {
             if (def.Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG)
             {
-                var changed = false;
                 var members = symbols[1..^1];
 
                 foreach (var member in members)
@@ -249,22 +240,14 @@ public static class SymbolCleaner
                             Console.WriteLine($"OK: {member2} -> {value}");
 
                             member2.Tag = value;
-
-                            changed = true;
                         }
                     }
                 }
-
-                return changed;
             }
-
-            return false;
         }
-
-        return false;
     }
 
-    private static bool TryRenameTypeDef(Symbol[] symbols)
+    private static void TryRenameTypeDef(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition2 def)
         {
@@ -275,17 +258,9 @@ public static class SymbolCleaner
                     Console.WriteLine($"OK: {def} -> {value}");
 
                     def.Tag = value;
-
-                    return true;
                 }
-
-                return false;
             }
-
-            return false;
         }
-
-        return false;
     }
 
     #endregion
