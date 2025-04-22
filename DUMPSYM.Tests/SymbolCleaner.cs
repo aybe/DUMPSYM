@@ -10,21 +10,6 @@ public static class SymbolCleaner
 {
     public static Symbol[][] PreProcessSymbols(Symbol[][] lists)
     {
-        foreach (var list in lists)
-        {
-            RenameType(list);
-        }
-
-        foreach (var list in lists)
-        {
-            RenameTypeDef(list);
-        }
-
-        foreach (var list in lists)
-        {
-            RenameTypeMembers(list);
-        }
-
         var changes = new List<Symbol[]>();
 
         var pass = 0;
@@ -49,6 +34,21 @@ public static class SymbolCleaner
         }
 
         Log($"performed {pass} {(pass == 1 ? "pass" : "passes")}");
+
+        foreach (var list in lists)
+        {
+            RenameType(list);
+        }
+
+        foreach (var list in lists)
+        {
+            RenameTypeDef(list);
+        }
+
+        foreach (var list in lists)
+        {
+            RenameTypeMembers(list);
+        }
 
         return lists;
     }
