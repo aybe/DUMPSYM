@@ -45,6 +45,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Solution.tt</DependentUpon>
 		</None>
+		<None Include="UnitTestSymbolSort.g.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>UnitTestSymbolSort.tt</DependentUpon>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -58,6 +63,11 @@
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
 		</Compile>
+		<Compile Update="UnitTestSymbolSort.g.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>UnitTestSymbolSort.tt</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -68,6 +78,10 @@
 		<None Update="UnitTestAuto.tt">
 			<LastGenOutput>UnitTestAuto.g.cs</LastGenOutput>
 			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="UnitTestSymbolSort.tt">
+		  <Generator>TextTemplatingFileGenerator</Generator>
+		  <LastGenOutput>UnitTestSymbolSort.g.cs</LastGenOutput>
 		</None>
 	</ItemGroup>
 
