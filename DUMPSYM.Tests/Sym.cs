@@ -43,7 +43,20 @@ public class Sym
 
     private static int PriorityGameTypeDef => PsxRuntimeLibrary.StructuresPriority - 2000; // TODO adjust
 
-    private int PriorityWithFilePosition => (int)(Settings.SortByFilePosition ? Code.Position : 0);
+    private int PriorityWithFilePosition
+    {
+        get
+        {
+            // keep it like this for coverage
+
+            if (Settings.SortByFilePosition)
+            {
+                return (int)Code.Position;
+            }
+
+            return 0;
+        }
+    }
 
     public override string ToString()
     {
