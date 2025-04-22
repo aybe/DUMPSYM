@@ -202,6 +202,17 @@ public static class SymbolCleaner
             }
         }
 
+        foreach (var symbols in everything)
+        {
+            // just the same as for EXT and STAT except that it must be done after as typedefs won't match anymore
+
+            if (symbols[0].Record is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF } sd2 && sd2.Tag == typedef.Tag)
+            {
+                sd2.Tag = typedef.Name;
+                changed = true;
+            }
+        }
+
         return changed ? current : null;
     }
 
