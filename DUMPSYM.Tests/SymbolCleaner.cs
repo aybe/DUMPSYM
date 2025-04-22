@@ -73,6 +73,9 @@ public static class SymbolCleaner
                 case SymbolStorageClass.EXT:
                     ParseExternal(list);
                     break;
+                case SymbolStorageClass.STAT:
+                    ParseStatic(list);
+                    break;
                 case SymbolStorageClass.TPDEF:
 
                     if (ParseTypeDef(list, lists) is { } s1)
@@ -104,6 +107,12 @@ public static class SymbolCleaner
     }
 
     private static void ParseExternal(Symbol[] symbols)
+    {
+        // TODO
+        Assert.AreEqual(1, symbols.Length);
+    }
+
+    private static void ParseStatic(Symbol[] symbols)
     {
         // TODO
         Assert.AreEqual(1, symbols.Length);
