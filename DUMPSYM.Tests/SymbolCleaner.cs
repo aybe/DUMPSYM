@@ -2,6 +2,7 @@
 // ReSharper disable CommentTypo
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace DUMPSYM.Tests;
 
@@ -48,9 +49,9 @@ public static class SymbolCleaner
     }
 
     [Conditional("LOG")]
-    private static void Log(object? value = null)
+    private static void Log(object? value = null, [CallerMemberName] string memberName = null!)
     {
-        Console.WriteLine(value?.ToString());
+        Console.WriteLine($"{memberName}: {value}");
     }
 
     private static void Parse(Symbol[] list, Symbol[][] lists, List<Symbol[]> changes)
