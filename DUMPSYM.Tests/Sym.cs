@@ -2,6 +2,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
+using System.Reflection;
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Tests;
@@ -58,16 +59,24 @@ public class Sym
         return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}], {nameof(Priority)}: {Priority}";
     }
 
-    private void Initialize()
+    public static void Initialize()
     {
-        // TODO delete
+        // TODO this sucks, it assumes [assembly: Parallelize(Scope = ExecutionScope.ClassLevel)]
+
+        var attribute = Assembly.GetExecutingAssembly().GetCustomAttribute<ParallelizeAttribute>();
+
+        Assert.IsNotNull(attribute);
+
+        Assert.AreEqual(ExecutionScope.ClassLevel, attribute.Scope);
+
+        PriorityTypedefBasicCursor = PriorityTypedefBasicStart;
+
+        PriorityTypeFakeCursor = PriorityTypedefFakeStart + 100_000;
     }
 
     public void ResolveDependencies(List<Sym> symbols)
     {
         Symbols = symbols;
-
-        Initialize();
 
         var symbol = Code[0];
 

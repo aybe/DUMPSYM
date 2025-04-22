@@ -64,6 +64,8 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
 
         symbols.Add(sym1);
 
+        Sym.Initialize();
+
         foreach (var sym in symbols)
         {
             sym.Settings = Settings;
