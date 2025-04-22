@@ -10,7 +10,7 @@ public sealed class Code : IReadOnlyList<ISymbol>
         Position = position;
     }
 
-    public Code(List<ISymbol> symbols, long position)
+    public Code(List<ISymbol> symbols, long position = default)
     {
         Symbols = symbols;
         Position = position;

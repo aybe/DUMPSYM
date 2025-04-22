@@ -7,6 +7,14 @@ public sealed class SymbolRecordDef : SymbolRecord, ISymbolDefinition
     {
     }
 
+    public SymbolRecordDef(SymbolStorageClass @class, SymbolType type, uint size, string name)
+    {
+        Class = @class;
+        Type = type;
+        Size = size;
+        Name = name;
+    }
+
     public SymbolRecordDef(SymbolContext context)
     {
         Class = context.Read<SymbolStorageClass>();

@@ -297,39 +297,29 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
     private static void AddMissingSymbols(List<Sym> symbols)
     {
         // AFFECT.C
-        symbols.AddRange([
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.NULL)  , Name = nameof(SymbolTypeKind.NULL) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.VOID)  , Name = nameof(SymbolTypeKind.VOID) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.CHAR)  , Name = nameof(SymbolTypeKind.CHAR) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.SHORT) , Name = nameof(SymbolTypeKind.SHORT) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.INT)   , Name = nameof(SymbolTypeKind.INT) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.LONG)  , Name = nameof(SymbolTypeKind.LONG) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.FLOAT) , Name = nameof(SymbolTypeKind.FLOAT) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.DOUBLE), Name = nameof(SymbolTypeKind.DOUBLE) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.UCHAR) , Name = nameof(SymbolTypeKind.UCHAR) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.USHORT), Name = nameof(SymbolTypeKind.USHORT) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.UINT)  , Name = nameof(SymbolTypeKind.UINT) }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.ULONG) , Name = nameof(SymbolTypeKind.ULONG) }) }
+
+        symbols.AddRange(
+        [
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.NULL), 0, nameof(SymbolTypeKind.NULL))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.VOID), 0, nameof(SymbolTypeKind.VOID))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.CHAR), 0, nameof(SymbolTypeKind.CHAR))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.SHORT), 0, nameof(SymbolTypeKind.SHORT))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.INT), 0, nameof(SymbolTypeKind.INT))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.LONG), 0, nameof(SymbolTypeKind.LONG))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.FLOAT), 0, nameof(SymbolTypeKind.FLOAT))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.DOUBLE), 0, nameof(SymbolTypeKind.DOUBLE))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, nameof(SymbolTypeKind.UCHAR))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, nameof(SymbolTypeKind.USHORT))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, nameof(SymbolTypeKind.UINT))) },
+            new Sym { Code = new Code(new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, nameof(SymbolTypeKind.ULONG))) }
         ]);
-/*
-   1fab97: $00000000 94 Def class STRTAG type STRUCT size 8 name Proportion
-   1fabaf: $00000000 94 Def class MOS type LONG size 0 name angle
-   1fabc2: $00000004 94 Def class MOS type LONG size 0 name hypotenuse
-   1fabda: $00000008 96 Def2 class EOS type NULL size 8 dims 0 tag Proportion name .eos
- */
 
-        var sym1 = new Sym
-        {
-            Code = new Code(
-                [
-                    new SymbolRecordDef { Class = SymbolStorageClass.STRTAG, Type = new SymbolType(SymbolTypeKind.STRUCT), Name = "NCB" },
-                    new SymbolRecordDef { Class = SymbolStorageClass.MOS, Type = new SymbolType(SymbolTypeKind.INT), Name = "BAD_SYMBOL" },
-                    new SymbolRecordDef2 { Class = SymbolStorageClass.EOS, Type = new SymbolType(SymbolTypeKind.NULL), Tag = "NCB", Name = ".eos" }
-                ],
-                0
-            )
-        };
+        var ncb = new Code([
+            new SymbolRecordDef(SymbolStorageClass.STRTAG, new SymbolType(SymbolTypeKind.STRUCT), 4, "NCB"),
+            new SymbolRecordDef(SymbolStorageClass.MOS, new SymbolType(SymbolTypeKind.INT), 4, "BAD_SYMBOL"),
+            new SymbolRecordDef2(SymbolStorageClass.EOS, new SymbolType(SymbolTypeKind.NULL), 4, [], "NCB", ".eos")
+        ]);
 
-        symbols.Add(sym1);
+        symbols.Add(new Sym { Code = ncb });
     }
 }
