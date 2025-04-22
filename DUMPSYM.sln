@@ -10,6 +10,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9F237D7-FA61-4BBB-B425-908A0107E800}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		README.md = README.md
+		README2.md = README2.md
+		TODO.txt = TODO.txt
+		TODO2.txt = TODO2.txt
+		TODO3.txt = TODO3.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dumpsym_cli", "dumpsym_cli\dumpsym_cli.csproj", "{4CE24AD6-7997-4411-B5AF-49C80C3ED23C}"
