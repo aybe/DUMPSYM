@@ -223,29 +223,7 @@ public class Sym
         }
         else
         {
-            if (def.Name == def.Type.Kind.ToString())
-            {
-                // no dependency, e.g. Def class TPDEF type ULONG size 0 name ULONG
-                Priority = PriorityTypedefBasicStart + Convert.ToInt32(def.Type.Kind);
-            }
-            else
-            {
-                // is an alias to another typedef
-                //Console.WriteLine(def);
-                var key = new SymKey(SymbolStorageClass.TPDEF, def.Type.Kind);
-
-                if (Name == key)
-                {
-                    Dependencies.Add(key);
-                    //Console.WriteLine(this);
-                }
-
-                Priority = PriorityTypedefBasicEnd; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL // TODO delete
-
-                // this is a new value that uses file position as well // TODO others should be sorted like so
-
-                Priority = PriorityTypedefBasicEnd + PriorityWithFilePosition; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
-            }
+            Priority = PriorityTypedefBasicStart + PriorityWithFilePosition; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
         }
     }
 
