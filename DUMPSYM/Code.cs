@@ -4,9 +4,10 @@ namespace DUMPSYM;
 
 public sealed class Code : IReadOnlyList<ISymbol>
 {
-    public Code(ISymbol symbol)
+    public Code(ISymbol symbol, long position = default)
     {
         Symbols = [symbol];
+        Position = position;
     }
 
     public Code(List<ISymbol> symbols, long position)
