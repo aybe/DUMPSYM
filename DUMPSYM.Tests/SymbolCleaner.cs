@@ -152,7 +152,7 @@ public static class SymbolCleaner
         {
             var record = symbols[0].Record;
 
-            if (record is ISymbolDefinition2 { Class: SymbolStorageClass.EXT } sd2 && sd2.Tag == typedef.Tag)
+            if (record is ISymbolDefinition2 { Class: SymbolStorageClass.EXT or SymbolStorageClass.STAT } sd2 && sd2.Tag == typedef.Tag)
             {
                 sd2.Tag = typedef.Name;
                 changed = true;
