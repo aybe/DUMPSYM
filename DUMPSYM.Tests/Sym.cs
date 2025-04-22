@@ -279,6 +279,11 @@ public class Sym
                     else
                     {
                         Priority = PriorityGameType; // TODO its typedef depends on PSX structures priority
+
+                        if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u is ISymbolDefinition2 sd2 && sd2.Tag == def.Name))))
+                        {
+                            Priority++; // when it's a game type that depends on other game types, push it down
+                        }
                     }
                 }
             }
