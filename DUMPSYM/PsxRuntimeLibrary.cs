@@ -9,10 +9,10 @@ public static class PsxRuntimeLibrary
     {
         { "_GsCOORDINATE", "GsCOORDINATE" },
         { "_GsCOORDINATE2", "GsCOORDINATE2" },
-        { "_GsPOSITION", "GsPOSITION" } // doesn't exist in SDK
+        { "_GsPOSITION", "GsPOSITION" }
     };
 
-    public static string[] Structures { get; } = new[]
+    public static string[] Structures { get; } = new[] // TODO finish this up, it will take some time
     {
         // Chapter 1: Kernel Library
         "DIRENTRY",
@@ -32,24 +32,28 @@ public static class PsxRuntimeLibrary
         // Chapter 6: Data Compression Library
         "DECDCTENV",
         "ENCSPUENV",
-        // Chapter 7: Basic Graphics Library
+        // Chapter 7: Basic Graphics Library (LIBGPU.H)
+        "BLK_FILL", // SDK <= 3.6
         "DISPENV",
-        "DRAWENV",
         "DR_AREA",
         "DR_ENV",
-        "DR_LOAD",
+        "DR_LOAD", // SDK >= 3.5
         "DR_MODE",
-        "DR_MOVE",
+        "DR_MOVE", // SDK >= 3.3
         "DR_OFFSET",
-        "DR_STP",
-        "DR_TPAGE",
+        "DR_PRIO", // SDK <= 3.6
+        "DR_STP", // SDK >= 4.1
+        "DR_TPAGE", // SDK >= 3.5
         "DR_TWIN",
+        "DRAWENV",
         "LINE_F2",
         "LINE_F3",
         "LINE_F4",
         "LINE_G2",
         "LINE_G3",
         "LINE_G4",
+        "P_CODE",
+        "P_TAG",
         "POLY_F3",
         "POLY_F4",
         "POLY_FT3",
@@ -61,55 +65,64 @@ public static class PsxRuntimeLibrary
         "RECT",
         "RECT32",
         "SPRT",
-        "SPRT_8",
         "SPRT_16",
+        "SPRT_8",
         "TILE",
         "TILE_1",
-        "TILE_8",
         "TILE_16",
+        "TILE_8",
         "TIM_IMAGE",
         "TMD_PRIM",
-        // Chapter 8: Basic Geometry Library
+        // Chapter 8: Basic Geometry Library (LIBGTE.H)
         "CRVECTOR3",
         "CRVECTOR4",
         "CVECTOR",
-        "DIVPOLYGON3",
-        "DIVPOLYGON4",
+        "DIVPOLYGON3", // SDK >= 2.6
+        "DIVPOLYGON4", // SDK >= 2.6
         "DVECTOR",
         "EVECTOR",
         "MATRIX",
-        "POL3",
-        "POL4",
-        "QMESH",
-        "RVECTOR",
-        "SPOL",
+        "POL3", // SDK >= 2.6
+        "POL4", // SDK >= 2.6
+        "QMESH", // SDK >= 3.3
+        "RVECTOR", // SDK >= 2.6
+        "SPOL", // SDK >= 2.6
         "SVECTOR",
-        "TMESH",
+        "TMESH", // SDK >= 3.3
         "VECTOR",
-        // Chapter 9: Extended Graphics Library
+        // Chapter 9: Extended Graphics Library (LIBGS.H)
+        "_GsFCALL", // SDK >= 3.3
+        "_GsPOSITION",
         "GsBG",
         "GsBOXF",
         "GsCELL",
         "GsCOORD2PARAM",
+        "GsCOORDINATE",
         "GsCOORDINATE2",
+        "GsDOBJ",
         "GsDOBJ2",
         "GsDOBJ3",
         "GsDOBJ5",
-        "GsFOGPARAM",
         "GsF_LIGHT",
+        "GsFOGPARAM",
         "GsGLINE",
         "GsIMAGE",
         "GsLINE",
         "GsMAP",
+        "GsMIMEN", // SDK <= 3.6
+        "GsMIMEV", // SDK >= 3.6
+        "GsOBJTABLE", // SDK <= 3.3
         "GsOBJTABLE2",
         "GsOT",
         "GsOT_TAG",
+        "GsRVIEW",
         "GsRVIEW2",
+        "GsSPARRAY", // SDK >= 2.6 <= 4.1
         "GsSPRITE",
+        "GsVIEW",
         "GsVIEW2",
-        "TMD_STRUCT",
-        "_GsFCALL",
-        "_GsPOSITION",
+        "GsZCLIP", // SDK >= 3.6
+        "TMD_STRUCT", // SDK >= 3.3
         // Chapter 10: CD/Streaming Library
         "CdlATV",
         "CdlFILE",
@@ -176,7 +189,13 @@ public static class PsxRuntimeLibrary
         "sMcGuiController",
         "sMcGuiCursor",
         "sMcGuiSnd",
-        "sMcGuiTexture"
+        "sMcGuiTexture",
+        // KERNEL.H
+        "XF_HDR",
+        // LIBCD.H
+        "StSECTOR", // SDK >= 2.6 <= 3.0
+        // LIBSPU.H
+        "SpuVolume16" // SDK >= 2.6 <= 3.5
     }.OrderBy(s => s).ToArray();
 
     public static int StructuresPriority { get; } = Math.Min(-1000, -Structures.Length);
