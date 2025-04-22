@@ -150,7 +150,16 @@ public static class SymbolCleaner
 
         foreach (var symbols in everything)
         {
-            if (symbols[0].Record is not ISymbolDefinition { Class: SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG } header)
+            var record = symbols[0].Record;
+
+            if (record is ISymbolDefinition2 { Class: SymbolStorageClass.EXT } sd2 && sd2.Tag == typedef.Tag)
+            {
+                sd2.Tag = typedef.Name;
+                changed = true;
+                continue;
+            }
+
+            if (record is not ISymbolDefinition { Class: SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG } header)
             {
                 continue;
             }
