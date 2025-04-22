@@ -182,21 +182,11 @@ public class Sym
     private void ResolveType(ISymbolDefinition def)
     {
         Name = new SymKey(def.Class, def.Name);
-        // return; // TODO adding a return here makes the test pass, bug below
-        var members = Code[1..^1];
 
-        if (def.Name == "EditorSave")
-        {
-            var w = 0;
-        }
+        var members = Code[1..^1];
 
         foreach (var m in members.Cast<ISymbolDefinition>())
         {
-            if (def.Name == "EditorSave" && m.Name == "Level")
-            {
-                var w = 0;
-            }
-
             if (m is ISymbolDefinition2 m2)
             {
                 if (string.IsNullOrWhiteSpace(m2.Tag))
@@ -245,7 +235,6 @@ public class Sym
                 Dependencies.Add(new SymKey(SymbolStorageClass.TPDEF, m.Type.Kind));
             }
         }
-
 
         if (SymbolRegistry.HasFakeName(def.Name))
         {
