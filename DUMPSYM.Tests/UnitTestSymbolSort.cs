@@ -30,18 +30,18 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
 
         // AFFECT.C
         symbols.AddRange([
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 0 }, Name = "NULL" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 1 }, Name = "VOID" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 2 }, Name = "CHAR" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 3 }, Name = "SHORT" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 4 }, Name = "INT" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 5 }, Name = "LONG" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 6 }, Name = "FLOAT" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 7 }, Name = "DOUBLE" }) }, // none
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 12 }, Name = "UCHAR" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 13 }, Name = "USHORT" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 14 }, Name = "UINT" }) },
-            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType { Value = 15 }, Name = "ULONG" }) }
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.NULL)  , Name = nameof(SymbolTypeKind.NULL) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.VOID)  , Name = nameof(SymbolTypeKind.VOID) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.CHAR)  , Name = nameof(SymbolTypeKind.CHAR) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.SHORT) , Name = nameof(SymbolTypeKind.SHORT) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.INT)   , Name = nameof(SymbolTypeKind.INT) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.LONG)  , Name = nameof(SymbolTypeKind.LONG) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.FLOAT) , Name = nameof(SymbolTypeKind.FLOAT) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.DOUBLE), Name = nameof(SymbolTypeKind.DOUBLE) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.UCHAR) , Name = nameof(SymbolTypeKind.UCHAR) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.USHORT), Name = nameof(SymbolTypeKind.USHORT) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.UINT)  , Name = nameof(SymbolTypeKind.UINT) }) },
+            new Sym { Code = new Code(new SymbolRecordDef { Class = SymbolStorageClass.TPDEF, Type = new SymbolType(SymbolTypeKind.ULONG) , Name = nameof(SymbolTypeKind.ULONG) }) }
         ]);
 /*
    1fab97: $00000000 94 Def class STRTAG type STRUCT size 8 name Proportion
@@ -54,9 +54,9 @@ public sealed partial class UnitTestSymbolSort : UnitTestBase
         {
             Code = new Code(
                 [
-                    new SymbolRecordDef { Class = SymbolStorageClass.STRTAG, Type = new SymbolType { Value = 8 }, Name = "NCB" },
-                    new SymbolRecordDef { Class = SymbolStorageClass.MOS, Type = new SymbolType { Value = 4 }, Name = "BAD_SYMBOL" },
-                    new SymbolRecordDef2 { Class = SymbolStorageClass.EOS, Type = new SymbolType { Value = 0 }, Tag = "NCB", Name = ".eos" }
+                    new SymbolRecordDef { Class = SymbolStorageClass.STRTAG, Type = new SymbolType(SymbolTypeKind.STRUCT), Name = "NCB" },
+                    new SymbolRecordDef { Class = SymbolStorageClass.MOS, Type = new SymbolType(SymbolTypeKind.INT), Name = "BAD_SYMBOL" },
+                    new SymbolRecordDef2 { Class = SymbolStorageClass.EOS, Type = new SymbolType(SymbolTypeKind.NULL), Tag = "NCB", Name = ".eos" }
                 ],
                 0
             )
