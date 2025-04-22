@@ -193,6 +193,20 @@ public static class SymbolCleaner
         return null;
     }
 
+    private static Symbol[]? ParseTypeUnion(Symbol[] symbols)
+    {
+        ParseType(symbols);
+        return null;
+    }
+
+    private static Symbol[]? ParseTypeStruct(Symbol[] symbols)
+    {
+        ParseType(symbols);
+        return null;
+    }
+
+    #region Rename
+
     private static bool TryRenameType(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition def)
@@ -274,15 +288,5 @@ public static class SymbolCleaner
         return false;
     }
 
-    private static Symbol[]? ParseTypeUnion(Symbol[] symbols)
-    {
-        ParseType(symbols);
-        return null;
-    }
-
-    private static Symbol[]? ParseTypeStruct(Symbol[] symbols)
-    {
-        ParseType(symbols);
-        return null;
-    }
+    #endregion
 }
