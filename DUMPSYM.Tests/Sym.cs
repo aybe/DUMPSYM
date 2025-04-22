@@ -37,6 +37,10 @@ public class Sym
 
     private static int PriorityTypedefFakeStart { get; } = -1_000_000; // TODO adjust
 
+    private static int PriorityGameType { get; } = -5; // TODO adjust
+
+    private static int PriorityGameTypeDef => PsxRuntimeLibrary.StructuresPriority - 2000; // TODO adjust
+
     public override string ToString()
     {
         return $"{nameof(Name)}: {Name}, {nameof(Dependencies)}: [{string.Join(", ", Dependencies)}], {nameof(Priority)}: {Priority}";
@@ -182,7 +186,7 @@ public class Sym
 
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
 
-            Priority = -1;
+            Priority = PriorityGameTypeDef;
 
             if (SymbolRegistry.HasFakeName(t2.Tag))
             {
@@ -293,28 +297,6 @@ public class Sym
             }
         }
 
-        if (members.Any(s => s is ISymbolDefinition2 def2 && !string.IsNullOrEmpty(def2.Tag)))
-        {
-            // type has dependencies to other structs, leave it off like that
-        }
-        else // TODO this a trivial priority adjustment
-        {
-            // type only depends on primitives, it can go further up the list
-            Assert.AreEqual(0, Priority);
-
-            if (SymbolRegistry.HasFakeName(def.Name))
-            {
-            }
-            // ReSharper disable once RedundantIfElseBlock
-            else
-            {
-                // this one is interesting, it pushes types with no deps up
-                // it fixes noisy symbols between a typedef and its type
-                // but 1st fake priority is LT basic typedef max
-                // then the rest of the list becomes very confusing
-                //Priority--;
-            }
-        }
 
         if (SymbolRegistry.HasFakeName(def.Name))
         {
@@ -332,12 +314,34 @@ public class Sym
         }
         else
         {
-
             if (PsxRuntimeLibrary.Structures.AsSpan().IndexOf(def.Name) is var i && i != -1)
             {
                 Priority = PsxRuntimeLibrary.StructuresPriority + i;
             }
+            else
+            {
+                if (members.Any(s => s is ISymbolDefinition2 def2 && !string.IsNullOrEmpty(def2.Tag)))
+                {
+                    // type has dependencies to other structs, leave it off like that
 
+                    var zero = 0; // TODO
+                }
+                else // TODO this a trivial priority adjustment
+                {
+                    // type only depends on primitives, it can go further up the list
+
+                    Assert.AreEqual(0, Priority);
+
+                    if (SymbolRegistry.HasFakeName(def.Name))
+                    {
+                        Assert.Fail();
+                    }
+                    else
+                    {
+                        Priority = PriorityGameType; // TODO its typedef depends on PSX structures priority
+                    }
+                }
+            }
         }
     }
 
