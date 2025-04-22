@@ -69,17 +69,25 @@ public static class SymbolCleaner
                     break;
                 case SymbolStorageClass.TPDEF:
 
-                    if (ParseTypeDef(list, lists) is { } s)
+                    if (ParseTypeDef(list, lists) is { } s1)
                     {
-                        changes.Add(s);
+                        changes.Add(s1);
                     }
 
                     break;
                 case SymbolStorageClass.STRTAG:
-                    ParseTypeStruct(list);
+                    if (ParseTypeStruct(list) is { } s2)
+                    {
+                        changes.Add(s2);
+                    }
+
                     break;
                 case SymbolStorageClass.UNTAG:
-                    ParseTypeUnion(list);
+                    if (ParseTypeUnion(list) is { } s3)
+                    {
+                        changes.Add(s3);
+                    }
+
                     break;
                 default:
                     throw new InvalidOperationException(definition.ToString());
@@ -178,10 +186,12 @@ public static class SymbolCleaner
         return changed ? current : null;
     }
 
-    private static void ParseType(Symbol[] symbols)
+    private static Symbol[]? ParseType(Symbol[] symbols)
     {
         // TODO
         Assert.AreNotEqual(1, symbols.Length);
+        return null;
+    }
 
     private static bool TryRenameType(Symbol[] symbols)
     {
@@ -264,13 +274,15 @@ public static class SymbolCleaner
         return false;
     }
 
-    private static void ParseTypeUnion(Symbol[] symbols)
+    private static Symbol[]? ParseTypeUnion(Symbol[] symbols)
     {
         ParseType(symbols);
+        return null;
     }
 
-    private static void ParseTypeStruct(Symbol[] symbols)
+    private static Symbol[]? ParseTypeStruct(Symbol[] symbols)
     {
         ParseType(symbols);
+        return null;
     }
 }
