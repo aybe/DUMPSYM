@@ -40,10 +40,7 @@ public static class SymbolCleaner
             pass++;
         }
 
-        Log($"Passes performed: {pass}");
-        Log("EOF");
-        Log("EOF");
-        Log("EOF");
+        Log($"performed {pass} {(pass == 1 ? "pass" : "passes")}");
 
         return lists;
     }
@@ -132,7 +129,7 @@ public static class SymbolCleaner
         //         if struct has a member whose tag is that fake tag
         //             change the tag of the member to the typedef name
         //     delete the typedef
-        Log($"OK: {typedef}");
+        Log($"{typedef}");
 
         foreach (var symbols in everything)
         {
@@ -143,10 +140,8 @@ public static class SymbolCleaner
 
             if (header.Name == typedef.Tag)
             {
-                Log($"\tRENAME STRUCT: {header}"); // TODO delete
+                Log($"\t{header}");
                 header.Name = typedef.Name;
-                //Log($"\tRENAME STRUCT: {header}"); // TODO delete
-
 
                 var footer = symbols[^1].Record as ISymbolDefinition2;
 
@@ -155,10 +150,8 @@ public static class SymbolCleaner
                 Assert.AreEqual(typedef.Tag, footer.Tag);
                 Assert.AreEqual(".eos", footer.Name);
 
-                Log($"\tRENAME FOOTER: {footer}"); // TODO delete
+                Log($"\t{footer}");
                 footer.Tag = typedef.Name;
-                //Log($"\tRENAME FOOTER: {footer}"); // TODO delete
-
 
                 changed = true;
             }
@@ -177,9 +170,8 @@ public static class SymbolCleaner
                     continue;
                 }
 
-                Log($"\t\tRENAME MEMBER: {member2}");
+                Log($"\t\t{member2}");
                 member2.Tag = typedef.Name;
-                //Log($"\t\tRENAME MEMBER: {member2}");
                 changed = true;
             }
         }
@@ -216,7 +208,7 @@ public static class SymbolCleaner
             {
                 if (PsxRuntimeLibrary.Names.TryGetValue(def.Name, out var value))
                 {
-                    Console.WriteLine($"OK: {def} -> {value}");
+                    Log($"{def} -> {value}");
 
                     def.Name = value;
                 }
@@ -238,7 +230,7 @@ public static class SymbolCleaner
                     {
                         if (PsxRuntimeLibrary.Names.TryGetValue(member2.Tag, out var value))
                         {
-                            Console.WriteLine($"OK: {member2} -> {value}");
+                            Log($"{member2} -> {value}");
 
                             member2.Tag = value;
                         }
@@ -256,7 +248,7 @@ public static class SymbolCleaner
             {
                 if (PsxRuntimeLibrary.Names.TryGetValue(def.Tag, out var value))
                 {
-                    Console.WriteLine($"OK: {def} -> {value}");
+                    Log($"{def} -> {value}");
 
                     def.Tag = value;
                 }
