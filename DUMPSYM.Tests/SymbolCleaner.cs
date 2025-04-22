@@ -11,9 +11,9 @@ public static class SymbolCleaner
     {
         foreach (var list in lists)
         {
-            TryRenameType(list);
-            TryRenameTypeMembers(list);
-            TryRenameTypeDef(list);
+            RenameType(list);
+            RenameTypeMembers(list);
+            RenameTypeDef(list);
         }
 
         var changes = new List<Symbol[]>();
@@ -207,7 +207,7 @@ public static class SymbolCleaner
 
     #region Rename
 
-    private static void TryRenameType(Symbol[] symbols)
+    private static void RenameType(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition def)
         {
@@ -223,7 +223,7 @@ public static class SymbolCleaner
         }
     }
 
-    private static void TryRenameTypeMembers(Symbol[] symbols)
+    private static void RenameTypeMembers(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition def)
         {
@@ -247,7 +247,7 @@ public static class SymbolCleaner
         }
     }
 
-    private static void TryRenameTypeDef(Symbol[] symbols)
+    private static void RenameTypeDef(Symbol[] symbols)
     {
         if (symbols[0].Record is ISymbolDefinition2 def)
         {
