@@ -29,7 +29,7 @@ public class Sym
 
     private static int PriorityFile { get; } = +3_000_000;
 
-    private int PriorityTypedefBasicStart { get; set; }
+    private int PriorityTypedefBasicStart { get; } = -2_000_000;
 
     private int PriorityTypedefBasicEnd { get; set; }
 
@@ -68,8 +68,6 @@ public class Sym
         var kinds = Enum.GetValues<SymbolTypeKind>();
 
         var max = Convert.ToInt32(kinds.Max());
-
-        PriorityTypedefBasicStart = int.MinValue;
 
         PriorityTypedefBasicEnd = PriorityTypedefBasicStart + max + 1;
 
