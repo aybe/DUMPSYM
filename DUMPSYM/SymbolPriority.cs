@@ -27,6 +27,11 @@ public sealed record SymbolPriority(int Value = default, string? Label = "UNNAME
         return $"{Value} ({Label})";
     }
 
+    public static implicit operator string?(SymbolPriority priority)
+    {
+        return priority.Label;
+    }
+    
     public static implicit operator int(SymbolPriority priority)
     {
         return priority.Value;
