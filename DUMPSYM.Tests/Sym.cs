@@ -8,7 +8,7 @@ namespace DUMPSYM.Tests;
 
 public class Sym
 {
-    public SymKey Name { get; set; }
+    public SymKey Name { get; set; } = null!;
 
     public HashSet<SymKey> Dependencies { get; init; } = [];
 
@@ -16,8 +16,9 @@ public class Sym
 
     public SymbolPriority? Priority { get; set; }
 
-    private List<Sym> Symbols { get; set; }
-    public SortingSettings Settings { get; set; }
+    private List<Sym> Symbols { get; set; } = null!;
+
+    public SortingSettings Settings { get; set; } = null!;
 
     #region Priorities
 
@@ -27,7 +28,7 @@ public class Sym
 
     private static SymbolPriority PriorityTypeSdk { get; set; } = null!;
 
-    private static SymbolPriority PriorityTypeGame { get; set; } = null!; // -100_000 // TODO adjust
+    private static SymbolPriority PriorityTypeGame { get; set; } = null!;
 
     private static SymbolPriority PriorityTypeDefGame { get; set; } = null!;
 
@@ -44,6 +45,8 @@ public class Sym
     private static SymbolPriority PrioritySymEndOfFile { get; set; } = null!;
 
     #endregion
+
+    #region Methods
 
     public override string ToString()
     {
@@ -196,7 +199,7 @@ public class Sym
         Priority ??= new SymbolPriority(0, hasFakeName ? "Fake Type" : "Real Type"); // TODO looks wrong
 
         var members = Code[1..^1];
-        
+
         foreach (var m in members.Cast<ISymbolDefinition>())
         {
             if (m is ISymbolDefinition2 m2)
@@ -365,4 +368,6 @@ public class Sym
 
         throw new InvalidDataException(def2.ToString());
     }
+
+    #endregion
 }
