@@ -22,6 +22,8 @@ public class Sym
 
     #region Priorities
 
+    private static SymbolPriority PriorityTypeDefSdk { get; set; } = null!;
+
     private static SymbolPriority PriorityTypeDefBasic { get; set; } = null!;
 
     private static SymbolPriority PriorityTypeFake { get; set; } = null!;
@@ -56,6 +58,8 @@ public class Sym
     public static void Initialize()
     {
         // TODO basic typdefs come from the SDK, update PsxRuntimeLibrary and label
+
+        PriorityTypeDefSdk = new SymbolPriority(-3_000_000, "TPDEF SDK");
 
         PriorityTypeDefBasic = new SymbolPriority(-2_000_000, "TPDEF basic");
 
@@ -186,7 +190,16 @@ public class Sym
         }
         else
         {
-            Priority = PriorityTypeDefBasic++; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+            // Def class TPDEF type UCHAR size 0 name BBOOL
+
+            if (PsxRuntimeLibrary.Types.AsSpan().IndexOf(def.Name) is var index && index != -1)
+            {
+                Priority = PriorityTypeDefSdk++; // use of index would be nice but that won't work as there are many headers
+            }
+            else
+            {
+                Priority = PriorityTypeDefBasic++;
+            }
         }
     }
 

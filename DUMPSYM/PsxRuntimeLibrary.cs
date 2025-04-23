@@ -197,4 +197,30 @@ public static class PsxRuntimeLibrary
         // LIBSPU.H
         "SpuVolume16" // SDK >= 2.6 <= 3.5
     }.OrderBy(s => s).ToArray();
+
+    public static string[] Types { get; } =
+    [
+        // TYPES.H 4.6
+        "u_char",
+        "u_short",
+        "u_int",
+        "u_long",
+        "ushort",
+        "uint",
+        "ulong",
+        "physadr",
+        "label_t",
+        "quad",
+        "daddr_t",
+        "caddr_t",
+        "qaddr_t",
+        "ino_t",
+        "swblk_t",
+        "size_t",
+        "time_t",
+        "dev_t",
+        "off_t",
+        "gid_t",
+        "uid_t"
+    ];
 }
