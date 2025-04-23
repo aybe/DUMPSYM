@@ -23,8 +23,6 @@ public class Sym
 
     private static SymbolPriority PriorityTypedefBasic { get; set; } = null!;
 
-    private static SymbolPriority PriorityTypedefFakeStart { get; set; } = null!; // this won't show up in output, only PriorityTypeFakeCursor will // TODO adjust
-
     private static SymbolPriority PriorityTypeFakeCursor { get; set; } = null!;
 
     private static SymbolPriority PriorityGameType { get; set; } = null!; // -100_000 // TODO adjust
@@ -54,9 +52,7 @@ public class Sym
     {
         PriorityTypedefBasic = new SymbolPriority(-2_000_000, "typedef (basic)");
 
-        PriorityTypedefFakeStart = new SymbolPriority(-1_000_000, "FAKE TPDEF START");
-
-        PriorityTypeFakeCursor = new SymbolPriority(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR");
+        PriorityTypeFakeCursor = new SymbolPriority(-1_000_000, "FAKE TYPE CURSOR");
 
         PriorityGameType = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE");
 
