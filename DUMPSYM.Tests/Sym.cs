@@ -22,9 +22,7 @@ public class Sym
 
     #region Priorities
 
-    private static SymbolPriority PriorityTypedefBasicStart { get; } = new(-2_000_000, "TPDEF BASIC START"); // this won't show up in output, only PriorityTypedefBasicCursor will // TODO adjust
-
-    private static SymbolPriority PriorityTypedefBasicCursor { get; set; } = PriorityTypedefBasicStart with { Label = "TPDEF BASIC CURSOR" };
+    private static SymbolPriority PriorityTypedefBasic { get; set; } = new(-2_000_000, "typedef (basic)");
 
     private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // this won't show up in output, only PriorityTypeFakeCursor will // TODO adjust
 
@@ -63,7 +61,7 @@ public class Sym
 
         Assert.AreEqual(ExecutionScope.ClassLevel, attribute.Scope);
 
-        PriorityTypedefBasicCursor = PriorityTypedefBasicStart with { Label = PriorityTypedefBasicCursor };
+        PriorityTypedefBasic = new SymbolPriority(-2_000_000, "typedef (basic)");
 
         PriorityTypeFakeCursor = PriorityTypeFakeCursor with { Value = PriorityTypedefFakeStart + 100_000 };
     }
@@ -172,7 +170,7 @@ public class Sym
         }
         else
         {
-            Priority = PriorityTypedefBasicCursor++; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+            Priority = PriorityTypedefBasic++; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
         }
     }
 
