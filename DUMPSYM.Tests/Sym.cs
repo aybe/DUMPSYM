@@ -161,26 +161,13 @@ public class Sym
 
         if (def is ISymbolDefinition2 t2)
         {
-            Assert.IsFalse(string.IsNullOrWhiteSpace(t2.Tag));
-            // is an alias to another typedef
             // Def2 class TPDEF type PTR STRUCT size 44 dims 0 tag LoadFiles name LoadFilesPtr
 
-            SymbolStorageClass cClass;
+            Assert.IsFalse(string.IsNullOrWhiteSpace(t2.Tag));
 
-            if (def.Type.Kind == SymbolTypeKind.STRUCT)
-            {
-                cClass = SymbolStorageClass.STRTAG;
-            }
-            else if (def.Type.Kind == SymbolTypeKind.UNION)
-            {
-                cClass = SymbolStorageClass.UNTAG;
-            }
-            else
-            {
-                cClass = SymbolStorageClass.TPDEF;
-            }
+            Assert.AreEqual(SymbolTypeKind.STRUCT, def.Type.Kind);
 
-            Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
+            Dependencies.Add(new SymKey(SymbolStorageClass.STRTAG, t2.Tag));
         }
 
         // Def class TPDEF type UCHAR size 0 name BBOOL
