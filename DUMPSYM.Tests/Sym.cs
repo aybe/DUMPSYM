@@ -18,6 +18,21 @@ public class Sym
     public SymbolPriority? Priority { get; set; }
 
     private List<Sym> Symbols { get; set; }
+    public SortingSettings Settings { get; set; }
+
+    #region Priorities
+
+    private static SymbolPriority PriorityTypedefBasicStart { get; } = new(-2_000_000, "TPDEF BASIC START");
+
+    private static SymbolPriority PriorityTypedefBasicCursor { get; set; } = PriorityTypedefBasicStart with { Label = "Game TPDEF basic" }; // BUG not in output
+
+    private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // TODO adjust
+
+    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = new(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR"); // BUG not in output
+
+    private static SymbolPriority PriorityGameType { get; } = new(PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE"); // -100_000 // TODO adjust
+
+    private static SymbolPriority PriorityGameTypeDef => new(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex"); // -100_000 // TODO adjust
 
     private static SymbolPriority PriorityExternal { get; } = new(+1_000_000, "EXT");
 
@@ -25,23 +40,9 @@ public class Sym
 
     private static SymbolPriority PriorityFile { get; } = new(+3_000_000, "FILE");
 
-    private static SymbolPriority PriorityTypedefBasicStart { get; } = new (-2_000_000, "TPDEF BASIC START");
-
-    private static SymbolPriority PriorityTypedefBasicCursor { get; set; } = new(PriorityTypedefBasicStart.Value, "Game TPDEF basic");
-
-    public SortingSettings Settings { get; set; }
-
-    private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // TODO adjust
-
-    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = new(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR");
-
-    private static SymbolPriority PriorityGameType { get; } = new (PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE"); // TODO adjust
-
-    private static SymbolPriority PriorityGameTypeDef => new(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex"); // TODO adjust
+    private static SymbolPriority PriorityStatic { get; } = new(+5_000_000, "STAT");
 
     private static SymbolPriority PriorityName { get; } = new(+6_000_000, "NAME");
-
-    private static SymbolPriority PriorityStatic { get; } = new(+5_000_000, "STAT");
 
     private static SymbolPriority PriorityEndOfFile { get; } = new(+7_000_000, "EOF");
 
@@ -59,6 +60,8 @@ public class Sym
             return 0;
         }
     }
+
+    #endregion
 
     public override string ToString()
     {
