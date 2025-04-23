@@ -46,21 +46,6 @@ public class Sym
 
     private static SymbolPriority PriorityEndOfFile { get; } = new(+7_000_000, "EOF");
 
-    private int PriorityWithFilePosition
-    {
-        get
-        {
-            // keep it like this for coverage
-
-            if (Settings.SortByFilePosition)
-            {
-                return (int)Code.Position;
-            }
-
-            return 0;
-        }
-    }
-
     #endregion
 
     public override string ToString()
