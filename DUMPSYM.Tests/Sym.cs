@@ -57,13 +57,13 @@ public class Sym
     {
         // TODO basic typdefs come from the SDK, update PsxRuntimeLibrary and label
 
-        PriorityTypeDefSdk = new SymbolPriority(-3_000_000, "TPDEF SDK");
+        PriorityTypeDefSdk = new SymbolPriority(-4_000_000, "TPDEF SDK");
+
+        PriorityTypeSdk = new SymbolPriority(-3_000_000, "TYPE SDK");
 
         PriorityTypeDefBasic = new SymbolPriority(-2_000_000, "TPDEF basic");
 
         PriorityTypeFake = new SymbolPriority(-1_000_000, "TYPE fake");
-
-        PriorityTypeSdk = new SymbolPriority(-500_000, "TYPE SDK");
 
         PriorityTypeGame = new SymbolPriority(-300_000, "TYPE game");
 
