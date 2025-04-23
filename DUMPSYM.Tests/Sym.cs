@@ -32,8 +32,6 @@ public class Sym
 
     private static SymbolPriority PriorityTypeGame { get; set; } = null!;
 
-    private static SymbolPriority PriorityTypeDefGame { get; set; } = null!;
-
     private static SymbolPriority PrioritySymExternal { get; set; } = null!;
 
     private static SymbolPriority PrioritySymFunction { get; set; } = null!;
@@ -68,8 +66,6 @@ public class Sym
         PriorityTypeSdk = new SymbolPriority(-500_000, "TYPE SDK");
 
         PriorityTypeGame = new SymbolPriority(-300_000, "TYPE game");
-
-        PriorityTypeDefGame = new SymbolPriority(-400_000, "TPDEF game");
 
         PrioritySymExternal = new SymbolPriority(+1_000_000, "SYM EXT");
 
@@ -185,21 +181,17 @@ public class Sym
             }
 
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
+        }
 
-            Priority = PriorityTypeDefGame;
+        // Def class TPDEF type UCHAR size 0 name BBOOL
+
+        if (PsxRuntimeLibrary.Types.AsSpan().IndexOf(def.Name) is var index && index != -1)
+        {
+            Priority = PriorityTypeDefSdk++; // use of index would be nice but that won't work as there are many headers
         }
         else
         {
-            // Def class TPDEF type UCHAR size 0 name BBOOL
-
-            if (PsxRuntimeLibrary.Types.AsSpan().IndexOf(def.Name) is var index && index != -1)
-            {
-                Priority = PriorityTypeDefSdk++; // use of index would be nice but that won't work as there are many headers
-            }
-            else
-            {
-                Priority = PriorityTypeDefBasic++;
-            }
+            Priority = PriorityTypeDefBasic++;
         }
     }
 
