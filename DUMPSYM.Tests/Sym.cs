@@ -26,9 +26,9 @@ public class Sym
 
     private static SymbolPriority PriorityTypedefBasicCursor { get; set; } = PriorityTypedefBasicStart with { Label = "Game TPDEF basic" }; // BUG not in output
 
-    private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // TODO adjust
+    private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // this won't show up in output, only PriorityTypeFakeCursor will // TODO adjust
 
-    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = new(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR"); // BUG not in output
+    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = new(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR");
 
     private static SymbolPriority PriorityGameType { get; } = new(PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE"); // -100_000 // TODO adjust
 
@@ -65,7 +65,7 @@ public class Sym
 
         PriorityTypedefBasicCursor = PriorityTypedefBasicStart;
 
-        PriorityTypeFakeCursor = PriorityTypedefFakeStart + 100_000;
+        PriorityTypeFakeCursor = PriorityTypeFakeCursor with { Value = PriorityTypedefFakeStart + 100_000 };
     }
 
     public void ResolveDependencies(List<Sym> symbols)
