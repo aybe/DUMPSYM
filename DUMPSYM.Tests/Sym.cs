@@ -25,6 +25,8 @@ public class Sym
 
     private static SymbolPriority PriorityTypeFake { get; set; } = null!;
 
+    private static SymbolPriority PriorityTypeSdk { get; set; } = null!;
+
     private static SymbolPriority PriorityTypeGame { get; set; } = null!; // -100_000 // TODO adjust
 
     private static SymbolPriority PriorityTypeDefGame { get; set; } = null!;
@@ -52,15 +54,15 @@ public class Sym
     {
         // TODO basic typdefs come from the SDK, update PsxRuntimeLibrary and label
 
-        // TODO move priority for PsxRuntimeLibrary.StructuresPriority because it makes no sense
-
         PriorityTypeDefBasic = new SymbolPriority(-2_000_000, "TPDEF basic");
 
         PriorityTypeFake = new SymbolPriority(-1_000_000, "TYPE fake");
 
-        PriorityTypeGame = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value / 2, "TYPE game");
+        PriorityTypeSdk = new SymbolPriority(-500_000, "TYPE SDK");
 
-        PriorityTypeDefGame = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "TPDEF game");
+        PriorityTypeGame = new SymbolPriority(-300_000, "TYPE game");
+
+        PriorityTypeDefGame = new SymbolPriority(-400_000, "TPDEF game");
 
         PrioritySymExternal = new SymbolPriority(+1_000_000, "SYM EXT");
 
@@ -73,6 +75,8 @@ public class Sym
         PrioritySymName = new SymbolPriority(+6_000_000, "SYM NAME");
 
         PrioritySymEndOfFile = new SymbolPriority(+7_000_000, "SYM EOF");
+
+        // BUG Name: [TPDEF, GsCOORDINATE2], Dependencies: [[STRTAG, GsCOORDINATE2]], Priority: -400000 (TPDEF game)
     }
 
     public void ResolveDependencies(List<Sym> symbols)
@@ -264,7 +268,7 @@ public class Sym
         {
             if (PsxRuntimeLibrary.Structures.AsSpan().IndexOf(def.Name) is var i && i != -1)
             {
-                Priority = PsxRuntimeLibrary.StructuresPriority with { Value = PsxRuntimeLibrary.StructuresPriority.Value + i };
+                Priority = PriorityTypeSdk++;
             }
             else
             {

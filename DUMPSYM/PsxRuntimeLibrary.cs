@@ -197,6 +197,4 @@ public static class PsxRuntimeLibrary
         // LIBSPU.H
         "SpuVolume16" // SDK >= 2.6 <= 3.5
     }.OrderBy(s => s).ToArray();
-
-    public static SymbolPriority StructuresPriority { get; } = new(Math.Min(-100_000, -Structures.Length), "SDK type");
 }
