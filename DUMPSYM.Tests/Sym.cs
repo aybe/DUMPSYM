@@ -21,25 +21,25 @@ public class Sym
 
     #region Priorities
 
-    private static SymbolPriority PriorityTypedefBasic { get; set; } = null!;
+    private static SymbolPriority PriorityTypeDefBasic { get; set; } = null!;
 
-    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = null!;
+    private static SymbolPriority PriorityTypeFake { get; set; } = null!;
 
-    private static SymbolPriority PriorityGameType { get; set; } = null!; // -100_000 // TODO adjust
+    private static SymbolPriority PriorityTypeGame { get; set; } = null!; // -100_000 // TODO adjust
 
-    private static SymbolPriority PriorityGameTypeDef { get; set; } = null!;
+    private static SymbolPriority PriorityTypeDefGame { get; set; } = null!;
 
-    private static SymbolPriority PriorityExternal { get; set; } = null!;
+    private static SymbolPriority PrioritySymExternal { get; set; } = null!;
 
-    private static SymbolPriority PriorityFunction { get; set; } = null!;
+    private static SymbolPriority PrioritySymFunction { get; set; } = null!;
 
-    private static SymbolPriority PriorityFile { get; set; } = null!;
+    private static SymbolPriority PrioritySymFile { get; set; } = null!;
 
-    private static SymbolPriority PriorityStatic { get; set; } = null!;
+    private static SymbolPriority PrioritySymStatic { get; set; } = null!;
 
-    private static SymbolPriority PriorityName { get; set; } = null!;
+    private static SymbolPriority PrioritySymName { get; set; } = null!;
 
-    private static SymbolPriority PriorityEndOfFile { get; set; } = null!;
+    private static SymbolPriority PrioritySymEndOfFile { get; set; } = null!;
 
     #endregion
 
@@ -50,25 +50,25 @@ public class Sym
 
     public static void Initialize()
     {
-        PriorityTypedefBasic = new SymbolPriority(-2_000_000, "typedef (basic)");
+        PriorityTypeDefBasic = new SymbolPriority(-2_000_000, "TPDEF basic");
 
-        PriorityTypeFakeCursor = new SymbolPriority(-1_000_000, "FAKE TYPE CURSOR");
+        PriorityTypeFake = new SymbolPriority(-1_000_000, "TYPE fake");
 
-        PriorityGameType = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE");
+        PriorityTypeGame = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value / 2, "TYPE game");
 
-        PriorityGameTypeDef = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex");
+        PriorityTypeDefGame = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "TPDEF game");
 
-        PriorityExternal = new SymbolPriority(+1_000_000, "EXT");
+        PrioritySymExternal = new SymbolPriority(+1_000_000, "SYM EXT");
 
-        PriorityFunction = new SymbolPriority(+2_000_000, "FUNC");
+        PrioritySymFunction = new SymbolPriority(+2_000_000, "SYM FUNC");
 
-        PriorityFile = new SymbolPriority(+3_000_000, "FILE");
+        PrioritySymFile = new SymbolPriority(+3_000_000, "SYM FILE");
 
-        PriorityStatic = new SymbolPriority(+5_000_000, "STAT");
+        PrioritySymStatic = new SymbolPriority(+5_000_000, "SYM STAT");
 
-        PriorityName = new SymbolPriority(+6_000_000, "NAME");
+        PrioritySymName = new SymbolPriority(+6_000_000, "SYM NAME");
 
-        PriorityEndOfFile = new SymbolPriority(+7_000_000, "EOF");
+        PrioritySymEndOfFile = new SymbolPriority(+7_000_000, "SYM EOF");
     }
 
     public void ResolveDependencies(List<Sym> symbols)
@@ -96,15 +96,15 @@ public class Sym
                 break;
             case ISymbolFileStart file:
                 Name = new SymKey("FILE", ((SymbolRecordSetSldToLineOfFile)file).File); // TODO can't use SymbolStorageClass.FILE here?
-                Priority = PriorityFile;
+                Priority = PrioritySymFile;
                 break; // NONE
             case ISymbolFileEnd:
                 Name = new SymKey("EOF");
-                Priority = PriorityEndOfFile;
+                Priority = PrioritySymEndOfFile;
                 break;
             case ISymbolFunction func:
                 Name = new SymKey("FUNC", func.Name); // TODO
-                Priority = PriorityFunction;
+                Priority = PrioritySymFunction;
                 break; // NONE
             case ISymbolVariable variable:
                 ResolveVariable(variable);
@@ -118,7 +118,7 @@ public class Sym
     {
         Name = new SymKey(def.Class, def.Name);
 
-        Priority = PriorityStatic;
+        Priority = PrioritySymStatic;
 
         if (def is not ISymbolDefinition2 def2)
         {
@@ -171,11 +171,11 @@ public class Sym
 
             Dependencies.Add(new SymKey(cClass, t2.Tag)); // BUG this prevents sorting many symbols
 
-            Priority = PriorityGameTypeDef;
+            Priority = PriorityTypeDefGame;
         }
         else
         {
-            Priority = PriorityTypedefBasic++; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
+            Priority = PriorityTypeDefBasic++; // e.g. Def class TPDEF type UCHAR size 0 name BBOOL
         }
     }
 
@@ -254,7 +254,7 @@ public class Sym
             //
             //Priority = PriorityTypedefBasicEnd + i + extra;
 
-            Priority = PriorityTypeFakeCursor++;
+            Priority = PriorityTypeFake++;
         }
         else
         {
@@ -282,7 +282,7 @@ public class Sym
                     }
                     else
                     {
-                        Priority = PriorityGameType; // TODO its typedef depends on PSX structures priority
+                        Priority = PriorityTypeGame; // TODO its typedef depends on PSX structures priority
 
                         if (Symbols.Any(s => s.Code.Any(t => t.IsTypedef(u => u is ISymbolDefinition2 sd2 && sd2.Tag == def.Name))))
                         {
@@ -298,7 +298,7 @@ public class Sym
     {
         Name = new SymKey("NAME", variable.Name);
 
-        Priority = PriorityName;
+        Priority = PrioritySymName;
 
         foreach (var sym in Symbols)
         {
@@ -321,7 +321,7 @@ public class Sym
     {
         Name = new SymKey(def.Class, def.Name);
 
-        Priority = PriorityExternal;
+        Priority = PrioritySymExternal;
 
         if (def is not ISymbolDefinition2 def2)
         {
