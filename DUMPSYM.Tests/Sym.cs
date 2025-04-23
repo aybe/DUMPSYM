@@ -50,6 +50,10 @@ public class Sym
 
     public static void Initialize()
     {
+        // TODO basic typdefs come from the SDK, update PsxRuntimeLibrary and label
+
+        // TODO move priority for PsxRuntimeLibrary.StructuresPriority because it makes no sense
+
         PriorityTypeDefBasic = new SymbolPriority(-2_000_000, "TPDEF basic");
 
         PriorityTypeFake = new SymbolPriority(-1_000_000, "TYPE fake");
