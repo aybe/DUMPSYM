@@ -257,6 +257,34 @@ public static class PsxRuntimeLibrary
         "dev_t",
         "off_t",
         "gid_t",
-        "uid_t"
+        "uid_t",
+        // TODO these SymbolTypeKind have to be here otherwise we get a weird layout where SDK typedef depend on basic typedefs
+        "NULL",
+        "VOID",
+        "CHAR",
+        "SHORT",
+        "INT",
+        "LONG",
+        "FLOAT",
+        "DOUBLE",
+        "UCHAR",
+        "USHORT",
+        "UINT",
+        "ULONG"
+        // TODO consider adding 143: Name: [TPDEF, SLONG], Dependencies: [], Priority: -2000000 (TPDEF basic)
+        // TODO consider adding 144: Name: [TPDEF, SWORD], Dependencies: [], Priority: -1999999 (TPDEF basic)
+        // TODO consider adding 145: Name: [TPDEF, UWORD], Dependencies: [], Priority: -1999998 (TPDEF basic)
+        // TODO consider adding 146: Name: [TPDEF, SBYTE], Dependencies: [], Priority: -1999997 (TPDEF basic)
+        // TODO consider adding 147: Name: [TPDEF, UBYTE], Dependencies: [], Priority: -1999996 (TPDEF basic)
+        // TODO consider adding 148: Name: [TPDEF, PULONG], Dependencies: [], Priority: -1999995 (TPDEF basic)
+        // TODO consider adding 149: Name: [TPDEF, BOOL], Dependencies: [], Priority: -1999994 (TPDEF basic)
+        // TODO consider adding 150: Name: [TPDEF, PSBYTE], Dependencies: [], Priority: -1999993 (TPDEF basic)
+        // TODO consider adding 151: Name: [TPDEF, PUBYTE], Dependencies: [], Priority: -1999992 (TPDEF basic)
+        // TODO consider adding 152: Name: [TPDEF, PSWORD], Dependencies: [], Priority: -1999991 (TPDEF basic)
+        // TODO consider adding 153: Name: [TPDEF, PUWORD], Dependencies: [], Priority: -1999990 (TPDEF basic)
+        // TODO consider adding 154: Name: [TPDEF, PSLONG], Dependencies: [], Priority: -1999989 (TPDEF basic)
+        // TODO consider adding 155: Name: [TPDEF, BBOOL], Dependencies: [], Priority: -1999988 (TPDEF basic)
+        // TODO consider adding 156: Name: [TPDEF, wchar_t], Dependencies: [], Priority: -1999982 (TPDEF basic)
+        // TODO consider adding 157: Name: [TPDEF, PACKET], Dependencies: [], Priority: -1999981 (TPDEF basic)
     ];
 }
