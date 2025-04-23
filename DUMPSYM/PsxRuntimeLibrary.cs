@@ -232,6 +232,10 @@ public static class PsxRuntimeLibrary
         "GsMIMEV", // SDK >= 2.0 <= 3.6
         "GsMIMEN", // SDK >= 2.0 <= 3.6
         "_GsFCALL", // SDK >= 3.3 <= 4.6
+        // LIBSPU.H // TODO more
+        "SpuIRQCallbackProc", // SDK >= 2.6 <= 4.6
+        "SpuTransferCallbackProc", // SDK >= 3.0 <= 4.6
+        "SpuStCallbackProc", // SDK >= 3.3 <= 4.6
         // TYPES.H 4.6
         "u_char",
         "u_short",
