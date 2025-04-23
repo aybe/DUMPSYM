@@ -229,8 +229,7 @@ public class Sym
                             // this pushes the type further up the list, closer to its dependencies
                             // it results in the unrelated nodes between them to move somewhere else
                             // i.e. it's much more tight now
-                            Priority = -1;
-                            Priority = new(-1, "STRUCT MEMBER");
+                            Priority = new SymbolPriority(-1, "STRUCT MEMBER");
                         }
                     }
                 }
