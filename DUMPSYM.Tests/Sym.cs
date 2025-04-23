@@ -39,6 +39,12 @@ public class Sym
 
     private static SymbolPriority PriorityGameTypeDef => new(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex"); // TODO adjust
 
+    private static SymbolPriority PriorityName { get; } = new(+6_000_000, "NAME");
+
+    private static SymbolPriority PriorityStatic { get; } = new(+5_000_000, "STAT");
+
+    private static SymbolPriority PriorityEndOfFile { get; } = new(+7_000_000, "EOF");
+
     private int PriorityWithFilePosition
     {
         get
@@ -103,6 +109,7 @@ public class Sym
                 break; // NONE
             case ISymbolFileEnd:
                 Name = new SymKey("EOF");
+                Priority = PriorityEndOfFile;
                 break;
             case ISymbolFunction func:
                 Name = new SymKey("FUNC", func.Name); // TODO
@@ -119,6 +126,8 @@ public class Sym
     private void ResolveStatic(ISymbolDefinition def)
     {
         Name = new SymKey(def.Class, def.Name);
+
+        Priority = PriorityStatic;
 
         if (def is not ISymbolDefinition2 def2)
         {
@@ -297,6 +306,8 @@ public class Sym
     private void ResolveVariable(ISymbolVariable variable) // TODO rework this crap, could be other than STAT
     {
         Name = new SymKey("NAME", variable.Name);
+
+        Priority = PriorityName;
 
         foreach (var sym in Symbols)
         {
