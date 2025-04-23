@@ -2,7 +2,6 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 
-using System.Reflection;
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Tests;
@@ -22,27 +21,27 @@ public class Sym
 
     #region Priorities
 
-    private static SymbolPriority PriorityTypedefBasic { get; set; } = new(-2_000_000, "typedef (basic)");
+    private static SymbolPriority PriorityTypedefBasic { get; set; } = null!;
 
-    private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // this won't show up in output, only PriorityTypeFakeCursor will // TODO adjust
+    private static SymbolPriority PriorityTypedefFakeStart { get; set; } = null!; // this won't show up in output, only PriorityTypeFakeCursor will // TODO adjust
 
-    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = new(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR");
+    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = null!;
 
-    private static SymbolPriority PriorityGameType { get; } = new(PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE"); // -100_000 // TODO adjust
+    private static SymbolPriority PriorityGameType { get; set; } = null!; // -100_000 // TODO adjust
 
-    private static SymbolPriority PriorityGameTypeDef => new(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex"); // -100_000 // TODO adjust
+    private static SymbolPriority PriorityGameTypeDef { get; set; } = null!;
 
-    private static SymbolPriority PriorityExternal { get; } = new(+1_000_000, "EXT");
+    private static SymbolPriority PriorityExternal { get; set; } = null!;
 
-    private static SymbolPriority PriorityFunction { get; } = new(+2_000_000, "FUNC");
+    private static SymbolPriority PriorityFunction { get; set; } = null!;
 
-    private static SymbolPriority PriorityFile { get; } = new(+3_000_000, "FILE");
+    private static SymbolPriority PriorityFile { get; set; } = null!;
 
-    private static SymbolPriority PriorityStatic { get; } = new(+5_000_000, "STAT");
+    private static SymbolPriority PriorityStatic { get; set; } = null!;
 
-    private static SymbolPriority PriorityName { get; } = new(+6_000_000, "NAME");
+    private static SymbolPriority PriorityName { get; set; } = null!;
 
-    private static SymbolPriority PriorityEndOfFile { get; } = new(+7_000_000, "EOF");
+    private static SymbolPriority PriorityEndOfFile { get; set; } = null!;
 
     #endregion
 
@@ -53,17 +52,27 @@ public class Sym
 
     public static void Initialize()
     {
-        // TODO this sucks, it assumes [assembly: Parallelize(Scope = ExecutionScope.ClassLevel)]
-
-        var attribute = Assembly.GetExecutingAssembly().GetCustomAttribute<ParallelizeAttribute>();
-
-        Assert.IsNotNull(attribute);
-
-        Assert.AreEqual(ExecutionScope.ClassLevel, attribute.Scope);
-
         PriorityTypedefBasic = new SymbolPriority(-2_000_000, "typedef (basic)");
 
-        PriorityTypeFakeCursor = PriorityTypeFakeCursor with { Value = PriorityTypedefFakeStart + 100_000 };
+        PriorityTypedefFakeStart = new SymbolPriority(-1_000_000, "FAKE TPDEF START");
+
+        PriorityTypeFakeCursor = new SymbolPriority(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR");
+
+        PriorityGameType = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE");
+
+        PriorityGameTypeDef = new SymbolPriority(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex");
+
+        PriorityExternal = new SymbolPriority(+1_000_000, "EXT");
+
+        PriorityFunction = new SymbolPriority(+2_000_000, "FUNC");
+
+        PriorityFile = new SymbolPriority(+3_000_000, "FILE");
+
+        PriorityStatic = new SymbolPriority(+5_000_000, "STAT");
+
+        PriorityName = new SymbolPriority(+6_000_000, "NAME");
+
+        PriorityEndOfFile = new SymbolPriority(+7_000_000, "EOF");
     }
 
     public void ResolveDependencies(List<Sym> symbols)
