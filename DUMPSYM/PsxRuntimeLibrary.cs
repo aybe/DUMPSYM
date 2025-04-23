@@ -198,8 +198,40 @@ public static class PsxRuntimeLibrary
         "SpuVolume16" // SDK >= 2.6 <= 3.5
     }.OrderBy(s => s).ToArray();
 
-    public static string[] Types { get; } =
+    public static string[] Types { get; } = // TODO structures shall be cleaned up from new ones in here
     [
+        // LIBGS.H
+        "GsCOORDINATE", // SDK >= 2.0 <= 3.3
+        "GsCOORD2PARAM", // SDK >= 2.0 <= 4.6
+        "GsCOORDINATE2", // SDK >= 2.0 <= 4.6
+        "GsVIEW", // SDK >= 2.0 <= 3.3
+        "GsVIEW2", // SDK >= 2.0 <= 4.6
+        "GsRVIEW", // SDK >= 2.0 <= 3.3
+        "GsRVIEW2", // SDK >= 2.0 <= 4.6
+        "GsF_LIGHT", // SDK >= 2.0 <= 4.6
+        "GsOT_TAG", // SDK >= 2.0 <= 4.6
+        "GsOT", // SDK >= 2.0 <= 4.6
+        "GsDOBJ", // SDK >= 2.0 <= 3.3
+        "GsDOBJ2", // SDK >= 2.0 <= 4.6
+        "GsDOBJ3", // SDK >= 2.0 <= 4.6
+        "GsDOBJ5", // SDK >= 2.0 <= 4.6
+        "GsSPRITE", // SDK >= 2.0 <= 4.6
+        "GsSPARRAY", // SDK >= 2.6 <= 4.1
+        "GsCELL", // SDK >= 2.0 <= 4.6
+        "GsMAP", // SDK >= 2.0 <= 4.6
+        "GsBG", // SDK >= 2.0 <= 4.6
+        "GsLINE", // SDK >= 2.0 <= 4.6
+        "GsGLINE", // SDK >= 2.0 <= 4.6
+        "GsBOXF", // SDK >= 2.0 <= 4.6
+        "GsFOGPARAM", // SDK >= 2.0 <= 4.6
+        "GsIMAGE", // SDK >= 2.0 <= 4.6
+        "_GsPOSITION", // SDK >= 2.0 <= 4.6
+        "GsZCLIP", // SDK >= 2.0 <= 3.6
+        "GsOBJTABLE", // SDK >= 2.0 <= 3.3
+        "GsOBJTABLE2", // SDK >= 2.0 <= 4.6
+        "GsMIMEV", // SDK >= 2.0 <= 3.6
+        "GsMIMEN", // SDK >= 2.0 <= 3.6
+        "_GsFCALL", // SDK >= 3.3 <= 4.6
         // TYPES.H 4.6
         "u_char",
         "u_short",
