@@ -15,29 +15,29 @@ public class Sym
 
     public required Code Code { get; init; }
 
-    public int Priority { get; set; }
+    public SymbolPriority? Priority { get; set; }
 
     private List<Sym> Symbols { get; set; }
 
-    private static int PriorityExternal { get; } = +1_000_000;
+    private static SymbolPriority PriorityExternal { get; } = new(+1_000_000, "EXT");
 
-    private static int PriorityFunction { get; } = +2_000_000;
+    private static SymbolPriority PriorityFunction { get; } = new(+2_000_000, "FUNC");
 
-    private static int PriorityFile { get; } = +3_000_000;
+    private static SymbolPriority PriorityFile { get; } = new(+3_000_000, "FILE");
 
-    private static int PriorityTypedefBasicStart { get; } = -2_000_000;
+    private static SymbolPriority PriorityTypedefBasicStart { get; } = new (-2_000_000, "TPDEF BASIC START");
 
-    private static int PriorityTypedefBasicCursor { get; set; } = PriorityTypedefBasicStart;
+    private static SymbolPriority PriorityTypedefBasicCursor { get; set; } = new(PriorityTypedefBasicStart.Value, "Game TPDEF basic");
 
     public SortingSettings Settings { get; set; }
 
-    private static int PriorityTypedefFakeStart { get; } = -1_000_000; // TODO adjust
+    private static SymbolPriority PriorityTypedefFakeStart { get; } = new(-1_000_000, "FAKE TPDEF START"); // TODO adjust
 
-    private static int PriorityTypeFakeCursor { get; set; } = PriorityTypedefFakeStart + 100_000;
+    private static SymbolPriority PriorityTypeFakeCursor { get; set; } = new(PriorityTypedefFakeStart.Value + 100_000, "FAKE TYPE CURSOR");
 
-    private static int PriorityGameType { get; } = PsxRuntimeLibrary.StructuresPriority / 2; // TODO adjust
+    private static SymbolPriority PriorityGameType { get; } = new (PsxRuntimeLibrary.StructuresPriority.Value / 2, "Game TYPE"); // TODO adjust
 
-    private static int PriorityGameTypeDef => PsxRuntimeLibrary.StructuresPriority - 2000; // TODO adjust
+    private static SymbolPriority PriorityGameTypeDef => new(PsxRuntimeLibrary.StructuresPriority.Value - 2000, "Game TPDEF complex"); // TODO adjust
 
     private int PriorityWithFilePosition
     {
@@ -183,8 +183,12 @@ public class Sym
     {
         Name = new SymKey(def.Class, def.Name);
 
-        var members = Code[1..^1];
+        var hasFakeName = SymbolRegistry.HasFakeName(def.Name);
 
+        Priority ??= new SymbolPriority(0, hasFakeName ? "Fake Type" : "Real Type"); // TODO looks wrong
+
+        var members = Code[1..^1];
+        
         foreach (var m in members.Cast<ISymbolDefinition>())
         {
             if (m is ISymbolDefinition2 m2)
@@ -226,6 +230,7 @@ public class Sym
                             // it results in the unrelated nodes between them to move somewhere else
                             // i.e. it's much more tight now
                             Priority = -1;
+                            Priority = new(-1, "STRUCT MEMBER");
                         }
                     }
                 }
@@ -236,7 +241,7 @@ public class Sym
             }
         }
 
-        if (SymbolRegistry.HasFakeName(def.Name))
+        if (hasFakeName)
         {
             // push fake types up
 
@@ -256,7 +261,7 @@ public class Sym
         {
             if (PsxRuntimeLibrary.Structures.AsSpan().IndexOf(def.Name) is var i && i != -1)
             {
-                Priority = PsxRuntimeLibrary.StructuresPriority + i;
+                Priority = PsxRuntimeLibrary.StructuresPriority with { Value = PsxRuntimeLibrary.StructuresPriority.Value + i };
             }
             else
             {
@@ -270,9 +275,9 @@ public class Sym
                 {
                     // type only depends on primitives, it can go further up the list
 
-                    Assert.AreEqual(0, Priority);
+                    Assert.AreEqual(0, Priority.Value);
 
-                    if (SymbolRegistry.HasFakeName(def.Name))
+                    if (hasFakeName)
                     {
                         Assert.Fail();
                     }
