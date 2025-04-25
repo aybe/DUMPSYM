@@ -24,7 +24,9 @@ public sealed class UnitTestClangParsing : UnitTestBase
         var args = new List<string>
         {
             "-I", SdkDirInclude,
-            "-D", "_SIZE_T" // SYS/TYPES.H:69 typedef redefinition with different types ('unsigned int' vs 'unsigned long long'):
+            "-D", "LANGUAGE_C", // KERNEL.H // BUG these have no typedefs
+            "-D", "_SIZE_T",    // typedef redefinition with different types ('unsigned int' vs 'unsigned long long'): Line 69, Column 22 in SYS/TYPES.H
+            "-D", "_WCHAR_T"    // 'long wchar_t' is invalid: Line 19, Column 18 in STDDEF.H
         };
 
         var sort = Sorting.TryGetTopologicalSort(header, s => s, out var result);
@@ -67,56 +69,56 @@ public sealed class UnitTestClangParsing : UnitTestBase
 
     public static IEnumerable<object[]> TestSymbolSearchData()
     {
-        // TODO // ABS.H
-        // TODO // ASM.H
-        // TODO // ASSERT.H
-        // TODO // CONVERT.H
-        // TODO // CTYPE.H
-        // TODO // FS.H
-        // TODO // GTEMAC.H
-        // TODO // GTENOM.H
-        // TODO // GTEREG_S.H
-        // TODO // GTEREG.H
-        // TODO // INLINE_A.H
-        // TODO // INLINE_C.H
-        // TODO // INLINE_O.H
-        // TODO // INLINE_S.H
-        yield return [Headers.KERNEL]; // KERNEL.H
-        // TODO // LIBAPI.H
-        yield return [Headers.LIBCD]; // LIBCD.H
-        // TODO // LIBCOMB.H
-        yield return [Headers.LIBDS]; // LIBDS.H
-        // TODO // LIBETC.H
-        yield return [Headers.LIBGPU]; // LIBGPU.H
-        yield return [Headers.LIBGS];  // LIBGS.H
-        yield return [Headers.LIBGTE]; // LIBGTE.H
-        // TODO // LIBGUN.H
-        yield return [Headers.LIBHMD]; // LIBHMD.H
-        // TODO // LIBMATH.H
-        yield return [Headers.LIBMCRD]; // LIBMCRD.H
-        // TODO // LIBMCX.H
-        // TODO // LIBPAD.H
-        // TODO // LIBPRESS.H
-        // TODO // LIBSIO.H
-        // TODO // LIBSN.H
-        yield return [Headers.LIBSND]; // LIBSND.H
-        yield return [Headers.LIBSPU]; // LIBSPU.H
-        // TODO // LIBTAP.H
-        // TODO // LIMITS.H
-        // TODO // MALLOC.H
-        // TODO // MCGUI.H
-        // TODO // MEMORY.H
-        // TODO // QSORT.H
-        // TODO // R3000.H
-        // TODO // RAND.H
-        // TODO // ROMIO.H
-        // TODO // SETJMP.H
-        // TODO // STDARG.H
-        // TODO // STDDEF.H
-        // TODO // STDIO.H
-        // TODO // STDLIB.H
-        // TODO // STRING.H
-        // TODO // STRINGS.H
+        _ = 0;                           // ABS.H           // BUG useless 
+        _ = 0;                           // ASM.H           // BUG useless 
+        _ = 0;                           // ASSERT.H        // BUG useless 
+        _ = 0;                           // CONVERT.H       // BUG useless 
+        _ = 0;                           // CTYPE.H         // BUG useless 
+        yield return [Headers.FS];       // FS.H
+        _ = 0;                           // GTEMAC.H        // BUG useless 
+        _ = 0;                           // GTENOM.H        // BUG useless 
+        _ = 0;                           // GTEREG_S.H      // BUG useless 
+        _ = 0;                           // GTEREG.H        // BUG useless 
+        _ = 0;                           // INLINE_A.H      // BUG useless 
+        _ = 0;                           // INLINE_C.H      // BUG useless 
+        _ = 0;                           // INLINE_O.H      // BUG useless 
+        _ = 0;                           // INLINE_S.H      // BUG useless 
+        yield return [Headers.KERNEL];   // KERNEL.H
+        _ = 0;                           // LIBAPI.H        // BUG useless 
+        yield return [Headers.LIBCD];    // LIBCD.H
+        _ = 0;                           // LIBCOMB.H       // BUG useless 
+        yield return [Headers.LIBDS];    // LIBDS.H
+        _ = 0;                           // LIBETC.H        // BUG useless 
+        yield return [Headers.LIBGPU];   // LIBGPU.H
+        yield return [Headers.LIBGS];    // LIBGS.H
+        yield return [Headers.LIBGTE];   // LIBGTE.H
+        _ = 0;                           // LIBGUN.H        // BUG useless 
+        yield return [Headers.LIBHMD];   // LIBHMD.H
+        _ = 0;                           // LIBMATH.H       // BUG useless 
+        yield return [Headers.LIBMCRD];  // LIBMCRD.H
+        _ = 0;                           // LIBMCX.H        // BUG useless 
+        _ = 0;                           // LIBPAD.H        // BUG useless 
+        yield return [Headers.LIBPRESS]; // LIBPRESS.H
+        _ = 0;                           // LIBSIO.H        // BUG useless 
+        _ = 0;                           // LIBSN.H         // BUG useless 
+        yield return [Headers.LIBSND];   // LIBSND.H
+        yield return [Headers.LIBSPU];   // LIBSPU.H
+        _ = 0;                           // LIBTAP.H        // BUG useless 
+        _ = 0;                           // LIMITS.H        // BUG useless 
+        _ = 0;                           // MALLOC.H        // BUG useless 
+        yield return [Headers.MCGUI];    // MCGUI.H
+        _ = 0;                           // MEMORY.H        // BUG useless 
+        _ = 0;                           // QSORT.H         // BUG useless 
+        _ = 0;                           // R3000.H         // BUG useless 
+        _ = 0;                           // RAND.H          // BUG useless 
+        _ = 0;                           // ROMIO.H         // BUG useless 
+        yield return [Headers.SETJMP];   // SETJMP.H
+        yield return [Headers.STDARG];   // STDARG.H
+        yield return [Headers.STDDEF];   // STDDEF.H
+        _ = 0;                           // STDIO.H         // BUG useless 
+        _ = 0;                           // STDLIB.H        // BUG useless 
+        _ = 0;                           // STRING.H        // BUG useless 
+        _ = 0;                           // STRINGS.H       // BUG useless 
     }
 
     private unsafe CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, void* data)

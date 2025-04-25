@@ -9,7 +9,21 @@ public static class Headers
 {
     static Headers()
     {
+        // TODO cleanup/sort
+
         TYPES = new Header("SYS/TYPES.H");
+
+        FS = new Header("FS.H", TYPES);
+
+        LIBPRESS = new Header("LIBPRESS.H", TYPES);
+
+        MCGUI = new Header("MCGUI.H");
+
+        SETJMP = new Header("SETJMP.H");
+
+        STDARG = new Header("STDARG.H");
+
+        STDDEF = new Header("STDDEF.H");
 
         KERNEL = new Header("KERNEL.H");
 
@@ -32,6 +46,8 @@ public static class Headers
         LIBHMD = new Header("LIBHMD.H", TYPES, LIBGTE, LIBGPU, LIBGS);
     }
 
+    public static Header FS { get; }
+
     public static Header TYPES { get; }
 
     public static Header KERNEL { get; }
@@ -50,7 +66,17 @@ public static class Headers
 
     public static Header LIBMCRD { get; }
 
+    public static Header LIBPRESS { get; }
+
     public static Header LIBSND { get; }
 
     public static Header LIBSPU { get; }
+
+    public static Header MCGUI { get; }
+
+    public static Header SETJMP { get; }
+
+    public static Header STDARG { get; }
+
+    public static Header STDDEF { get; }
 }
