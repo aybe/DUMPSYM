@@ -7,76 +7,37 @@ namespace DUMPSYM.Tests.WorkInProgress;
 [SuppressMessage("ReSharper", "IdentifierTypo")]
 public static class Headers
 {
-    static Headers()
-    {
-        // TODO cleanup/sort
+    public static Header TYPES { get; } = new("SYS/TYPES.H");
 
-        TYPES = new Header("SYS/TYPES.H");
+    public static Header FS { get; } = new("FS.H", TYPES);
 
-        FS = new Header("FS.H", TYPES);
+    public static Header KERNEL { get; } = new("KERNEL.H");
 
-        LIBPRESS = new Header("LIBPRESS.H", TYPES);
+    public static Header LIBCD { get; } = new("LIBCD.H", TYPES);
 
-        MCGUI = new Header("MCGUI.H");
+    public static Header LIBDS { get; } = new("LIBDS.H", TYPES);
 
-        SETJMP = new Header("SETJMP.H");
+    public static Header LIBGTE { get; } = new("LIBGTE.H", TYPES);
 
-        STDARG = new Header("STDARG.H");
+    public static Header LIBGPU { get; } = new("LIBGPU.H", LIBGTE);
 
-        STDDEF = new Header("STDDEF.H");
+    public static Header LIBGS { get; } = new("LIBGS.H", LIBGPU);
 
-        KERNEL = new Header("KERNEL.H");
+    public static Header LIBHMD { get; } = new("LIBHMD.H", LIBGS);
 
-        LIBCD = new Header("LIBCD.H", TYPES);
+    public static Header LIBMCRD { get; } = new("LIBMCRD.H");
 
-        LIBDS = new Header("LIBDS.H", TYPES);
+    public static Header LIBPRESS { get; } = new("LIBPRESS.H", TYPES);
 
-        LIBMCRD = new Header("LIBMCRD.H");
+    public static Header LIBSND { get; } = new("LIBSND.H");
 
-        LIBSND = new Header("LIBSND.H");
+    public static Header LIBSPU { get; } = new("LIBSPU.H");
 
-        LIBSPU = new Header("LIBSPU.H");
+    public static Header MCGUI { get; } = new("MCGUI.H");
 
-        LIBGTE = new Header("LIBGTE.H", TYPES);
+    public static Header SETJMP { get; } = new("SETJMP.H");
 
-        LIBGPU = new Header("LIBGPU.H", LIBGTE);
+    public static Header STDARG { get; } = new("STDARG.H");
 
-        LIBGS = new Header("LIBGS.H", LIBGPU);
-
-        LIBHMD = new Header("LIBHMD.H", LIBGS);
-    }
-
-    public static Header FS { get; }
-
-    public static Header TYPES { get; }
-
-    public static Header KERNEL { get; }
-
-    public static Header LIBCD { get; }
-
-    public static Header LIBDS { get; }
-
-    public static Header LIBGPU { get; }
-
-    public static Header LIBGTE { get; }
-
-    public static Header LIBGS { get; }
-
-    public static Header LIBHMD { get; }
-
-    public static Header LIBMCRD { get; }
-
-    public static Header LIBPRESS { get; }
-
-    public static Header LIBSND { get; }
-
-    public static Header LIBSPU { get; }
-
-    public static Header MCGUI { get; }
-
-    public static Header SETJMP { get; }
-
-    public static Header STDARG { get; }
-
-    public static Header STDDEF { get; }
+    public static Header STDDEF { get; } = new("STDDEF.H");
 }
