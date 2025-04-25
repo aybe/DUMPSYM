@@ -11,7 +11,7 @@ namespace DUMPSYM.Tests;
 [SuppressMessage("ReSharper", "GrammarMistakeInComment")]
 public sealed partial class UnitTestClangParsing : UnitTestBase
 {
-    private static string SdkDir { get; } = @"C:\Temp\PSX SDKs\extracted\Programmer Tool - Runtime Library Version 4.6 (Japan)_DTL-S2360_redump\PSX";
+    private static string SdkDir { get; } = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7";
 
     private static string SdkDirInclude { get; } = Path.Combine(SdkDir, "INCLUDE");
 
