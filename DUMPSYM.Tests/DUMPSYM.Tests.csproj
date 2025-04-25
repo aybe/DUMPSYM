@@ -51,6 +51,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Solution.tt</DependentUpon>
 		</None>
+		<None Include="UnitTestClangParsing.g.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>UnitTestClangParsing.tt</DependentUpon>
+		</None>
 		<None Include="UnitTestSymbolSort.g.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -69,6 +74,11 @@
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
 		</Compile>
+		<Compile Update="UnitTestClangParsing.g.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>UnitTestClangParsing.tt</DependentUpon>
+		</Compile>
 		<Compile Update="UnitTestSymbolSort.g.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -84,6 +94,10 @@
 		<None Update="UnitTestAuto.tt">
 			<LastGenOutput>UnitTestAuto.g.cs</LastGenOutput>
 			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="UnitTestClangParsing.tt">
+		  <Generator>TextTemplatingFileGenerator</Generator>
+		  <LastGenOutput>UnitTestClangParsing.g.cs</LastGenOutput>
 		</None>
 		<None Update="UnitTestSymbolSort.tt">
 		  <Generator>TextTemplatingFileGenerator</Generator>

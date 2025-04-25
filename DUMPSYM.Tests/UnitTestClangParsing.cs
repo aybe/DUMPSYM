@@ -9,15 +9,13 @@ namespace DUMPSYM.Tests;
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "CommentTypo")]
 [SuppressMessage("ReSharper", "GrammarMistakeInComment")]
-public sealed class UnitTestClangParsing : UnitTestBase
+public sealed partial class UnitTestClangParsing : UnitTestBase
 {
     private static string SdkDir { get; } = @"C:\Temp\PSX SDKs\extracted\Programmer Tool - Runtime Library Version 4.6 (Japan)_DTL-S2360_redump\PSX";
 
     private static string SdkDirInclude { get; } = Path.Combine(SdkDir, "INCLUDE");
 
-    [TestMethod]
-    [DynamicData(nameof(TestSymbolSearchData))]
-    public unsafe void TestSymbolSearch(Header header)
+    private unsafe void Test(Header header)
     {
         using var index = CXIndex.Create();
 
@@ -65,60 +63,6 @@ public sealed class UnitTestClangParsing : UnitTestBase
         }
 
         Assert.AreNotEqual(0, cursors.Count, "No symbols found.");
-    }
-
-    public static IEnumerable<object[]> TestSymbolSearchData()
-    {
-        _ = 0;                           // ABS.H           // BUG useless 
-        _ = 0;                           // ASM.H           // BUG useless 
-        _ = 0;                           // ASSERT.H        // BUG useless 
-        _ = 0;                           // CONVERT.H       // BUG useless 
-        _ = 0;                           // CTYPE.H         // BUG useless 
-        yield return [Headers.FS];       // FS.H
-        _ = 0;                           // GTEMAC.H        // BUG useless 
-        _ = 0;                           // GTENOM.H        // BUG useless 
-        _ = 0;                           // GTEREG_S.H      // BUG useless 
-        _ = 0;                           // GTEREG.H        // BUG useless 
-        _ = 0;                           // INLINE_A.H      // BUG useless 
-        _ = 0;                           // INLINE_C.H      // BUG useless 
-        _ = 0;                           // INLINE_O.H      // BUG useless 
-        _ = 0;                           // INLINE_S.H      // BUG useless 
-        yield return [Headers.KERNEL];   // KERNEL.H
-        _ = 0;                           // LIBAPI.H        // BUG useless 
-        yield return [Headers.LIBCD];    // LIBCD.H
-        _ = 0;                           // LIBCOMB.H       // BUG useless 
-        yield return [Headers.LIBDS];    // LIBDS.H
-        _ = 0;                           // LIBETC.H        // BUG useless 
-        yield return [Headers.LIBGPU];   // LIBGPU.H
-        yield return [Headers.LIBGS];    // LIBGS.H
-        yield return [Headers.LIBGTE];   // LIBGTE.H
-        _ = 0;                           // LIBGUN.H        // BUG useless 
-        yield return [Headers.LIBHMD];   // LIBHMD.H
-        _ = 0;                           // LIBMATH.H       // BUG useless 
-        yield return [Headers.LIBMCRD];  // LIBMCRD.H
-        _ = 0;                           // LIBMCX.H        // BUG useless 
-        _ = 0;                           // LIBPAD.H        // BUG useless 
-        yield return [Headers.LIBPRESS]; // LIBPRESS.H
-        _ = 0;                           // LIBSIO.H        // BUG useless 
-        _ = 0;                           // LIBSN.H         // BUG useless 
-        yield return [Headers.LIBSND];   // LIBSND.H
-        yield return [Headers.LIBSPU];   // LIBSPU.H
-        _ = 0;                           // LIBTAP.H        // BUG useless 
-        _ = 0;                           // LIMITS.H        // BUG useless 
-        _ = 0;                           // MALLOC.H        // BUG useless 
-        yield return [Headers.MCGUI];    // MCGUI.H
-        _ = 0;                           // MEMORY.H        // BUG useless 
-        _ = 0;                           // QSORT.H         // BUG useless 
-        _ = 0;                           // R3000.H         // BUG useless 
-        _ = 0;                           // RAND.H          // BUG useless 
-        _ = 0;                           // ROMIO.H         // BUG useless 
-        yield return [Headers.SETJMP];   // SETJMP.H
-        yield return [Headers.STDARG];   // STDARG.H
-        yield return [Headers.STDDEF];   // STDDEF.H
-        _ = 0;                           // STDIO.H         // BUG useless 
-        _ = 0;                           // STDLIB.H        // BUG useless 
-        _ = 0;                           // STRING.H        // BUG useless 
-        _ = 0;                           // STRINGS.H       // BUG useless 
     }
 
     private unsafe CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, void* data)
