@@ -39,11 +39,11 @@ public static class Headers
 
         LIBGTE = new Header("LIBGTE.H", TYPES);
 
-        LIBGPU = new Header("LIBGPU.H", TYPES, LIBGTE);
+        LIBGPU = new Header("LIBGPU.H", LIBGTE);
 
-        LIBGS = new Header("LIBGS.H", TYPES, LIBGPU, LIBGTE);
+        LIBGS = new Header("LIBGS.H", LIBGPU);
 
-        LIBHMD = new Header("LIBHMD.H", TYPES, LIBGTE, LIBGPU, LIBGS);
+        LIBHMD = new Header("LIBHMD.H", LIBGS);
     }
 
     public static Header FS { get; }
