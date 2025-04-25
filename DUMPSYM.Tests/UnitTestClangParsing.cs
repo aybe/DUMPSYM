@@ -138,6 +138,8 @@ public sealed class UnitTestClangParsing : UnitTestBase
         switch (cursor.Kind)
         {
             case CXCursorKind.CXCursor_StructDecl:
+                list.Add(cursor);
+                WriteLine($"{info}");
                 break;
             case CXCursorKind.CXCursor_TypedefDecl:
                 WriteLine($"{info} -> {cursor.TypedefDeclUnderlyingType}");
