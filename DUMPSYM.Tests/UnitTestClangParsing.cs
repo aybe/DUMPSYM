@@ -94,4 +94,35 @@ public sealed partial class UnitTestClangParsing : UnitTestBase
 
         return CXChildVisitResult.CXChildVisit_Continue;
     }
+
+    [TestMethod]
+    public void TestManyHeaders()
+    {
+        var headers = new[]
+        {
+            Headers.FS,
+            Headers.KERNEL,
+            Headers.LIBCD,
+            Headers.LIBDS,
+            Headers.LIBGPU,
+            Headers.LIBGS,
+            Headers.LIBGTE,
+            Headers.LIBHMD,
+            Headers.LIBMCRD,
+            Headers.LIBPRESS,
+            Headers.LIBSND,
+            Headers.LIBSPU,
+            Headers.MCGUI,
+            Headers.SETJMP,
+            Headers.STDARG,
+            Headers.STDDEF,
+            Headers.TYPES
+        };
+
+        var sort = Sorting.TryGetTopologicalSort(headers, s => s, out var result);
+
+        Assert.IsTrue(sort);
+
+        result.ForEach(WriteLine);
+    }
 }
