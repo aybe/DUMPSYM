@@ -22,9 +22,10 @@ public sealed partial class UnitTestClangParsing : UnitTestBase
         var args = new List<string>
         {
             "-I", SdkDirInclude,
-            "-D", "LANGUAGE_C", // KERNEL.H // BUG these have no typedefs
-            "-D", "_SIZE_T",    // typedef redefinition with different types ('unsigned int' vs 'unsigned long long'): Line 69, Column 22 in SYS/TYPES.H
-            "-D", "_WCHAR_T"    // 'long wchar_t' is invalid: Line 19, Column 18 in STDDEF.H
+            "-D", "LANGUAGE_C",             // KERNEL.H // BUG these have no typedefs
+            "-D", "_SIZE_T",                // typedef redefinition with different types ('unsigned int' vs 'unsigned long long'): Line 69, Column 22 in SYS/TYPES.H
+            "-D", "_WCHAR_T",               // 'long wchar_t' is invalid: Line 19, Column 18 in STDDEF.H
+            "-Wno-nonportable-include-path" // KERNEL.H
         };
 
         var sort = Sorting.TryGetTopologicalSort(header, s => s, out var result);
