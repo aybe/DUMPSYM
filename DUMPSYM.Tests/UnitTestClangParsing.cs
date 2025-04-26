@@ -9,20 +9,17 @@ namespace DUMPSYM.Tests;
 [SuppressMessage("ReSharper", "StringLiteralTypo")]
 [SuppressMessage("ReSharper", "CommentTypo")]
 [SuppressMessage("ReSharper", "GrammarMistakeInComment")]
-public sealed partial class UnitTestClangParsing : UnitTestBase
+public sealed partial class UnitTestClangParsing
 {
-    private static string SdkDir { get; } = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7";
-
-    private static string SdkDirInclude { get; } = Path.Combine(SdkDir, "INCLUDE");
+    private static string SdkDir { get; } = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7\INCLUDE";
 
     private unsafe void Test(Header header)
-        // KERNEL.H // BUG these have no typedefs
     {
         using var index = CXIndex.Create();
 
         var args = new List<string>
         {
-            "-I", SdkDirInclude,
+            "-I", SdkDir,
             "-D", "_SIZE_T",                // typedef redefinition with different types ('unsigned int' vs 'unsigned long long'): Line 69, Column 22 in SYS/TYPES.H
             "-D", "_WCHAR_T",               // 'long wchar_t' is invalid: Line 19, Column 18 in STDDEF.H
             "-Wno-nonportable-include-path" // KERNEL.H
@@ -43,7 +40,7 @@ public sealed partial class UnitTestClangParsing : UnitTestBase
 
         var cursors = new List<CXCursor>();
 
-        var sourceFileName = Path.Combine(SdkDirInclude, header.Path);
+        var sourceFileName = Path.Combine(SdkDir, header.Path);
 
         using (var unit = CXTranslationUnit.Parse(index, sourceFileName, CollectionsMarshal.AsSpan(args), [], CXTranslationUnit_Flags.CXTranslationUnit_None))
         {
