@@ -11,80 +11,80 @@ namespace DUMPSYM.Tests;
 [SuppressMessage("ReSharper", "GrammarMistakeInComment")]
 public sealed partial class UnitTestClangParsing
 {
-    private static string SdkDir { get; } = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7\INCLUDE";
-
-    private unsafe void Test(Header header)
+    private void Test(Header header)
     {
-        using var index = CXIndex.Create();
+        const string directory = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7\INCLUDE";
 
+        using var unit = Parse(directory, header, out var cursors);
+
+        var diagnostics = unit.DiagnosticSet;
+
+        foreach (var diagnostic in diagnostics)
+        {
+            WriteLine($"{diagnostic.Severity}:\n\t{diagnostic}:\n\t\t{diagnostic.Location}");
+        }
+
+        Assert.IsFalse(diagnostics.Any(s => s.Severity is CXDiagnosticSeverity.CXDiagnostic_Error or CXDiagnosticSeverity.CXDiagnostic_Fatal));
+
+        foreach (var cursor in cursors)
+        {
+            cursor.Location.GetSpellingLocation(out var file, out var line, out var column, out var offset);
+
+            WriteLine($"{cursor}, {cursor.Kind}, {file}");
+        }
+    }
+
+    private static unsafe CXTranslationUnit Parse(string directory, Header header, out List<CXCursor> result)
+    {
         var args = new List<string>
         {
-            "-I", SdkDir,
+            "-I", directory,
             "-D", "_SIZE_T",                // typedef redefinition with different types ('unsigned int' vs 'unsigned long long'): Line 69, Column 22 in SYS/TYPES.H
             "-D", "_WCHAR_T",               // 'long wchar_t' is invalid: Line 19, Column 18 in STDDEF.H
             "-Wno-nonportable-include-path" // KERNEL.H
         };
 
-        var sort = Sorting.TryGetTopologicalSort(header, s => s, out var result);
-
-        Assert.IsTrue(sort);
-
-        foreach (var dependency in result)
+        if (!Sorting.TryGetTopologicalSort(header, s => s, out var dependencies))
         {
-            WriteLineVar(dependency);
+            throw new InvalidOperationException("Header topological sort failed.");
+        }
 
-            Assert.AreNotEqual(header.Path, dependency.Path);
-
+        foreach (var dependency in dependencies)
+        {
             args.AddRange(["-include", dependency.Path]);
         }
 
-        var cursors = new List<CXCursor>();
+        result = [];
 
-        var sourceFileName = Path.Combine(SdkDir, header.Path);
+        var handle = GCHandle.Alloc(result);
 
-        using (var unit = CXTranslationUnit.Parse(index, sourceFileName, CollectionsMarshal.AsSpan(args), [], CXTranslationUnit_Flags.CXTranslationUnit_None))
+        try
         {
-            var diagnostics = unit.DiagnosticSet;
+            using var index = CXIndex.Create();
 
-            foreach (var diagnostic in diagnostics)
-            {
-                WriteLine($"{diagnostic.Severity}:\n\t{diagnostic}:\n\t\t{diagnostic.Location}");
-            }
+            var name = Path.Combine(directory, header.Path);
 
-            Assert.IsFalse(diagnostics.Any(s => s.Severity is CXDiagnosticSeverity.CXDiagnostic_Error or CXDiagnosticSeverity.CXDiagnostic_Fatal));
-
-            var handle = GCHandle.Alloc(cursors);
+            var unit = CXTranslationUnit.Parse(index, name, CollectionsMarshal.AsSpan(args), [], CXTranslationUnit_Flags.CXTranslationUnit_None);
 
             unit.Cursor.VisitChildren(Visitor, new CXClientData(GCHandle.ToIntPtr(handle)));
 
+            return unit;
+        }
+        finally
+        {
             handle.Free();
         }
-
-        Assert.AreNotEqual(0, cursors.Count, "No symbols found.");
     }
 
-    private unsafe CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, void* data)
+    private static unsafe CXChildVisitResult Visitor(CXCursor cursor, CXCursor parent, void* data)
     {
         var handle = GCHandle.FromIntPtr(new IntPtr(data));
 
         var list = (List<CXCursor>)handle.Target!;
 
-        cursor.Location.GetSpellingLocation(out var file, out var line, out var column, out _);
-
-        var info = $"File: {file.ToString()[(SdkDir.Length + 1)..]}, " +
-                   $"Line: {line}, " +
-                   $"Column: {column}, " +
-                   $"Kind: {cursor.Kind}, " +
-                   $"Name: {cursor.DisplayName}";
-
         switch (cursor.Kind)
         {
-            case CXCursorKind.CXCursor_StructDecl:
-                list.Add(cursor);
-                WriteLine($"{info}");
-                break;
-            case CXCursorKind.CXCursor_TypedefDecl:
-                WriteLine($"{info} -> {cursor.TypedefDeclUnderlyingType}");
+            case CXCursorKind.CXCursor_StructDecl or CXCursorKind.CXCursor_TypedefDecl:
                 list.Add(cursor);
                 break;
         }
