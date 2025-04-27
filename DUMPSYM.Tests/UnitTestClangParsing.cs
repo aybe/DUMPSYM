@@ -13,7 +13,9 @@ public sealed partial class UnitTestClangParsing
 {
     private void Test(Header header)
     {
-        const string directory = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7\INCLUDE";
+        string directory;
+        directory = @"C:\Temp\PSX SDKs\extracted\PsyQ_Runtime_Library_4.7\INCLUDE";
+        directory = @"C:\Temp\PSX SDKs\extracted\Psy-Q_46\Psy-Q - 46\INCLUDE";
 
         using var unit = Parse(directory, header, out var cursors);
 
@@ -26,23 +28,34 @@ public sealed partial class UnitTestClangParsing
 
         Assert.IsFalse(diagnostics.Any(s => s.Severity is CXDiagnosticSeverity.CXDiagnostic_Error or CXDiagnosticSeverity.CXDiagnostic_Fatal));
 
+        foreach (var kind in cursors.Select(s => s.Kind).Distinct())
+        {
+            WriteLine(kind);
+        }
+
         foreach (var cursor in cursors)
         {
-            cursor.Location.GetSpellingLocation(out var file, out var line, out var column, out var offset);
+            if (cursor.Kind is CXCursorKind.CXCursor_LinkageSpec)
+            {
+                continue;
+            }
 
-            WriteLine($"{cursor}, {cursor.Kind}, {file}");
+            cursor.Location.GetSpellingLocation(out var file, out var line, out var column, out var offset);
+            var headerPath = Path.GetFullPath(Path.Combine(directory, header.Path));
+            var filePath = Path.GetFullPath(file.ToString());
+            var isHeader = string.Equals(headerPath, filePath, StringComparison.OrdinalIgnoreCase);
+            Assert.AreEqual(unit, cursor.TranslationUnit);
+
+            if (isHeader)
+            {
+                WriteLine($"{cursor}, {cursor.Kind}, {Path.GetFileName(file.ToString())}:{line}");
+            }
         }
     }
 
     private static unsafe CXTranslationUnit Parse(string directory, Header header, out List<CXCursor> result)
     {
-        var args = new List<string>
-        {
-            "-I", directory,
-            "-D", "_SIZE_T",                // typedef redefinition with different types ('unsigned int' vs 'unsigned long long'): Line 69, Column 22 in SYS/TYPES.H
-            "-D", "_WCHAR_T",               // 'long wchar_t' is invalid: Line 19, Column 18 in STDDEF.H
-            "-Wno-nonportable-include-path" // KERNEL.H
-        };
+        var args = UnitTestClangParsing2.GetDefaultArguments(directory);
 
         if (!Sorting.TryGetTopologicalSort(header, s => s, out var dependencies))
         {
@@ -82,14 +95,13 @@ public sealed partial class UnitTestClangParsing
 
         var list = (List<CXCursor>)handle.Target!;
 
-        switch (cursor.Kind)
-        {
-            case CXCursorKind.CXCursor_StructDecl or CXCursorKind.CXCursor_TypedefDecl:
-                list.Add(cursor);
-                break;
-        }
+        list.Add(cursor);
 
-        return CXChildVisitResult.CXChildVisit_Continue;
+        return cursor.Kind switch
+        {
+            CXCursorKind.CXCursor_LinkageSpec => CXChildVisitResult.CXChildVisit_Recurse,
+            _                                 => CXChildVisitResult.CXChildVisit_Continue,
+        };
     }
 
     [TestMethod]
@@ -113,7 +125,7 @@ public sealed partial class UnitTestClangParsing
             Headers.SETJMP,
             Headers.STDARG,
             Headers.STDDEF,
-            Headers.TYPES
+            Headers.TYPES,
         };
 
         var sort = Sorting.TryGetTopologicalSort(headers, s => s, out var result);
