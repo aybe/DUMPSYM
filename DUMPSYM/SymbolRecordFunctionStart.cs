@@ -1,7 +1,7 @@
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordFunctionStart : SymbolRecord, ISymbolFunction
+public sealed record SymbolRecordFunctionStart : SymbolRecord, ISymbolFunction
 {
     public SymbolRecordFunctionStart()
     {

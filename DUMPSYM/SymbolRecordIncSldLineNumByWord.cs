@@ -1,7 +1,7 @@
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLineModifier
+public sealed record SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLineModifier
 {
     public SymbolRecordIncSldLineNumByWord()
     {

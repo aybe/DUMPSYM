@@ -1,7 +1,7 @@
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordSetSldLineNum : SymbolRecord, ISymbolLineModifier
+public sealed record SymbolRecordSetSldLineNum : SymbolRecord, ISymbolLineModifier
 {
     public SymbolRecordSetSldLineNum()
     {

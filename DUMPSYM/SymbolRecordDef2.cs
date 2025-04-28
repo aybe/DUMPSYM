@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2, IEquatable<SymbolRecordDef2>
+[NoReorder]
+public sealed record SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
 {
     public SymbolRecordDef2()
     {
@@ -29,6 +31,18 @@ public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2, IEquata
         Name = context.ReadStringAscii();
     }
 
+    public SymbolStorageClass Class { get; set; }
+
+    public SymbolType Type { get; set; }
+
+    public uint Size { get; set; }
+
+    public uint[] Dimensions { get; set; } = null!;
+
+    public string Tag { get; set; } = null!;
+
+    public string Name { get; set; } = null!;
+
     public bool Equals(SymbolRecordDef2? other)
     {
         if (other is null)
@@ -42,23 +56,6 @@ public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2, IEquata
         }
 
         return Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Dimensions.SequenceEqual(other.Dimensions) && Tag == other.Tag && Name == other.Name;
-    }
-
-    public SymbolStorageClass Class { get; set; }
-
-    public SymbolType Type { get; set; }
-
-    public uint Size { get; set; }
-
-    public uint[] Dimensions { get; set; } = null!;
-
-    public string Tag { get; set; } = null!;
-
-    public string Name { get; set; } = null!;
-
-    public override bool Equals(object? obj)
-    {
-        return ReferenceEquals(this, obj) || (obj is SymbolRecordDef2 other && Equals(other));
     }
 
     [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]

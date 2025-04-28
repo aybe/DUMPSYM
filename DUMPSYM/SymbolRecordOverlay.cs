@@ -1,7 +1,7 @@
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordOverlay : SymbolRecord, ISymbolOverlay
+public sealed record SymbolRecordOverlay : SymbolRecord, ISymbolOverlay
 {
     public SymbolRecordOverlay()
     {

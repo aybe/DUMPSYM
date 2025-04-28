@@ -5,7 +5,7 @@ namespace DUMPSYM;
 
 [Serializable]
 [NoReorder]
-public sealed class SymbolRecordDef : SymbolRecord, ISymbolDefinition, IEquatable<SymbolRecordDef>
+public sealed record SymbolRecordDef : SymbolRecord, ISymbolDefinition
 {
     public SymbolRecordDef()
     {
@@ -34,32 +34,6 @@ public sealed class SymbolRecordDef : SymbolRecord, ISymbolDefinition, IEquatabl
     public uint Size { get; set; }
 
     public string Name { get; set; } = null!;
-
-    public bool Equals(SymbolRecordDef? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Name == other.Name;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return ReferenceEquals(this, obj) || (obj is SymbolRecordDef other && Equals(other));
-    }
-
-    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Class, Type, Size, Name);
-    }
 
     public override string ToString()
     {
