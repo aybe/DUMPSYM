@@ -177,7 +177,9 @@ public static class SymbolParserUtility
         {
             using var writer = GetWriter();
 
-            writer.Write($"{GetString(def.Class)} {SymbolRegistry.GetSafeName(def.Name)}".PadRight(GetPadding(writer))); // TODO parse typedef
+            var typeName = SymbolRegistry.GetSafeName(def.Name);
+
+            writer.Write($"{GetString(def.Class)} {typeName}".PadRight(GetPadding(writer))); // TODO parse typedef
 
             writer.Write($"// {node.Value}");
 
@@ -206,7 +208,14 @@ public static class SymbolParserUtility
 
                     var dimensions = GetMemberDimensions(memberDef);
 
-                    var text = $"{name}{pointers} {memberDef.Name}{dimensions};";
+                    var memberName = memberDef.Name;
+
+                    if (memberName == typeName)
+                    {
+                        memberName = $"{memberName}_";
+                    }
+
+                    var text = $"{name}{pointers} {memberName}{dimensions};";
 
                     writer.WriteLine($"{text.PadRight(GetPadding(writer))}// {memberSymbol}");
                 }
