@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
+public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2, IEquatable<SymbolRecordDef2>
 {
     public SymbolRecordDef2()
     {
@@ -27,6 +29,21 @@ public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
         Name = context.ReadStringAscii();
     }
 
+    public bool Equals(SymbolRecordDef2? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Dimensions.SequenceEqual(other.Dimensions) && Tag == other.Tag && Name == other.Name;
+    }
+
     public SymbolStorageClass Class { get; set; }
 
     public SymbolType Type { get; set; }
@@ -38,6 +55,17 @@ public sealed class SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
     public string Tag { get; set; } = null!;
 
     public string Name { get; set; } = null!;
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || (obj is SymbolRecordDef2 other && Equals(other));
+    }
+
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Class, Type, Size, Dimensions.Length, Dimensions.Aggregate(0, HashCode.Combine), Tag, Name);
+    }
 
     private static uint[] ReadDimensions(SymbolContext context)
     {
