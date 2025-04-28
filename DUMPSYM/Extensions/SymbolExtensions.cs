@@ -7,6 +7,11 @@ public static class SymbolExtensions // TODO move
 {
     #region Is*
 
+    public static bool IsLineModifier(this ISymbol symbol)
+    {
+        return symbol is ISymbolLineModifier;
+    }
+
     public static bool IsExternal(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.EXT };
@@ -27,6 +32,18 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT };
     }
 
+    public static bool IsType(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
+    {
+        result = null;
+
+        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG } def)
+        {
+            result = def;
+        }
+
+        return result != null;
+    }
+
     public static bool IsType(this ISymbol symbol, Predicate<ISymbolDefinition> predicate, [MaybeNullWhen(false)] out ISymbolDefinition result)
     {
         result = null;
@@ -42,6 +59,30 @@ public static class SymbolExtensions // TODO move
     public static bool IsTypedef(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF };
+    }
+
+    public static bool IsTypedef(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
+    {
+        result = null;
+
+        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def)
+        {
+            result = def;
+        }
+
+        return result != null;
+    }
+
+    public static bool IsTypedef2(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition2 result)
+    {
+        result = null;
+
+        if (symbol is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF } def)
+        {
+            result = def;
+        }
+
+        return result != null;
     }
 
     public static bool IsTypedef(this ISymbol symbol, Predicate<ISymbolDefinition> predicate)
@@ -141,6 +182,18 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolFileStart;
     }
 
+    public static bool IsFileHeader(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolFileStart result)
+    {
+        result = null;
+
+        if (symbol is ISymbolFileStart start)
+        {
+            result = start;
+        }
+
+        return result != null;
+    }
+
     public static bool IsFileFooter(this ISymbol symbol)
     {
         return symbol is ISymbolFileEnd;
@@ -166,9 +219,15 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.UNTAG, Type.Kind: SymbolTypeKind.UNION };
     }
 
+    [Obsolete("Use overload with type parameter.")]
     public static bool IsTypeFooter(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" };
+    }
+
+    public static bool IsTypeFooter(this ISymbol symbol, ISymbolDefinition type)
+    {
+        return symbol is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def && def.Tag == type.Name;
     }
 
     #endregion

@@ -1,4 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿// #define LOG
+
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Tests;
@@ -15,8 +19,8 @@ public sealed class UnitTestXYZ : UnitTestBase
         // this doesn't solve the problem of where a variable is initially declared...
 
         const bool removeExternals = true;
-        const bool removeFiles = true;
-        const bool removeFilesEndings = true;
+        const bool removeFiles = false;
+        const bool removeFilesEndings = false;
         const bool removeFunctions = true;
         const bool removeNames = true;
         const bool removeStatics = true;
@@ -38,6 +42,14 @@ public sealed class UnitTestXYZ : UnitTestBase
 
         Remove(s => s.First().Record.IsStatic(), removeStatics, "Removing statics...");
 
+        const bool fixFakesBefore = true;
+
+        if (fixFakesBefore)
+        {
+            WriteLine("Fixing fakes...");
+            FixFakes(split);
+        }
+
         WriteLine("Grouping symbols...");
 
         var groups = split.ToLookup(s => s[0].Record, s => s).ToArray();
@@ -45,6 +57,14 @@ public sealed class UnitTestXYZ : UnitTestBase
         WriteLineVar(groups.Length);
 
         Assert.AreNotEqual(split.Count, groups.Length);
+
+        if (!fixFakesBefore)
+        {
+            WriteLine("Fixing fakes...");
+            var symbolsList = groups.SelectMany(s => s).ToList();
+            symbolsList = groups.Select(s => s.First()).ToList();
+            FixFakes(symbolsList);
+        }
 
         if (removeDuplicateGroups)
         {
@@ -63,6 +83,8 @@ public sealed class UnitTestXYZ : UnitTestBase
         }
 
         WriteLine($"{groups.Length} groups remaining:");
+
+        // Console.WriteLine(string.Join("\n", groups.Select(s => s.Key.ToString())));
 
         using var writer = new StringWriter();
 
@@ -89,7 +111,7 @@ public sealed class UnitTestXYZ : UnitTestBase
             sw.WriteLine("// ReSharper disable CppClangTidyClangDiagnosticReservedIdentifier");
             sw.WriteLine("// ReSharper disable CppClangTidyBugproneReservedIdentifier");
             sw.WriteLine(parse);
-            File.WriteAllText(@"C:\Files\GitHub\! PSX\DUMPSYM\Project1\test.cpp", sw.ToString());
+            //File.WriteAllText(@"C:\Files\GitHub\! PSX\DUMPSYM\Project1\test.cpp", sw.ToString());
         }
         return;
 
@@ -139,6 +161,74 @@ public sealed class UnitTestXYZ : UnitTestBase
             }
 
             return true;
+        }
+    }
+
+    [SuppressMessage("ReSharper", "InvertIf")]
+    [SuppressMessage("ReSharper", "CommentTypo")]
+    private static void FixFakes(List<Symbol[]> sym)
+    {
+        var regexFake = new Regex(@"^\.(\d+)fake$", RegexOptions.Compiled);
+
+        var uniques = new ConcurrentDictionary<string, int>(); // TODO maybe move inside
+
+        var files = sym.Split(s => s[0].Record is SymbolRecordSetSldToLineOfFile);
+
+        foreach (var file in files)
+        {
+            if (file[0][0].Record.IsFileHeader(out var start))
+            {
+                switch (Path.GetFileName(start.File))
+                {
+                    case "STATS.C": // BUG repeats symbols thrice
+                        break;
+                    case "THING.C": // BUG repeats symbols twice
+                        break;
+                }
+
+                Console.WriteLine(start.File);
+            }
+
+            var fakes = new Dictionary<string, string>();
+
+            var symbols = file.SelectMany(s => s).ToArray();
+
+            {
+                var end1 = Array.FindIndex(symbols, 0, s => s.Record.IsFileEnd());
+
+                Assert.AreNotEqual(-1, end1);
+
+                var end2 = Array.FindIndex(symbols, end1 + 1, s => s.Record.IsFileEnd());
+
+                if (end2 != -1)
+                {
+                    symbols = symbols[..end2];
+                }
+            }
+
+            for (var i = 0; i < symbols.Length; i++)
+            {
+                var header = symbols[i].Record;
+
+                if (header.IsType(out var type))
+                {
+                    var key = type.Name;
+
+                    if (regexFake.IsMatch(key))
+                    {
+                        fakes.Add(key, ""); // TODO delete when STATS/THING fixed
+                        var def = default(ISymbolDefinition2);
+                        var idx = Array.FindIndex(symbols, i, s => s.Record.IsTypedef2(out def) && def.Tag == key);
+
+                        var real = idx == -1 ? $"_{key[1..]}_{uniques.AddOrUpdate(key, 0, (_, t) => ++t)}" : def!.Name;
+                        Console.WriteLine($"{idx}, {real}, {type}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"0, {key}, {type}");
+                    }
+                }
+            }
         }
     }
 }

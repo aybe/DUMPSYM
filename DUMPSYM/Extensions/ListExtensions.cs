@@ -23,6 +23,11 @@ public static class ListExtensions
                 lists.Add([]);
             }
 
+            if (lists.Count == 0)
+            {
+                lists.Add([]);
+            }
+
             lists[^1].Add(item);
         }
 

@@ -8,7 +8,7 @@ namespace DUMPSYM.Tests;
 
 public static class SymbolParserUtility
 {
-    private const int Padding = 55;
+    private const int Padding = 60;
 
     public static string Parse(List<Symbol> symbols)
     {
@@ -178,6 +178,27 @@ public static class SymbolParserUtility
             using var writer = GetWriter();
 
             var typeName = SymbolRegistry.GetSafeName(def.Name);
+            if (node.Value.ToString() == "001306: $00000000 94 Def class STRTAG type STRUCT size 88 name .8fake")
+            {
+                
+            }
+            if (SymbolRegistry.HasFakeName(def.Name))
+            {
+                var realName = ((ISymbolDefinition2)node.List!.Last!.Value.Record).Name;
+
+                var b = false;
+
+                if (b)
+                {
+                    // BUG this isn't working as it changes struct name but its uses don't pick it up
+                    typeName += $"_{realName}";
+                }
+                else
+                {
+                    // BUG this is better but usages show incomplete type
+                    typeName = realName;
+                }
+            }
 
             writer.Write($"{GetString(def.Class)} {typeName}".PadRight(GetPadding(writer))); // TODO parse typedef
 
@@ -259,6 +280,23 @@ public static class SymbolParserUtility
 
         private static string GetMemberTypeName(LinkedListNode<Symbol> node)
         {
+            if (node.Value.Record is ISymbolDefinition2 sd2)
+            {
+                if (SymbolRegistry.HasFakeName(sd2.Tag))
+                {
+                    var tpdef = TryFind(node.List, s=>s.Record as ISymbolDefinition2, s=> s.IsTypedef2(out var temp)&& temp.Tag == sd2.Tag);
+                    if (tpdef != null)
+                    {
+                        if (tpdef.Tag == sd2.Tag)
+                        {
+                            // BUG this fails, all symbols are needed, not only what's being parsed
+                        }
+                    }
+                }
+            }
+
+            // BUG this down below is wrong, it picks the wrong types
+
             var md = (ISymbolDefinition)node.Value.Record;
 
             var mt = md.Type;
@@ -335,7 +373,7 @@ public static class SymbolParserUtility
 #if FIX_FAKE_NAME
                     if (tag.StartsWith('.'))
                     {
-                        tag = $"_{tag[1..]}";
+                        tag = $"_{tag[1..]}_{def1.Name}";
                     }
 #endif
 

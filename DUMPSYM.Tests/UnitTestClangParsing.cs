@@ -132,6 +132,9 @@ public sealed partial class UnitTestClangParsing
 
         Assert.IsTrue(sort);
 
-        result.ForEach(WriteLine);
+        foreach (var header in result)
+        {
+            WriteLine(header);
+        }
     }
 }
