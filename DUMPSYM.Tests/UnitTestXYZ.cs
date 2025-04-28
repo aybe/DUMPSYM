@@ -77,6 +77,20 @@ public sealed class UnitTestXYZ : UnitTestBase
 
         WriteLine(result);
 
+        {
+            using var sw = new StringWriter();
+            var symbols = groups.SelectMany(s => s.First()).ToList();
+            var parse = SymbolParserUtility.Parse(symbols);
+            sw.WriteLine("// TODO remove size_t");
+            sw.WriteLine("// TODO remove wchar_t");
+            sw.WriteLine("// ReSharper disable CppInconsistentNaming");
+            sw.WriteLine("// ReSharper disable CommentTypo");
+            sw.WriteLine("// ReSharper disable IdentifierTypo");
+            sw.WriteLine("// ReSharper disable CppClangTidyClangDiagnosticReservedIdentifier");
+            sw.WriteLine("// ReSharper disable CppClangTidyBugproneReservedIdentifier");
+            sw.WriteLine(parse);
+            File.WriteAllText(@"C:\Files\GitHub\! PSX\DUMPSYM\Project1\test.cpp", sw.ToString());
+        }
         return;
 
         void Remove(Predicate<Symbol[]> predicate, bool condition, object? message)
