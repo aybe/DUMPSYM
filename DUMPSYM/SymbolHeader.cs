@@ -3,7 +3,7 @@ using Whatever.Extensions;
 namespace DUMPSYM;
 
 [Serializable]
-public struct SymbolHeader
+public record struct SymbolHeader
 {
     public SymbolHeader()
     {
@@ -21,6 +21,12 @@ public struct SymbolHeader
     public uint Address { get; set; }
 
     public byte Type { get; set; }
+
+    public static IComparer<SymbolHeader> AddressComparer { get; } =
+        Comparer<SymbolHeader>.Create((x, y) => x.Address.CompareTo(y.Address));
+
+    public static IComparer<SymbolHeader> PositionComparer { get; } =
+        Comparer<SymbolHeader>.Create((x, y) => x.Position.CompareTo(y.Position));
 
     public override string ToString()
     {
