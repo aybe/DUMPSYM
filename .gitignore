@@ -412,3 +412,4 @@ DUMPSYM/Properties/launchSettings.json
 *.sym.txt
 *.txt
 TestData
+Project1/**/*.cpp
