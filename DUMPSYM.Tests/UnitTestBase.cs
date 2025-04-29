@@ -14,19 +14,19 @@ public abstract class UnitTestBase // TODO move to library
         TestContext.Write(value?.ToString());
     }
 
-    [Conditional("LOG")]
+    //[Conditional("LOG")]
     protected void WriteLine(object? value = null)
     {
         TestContext.WriteLine(value?.ToString());
     }
 
-    [Conditional("LOG")]
+    //[Conditional("LOG")]
     protected void WriteLine<T>(Expression<Func<T>> expression) // T avoids Convert(...) expression
     {
         WriteLine(expression, s => s.ToString());
     }
 
-    [Conditional("LOG")]
+    //[Conditional("LOG")]
     protected void WriteLine<T>(Expression<Func<T>> expression, Func<T, object> valueGetter) // T avoids Convert(...) expression
     {
         if (expression.Body is not MemberExpression me)
@@ -45,7 +45,7 @@ public abstract class UnitTestBase // TODO move to library
         WriteLine(message);
     }
 
-    [Conditional("LOG")]
+    //[Conditional("LOG")]
     protected void WriteLineVar(object? value, [CallerArgumentExpression(nameof(value))] string valueName = null!)
     {
         WriteLine($"{valueName}: {value}");

@@ -73,6 +73,18 @@ public static class SymbolExtensions // TODO move
         return result != null;
     }
 
+    public static bool IsTypedef1(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
+    {
+        result = null;
+
+        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def and not ISymbolDefinition2)
+        {
+            result = def;
+        }
+
+        return result != null;
+    }
+
     public static bool IsTypedef2(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition2 result)
     {
         result = null;

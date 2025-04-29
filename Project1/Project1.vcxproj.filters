@@ -18,7 +18,10 @@
     <ClCompile Include="Project1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test.cpp">
+    <ClCompile Include="current.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="reference.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
