@@ -213,7 +213,7 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             name = type.Name;
         }
 
-        if (!Types.Add(name))
+        if (!Types.Add(fake && typedef == null ? $"{name}_0x{GetHashCode(node, eos):X8}" : name))
         {
             return;
         }
@@ -574,6 +574,18 @@ public sealed class UnitTestXYZ456 : UnitTestBase
 #endif
 
         Writer.WriteLine($"{value} // {def}");
+    }
+
+    private static int GetHashCode(LinkedListNode<ISymbol> head, LinkedListNode<ISymbol> tail)
+    {
+        var hashCode = new HashCode();
+
+        for (var n = head.Next; n != null && n != tail; n = n.Next)
+        {
+            hashCode.Add(n.Value.GetHashCode());
+        }
+
+        return hashCode.ToHashCode();
     }
 
     private static string GetSafeName(string name)
