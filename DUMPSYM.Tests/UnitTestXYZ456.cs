@@ -1,4 +1,5 @@
 ﻿// #define LOG_PARSE_TYPEDEF_2
+
 using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -238,7 +239,7 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             {
                 var member = n.Value;
 
-                var memberType = GetMemberType(n, out var undecorated /* TODO remove */);
+                var memberType = GetMemberType(n, node, out var undecorated, out var fakeType);
 
                 var memberName = ((ISymbolDefinition)member).Name;
 
@@ -339,8 +340,10 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         node = eos;
     }
 
-    private string GetMemberType(LinkedListNode<ISymbol> node, out string undecorated)
+    private string GetMemberType(LinkedListNode<ISymbol> node, LinkedListNode<ISymbol> type, out string undecorated, out LinkedListNode<ISymbol> fakeType)
     {
+        fakeType = null!;
+
         undecorated = null!; // TODO everywhere
 
         var symbol = node.Value as ISymbolDefinition ?? throw new ArgumentOutOfRangeException(nameof(node));
@@ -369,6 +372,35 @@ public sealed class UnitTestXYZ456 : UnitTestBase
                 if (RegexFakeName.IsMatch(tag))
                 {
                     var temp = default(string);
+
+                    if (symbol.ToString() == "Def2 class MOU type STRUCT size 2 dims 0 tag .109fake name WR")
+                    {
+                        // TODO delete
+                    }
+
+                    var previous = type.Previous;
+
+                    if (previous?.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } y)
+                    {
+                        if (y.Size == complex.Size && y.Dimensions.Length == complex.Dimensions.Length && y.Tag == complex.Tag)
+                        {
+                            for (var z = previous.Previous; z != null; z = z.Previous)
+                            {
+                                if (!z.Value.IsType())
+                                {
+                                    continue;
+                                }
+
+                                fakeType = z;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (fakeType != null)
+                    {
+                        WriteLineVar(fakeType.Value);
+                    }
 
                     for (var n = node; n != null; n = n.Previous)
                     {
