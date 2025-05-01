@@ -74,7 +74,7 @@ public sealed class UnitTestXYZ456 : UnitTestBase
 
         if (File.Exists(reference))
         {
-            Assert.AreEqual(File.ReadAllText(reference), value);
+            AssertLineByLine(File.ReadAllText(reference), value);
         }
         else
         {
@@ -84,6 +84,30 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         }
 
         Writer.Dispose();
+    }
+
+    private static void AssertLineByLine(string? expected, string? actual)
+    {
+        using var a = new StringReader(expected ?? string.Empty);
+
+        using var b = new StringReader(actual ?? string.Empty);
+
+        var line = 1;
+
+        while (true)
+        {
+            var x = a.ReadLine();
+            var y = b.ReadLine();
+
+            if (x == null && y == null)
+            {
+                break;
+            }
+
+            Assert.AreEqual(x, y, $"Line {line}");
+
+            line++;
+        }
     }
 
     private void Parse(LinkedList<ISymbol> symbols)
