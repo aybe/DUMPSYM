@@ -4,29 +4,19 @@ using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
 
 // ReSharper disable StringLiteralTypo
-
 // ReSharper disable IdentifierTypo
-
 // ReSharper disable GrammarMistakeInComment
-
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
-
 // ReSharper disable CommentTypo
 // ReSharper disable RedundantIfElseBlock
-// BUG spu_tab typedef has no associated structure
+
 namespace DUMPSYM.Tests;
 
 [TestClass]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public sealed partial class UnitTestXYZ456 : UnitTestBase
+public sealed class UnitTestXYZ456 : UnitTestBase
 {
-    private readonly ParseSettings Settings = new()
-    {
-        ParseTypedef1 = true,
-        ParseTypedef2 = true,
-        ParseUnknowns = false,
-        WithFakeNameSuffix = false,
-    };
+    private ParseSettings Settings { get; } = new();
 
     private static Regex RegexFakeName { get; } = new(@"^\.(\d+fake)", RegexOptions.Compiled);
 
@@ -66,7 +56,6 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
         Writer.WriteLine("    ");
         Writer.WriteLine("}");
         Writer.WriteLine("#endif /* !PSX_H */");
-
 
         var value = Writer.InnerWriter.ToString();
 
@@ -155,14 +144,6 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
 
     private void ParseType(ISymbolDefinition type, ref LinkedListNode<ISymbol> node)
     {
-        if (type.ToString() == "Def class STRTAG type STRUCT size 40 name _GsCOORDINATE")
-        {
-        }
-
-        if (type.ToString() == "Def class STRTAG type STRUCT size 140 name CameraWindow")
-        {
-        }
-
         if (!node.TryFindNode(out var eos, s => s.IsTypeFooter(type)))
         {
             throw new InvalidOperationException(); // TODO need .Find instead
@@ -178,7 +159,7 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
         {
             if (typedef != null)
             {
-                name = Settings.WithFakeNameSuffix ? $"{typedef.Name}_{type.Name[1..]}" : $"{typedef.Name}";
+                name = $"{typedef.Name}";
             }
             else
             {
@@ -199,19 +180,12 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
 
         var klass = ToString(type.Class);
 
-        if (typedef == null || Settings.GenerateTypedefStruct is false)
+        if (typedef == null)
         {
             writer.WriteLine($"{klass} {name} // {node.Value}");
         }
         else
         {
-            // BUG struct CliPt BPoints[9] type is incomplete
-            // TODO typedef struct EngineCoord should be typedef struct _95fake
-            // TODO struct CliPt BPoints[9] should be CliPt BPoints[9]
-
-            //writer.WriteLine($"{ToString(SymbolStorageClass.TPDEF)} {klass} {name} // {node.Value}");
-
-            //writer.WriteLine($"{ToString(SymbolStorageClass.TPDEF)} {klass} _{type.Name[1..]} // {node.Value}");
             writer.WriteLine($"{ToString(SymbolStorageClass.TPDEF)} {klass} // {node.Value}");
         }
 
@@ -222,10 +196,6 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
             for (var n = node.Next; n != null && n != eos; n = n.Next)
             {
                 var member = n.Value;
-
-                if (member.ToString() == "Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name super")
-                {
-                }
 
                 var memberType = GetMemberType(n, out var undecorated /* TODO remove */);
 
@@ -312,26 +282,13 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
             }
         }
 
-        if (typedef == null || Settings.GenerateTypedefStruct is false)
+        if (typedef == null)
         {
             writer.WriteLine("};");
         }
         else
         {
             writer.WriteLine($"}} {name};");
-        }
-
-        if (Settings.AddMissingTypedefs)
-        {
-            if (typedef == null)
-            {
-                if (Settings.AddEmptyLines)
-                {
-                    writer.WriteLine();
-                }
-
-                writer.WriteLine($"{ToString(SymbolStorageClass.TPDEF)} {klass} {name} {name}; // auto-generated (typedef)");
-            }
         }
 
         var format = writer.InnerWriter.ToString();
@@ -345,15 +302,7 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
     {
         undecorated = null!; // TODO everywhere
 
-        // BUG short m[3][3]; // should be SWORD m[3][3] // Def2 class MOS type ARY ARY SHORT size 18 dims 2 3 3 tag  name m
-        // BUG add pointers everywhere
-        // BUG ColVect.Pos1 type is "" // Def2 class MOS type STRUCT size 6 dims 0 tag .91fake name Pos1
         var symbol = node.Value as ISymbolDefinition ?? throw new ArgumentOutOfRangeException(nameof(node));
-
-        if (symbol.ToString() == "Def2 class MOU type STRUCT size 2 dims 0 tag .109fake name WR")
-        {
-            var i = 0;
-        }
 
         Assert.IsTrue(symbol.Class is SymbolStorageClass.MOS or SymbolStorageClass.MOU or SymbolStorageClass.FIELD, symbol.Class.ToString()); // TODO FIELD
 
@@ -463,11 +412,6 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
 
     private void ParseTypedef1(ISymbolDefinition def)
     {
-        if (!Settings.ParseTypedef1)
-        {
-            return;
-        }
-
         if (!Typedefs1.Add(def))
         {
             return;
@@ -499,35 +443,16 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
 
     private void ParseTypedef2(ISymbolDefinition2 def, LinkedListNode<ISymbol> node)
     {
-        if (def.ToString() == "Def2 class TPDEF type STRUCT size 3 dims 0 tag .109fake name Palette")
-        {
-        }
-
-        if (def.ToString() == "Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name CliPt")
-        {
-        }
-
-        if (!Settings.ParseTypedef2)
-        {
-            return;
-        }
-
         if (!Typedefs2.Add(def))
         {
             return;
         }
 
-        if (Settings.GenerateTypedefStruct)
+        if (node.Previous!.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } def2)
         {
-            if (def.Name == def.Name)
+            if (def2.Tag == def.Tag)
             {
-                if (node.Previous!.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } d)
-                {
-                    if (d.Tag == def.Tag)
-                    {
-                        return; // don't generate 'typedef', struct will be 'typedef struct' instead
-                    }
-                }
+                return; // don't generate 'typedef', struct will be 'typedef struct' instead
             }
         }
 
@@ -537,40 +462,33 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
 
         var kind = ToString(def.Type.Kind);
 
-        var tag = Settings.WithFakeNameSuffix ? RegexFakeName.Replace(def.Tag, $"{def.Name}_$1") : def.Name;
-
         var pointers = new string('*', mods.Count(s => s is SymbolTypeModifier.PTR));
 
         var fake = RegexFakeName.IsMatch(def.Tag);
 
-        var value = $"{ToString(def.Class)} {kind} {(fake ? tag : def.Tag)}{pointers} {def.Name}; // {def}";
-
-
-        // TODO search upstream for a typedef with same tag, if any, use its name instead of def.tag
-
-        string newTag = null;
+        var tag = default(string);
 
         for (var n = node.Previous; n != null; n = n.Previous)
         {
-            if (n.Value is ISymbolDefinition2 d)
+            if (n.Value is not ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF, Type.Kind: SymbolTypeKind.STRUCT } d)
             {
-                if (d.Class is SymbolStorageClass.TPDEF)
-                {
-                    if (d.Type.Kind is SymbolTypeKind.STRUCT)
-                    {
-                        if (d.Tag == def.Tag)
-                        {
-                            newTag = d.Name;
-                            break;
-                        }
-                    }
-                }
+                continue;
             }
+
+            if (d.Tag != def.Tag)
+            {
+                continue;
+            }
+
+            tag = d.Name;
+            break;
         }
 
-        if (newTag != null)
+        string value;
+
+        if (tag != null)
         {
-            value = $"{ToString(def.Class)} {newTag}{pointers} {def.Name}; // {def}";
+            value = $"{ToString(def.Class)} {tag}{pointers} {def.Name}; // {def}";
         }
         else
         {
@@ -579,11 +497,7 @@ public sealed partial class UnitTestXYZ456 : UnitTestBase
 
         Writer.WriteLine(value);
     }
-}
 
-[SuppressMessage("ReSharper", "InconsistentNaming")]
-public sealed partial class UnitTestXYZ456
-{
     private static string ToString(SymbolStorageClass value)
     {
         return value switch // TODO reuse for typedef and others
@@ -625,21 +539,10 @@ public sealed partial class UnitTestXYZ456
     }
 
     [SuppressMessage("ReSharper", "RedundantDefaultMemberInitializer")]
-    private record ParseSettings
+    private record struct ParseSettings()
     {
-        public bool ParseTypedef1 { get; init; } = true;
+        public bool ParseUnknowns { get; } = false; // TODO parse remaining unknowns
 
-        public bool ParseTypedef2 { get; init; } = true;
-
-        public bool ParseUnknowns { get; init; } = false;
-
-        [Obsolete("Either remove or do typedef struct...")] // TODO
-        public bool AddMissingTypedefs { get; } = false;
-
-        public bool WithFakeNameSuffix { get; init; } = false;
-
-        public bool AddEmptyLines { get; } = false; // BUG adds too many atm
-
-        public bool GenerateTypedefStruct { get; } = true;
+        public bool AddEmptyLines { get; } = false; // BUG adds too many atm because of ParseUnknowns
     }
 }
