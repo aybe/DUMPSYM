@@ -19,11 +19,11 @@ public sealed class UnitTestXYZ456 : UnitTestBase
 {
     private ParseSettings Settings { get; } = new();
 
-    private static Regex RegexFakeName { get; } = new(@"^\.(\d+fake)", RegexOptions.Compiled);
+    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private IndentedTextWriter Writer { get; } = GetWriter();
 
-    private ImmutableList<ISymbolDefinition> Typedefs { get; set; }
+    private ImmutableList<ISymbolDefinition> Typedefs { get; set; } = null!;
 
     private HashSet<ISymbolDefinition> Typedefs1 { get; } = [];
 
@@ -453,23 +453,10 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             return;
         }
 
-        if (node.Previous!.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } def2)
+        if (node.Previous!.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } type && type.Tag == def.Tag)
         {
-            if (def2.Tag == def.Tag)
-            {
-                return; // don't generate 'typedef', struct will be 'typedef struct' instead
-            }
+            return; // don't generate, associated struct becomes typedef struct
         }
-
-        var mods = def.Type.Modifiers.ToArray();
-
-        Assert.AreEqual(0, mods.Count(s => s is SymbolTypeModifier.FCN));
-
-        var kind = ToString(def.Type.Kind);
-
-        var pointers = new string('*', mods.Count(s => s is SymbolTypeModifier.PTR));
-
-        var fake = RegexFakeName.IsMatch(def.Tag);
 
         var tag = default(string);
 
@@ -487,20 +474,49 @@ public sealed class UnitTestXYZ456 : UnitTestBase
 
             tag = d.Name;
             break;
+
+            // structs become typedef struct with consequences:
+            //
+            //     Def class STRTAG type STRUCT size 16 name .95fake
+            //     Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name EngineCoord
+            //     Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name CliPt
+            //
+            // result:
+            //
+            //     typedef struct EngineCoord { .95fake content };
+            //     typedef struct .95fake CliPt; // C2079 on usage
+            //
+            // fix:
+            //
+            //     typedef EngineCoord CliPt;
         }
 
         string value;
 
+        var modifiers = def.Type.Modifiers.ToArray();
+
+        if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
+        {
+            throw new InvalidOperationException($"Typedef shouldn't have {SymbolTypeModifier.FCN} modifier(s):\n{def}");
+        }
+
+        var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
         if (tag != null)
         {
-            value = $"{ToString(def.Class)} {tag}{pointers} {def.Name}; // {def}";
+            value = $"{ToString(def.Class)} {tag}{pointers} {def.Name};";
         }
         else
         {
-            value = $"{ToString(def.Class)} {kind} {(fake ? $"_{def.Tag[1..]}" : def.Tag)}{pointers} {def.Name}; // {def}";
+            value = $"{ToString(def.Class)} {ToString(def.Type.Kind)} {GetSafeName(def.Tag)}{pointers} {def.Name};";
         }
 
-        Writer.WriteLine(value);
+        Writer.WriteLine($"{value} // {def}");
+    }
+
+    private static string GetSafeName(string name)
+    {
+        return RegexFakeName.IsMatch(name) ? $"_{name[1..]}" : name;
     }
 
     private static string ToString(SymbolStorageClass value)
