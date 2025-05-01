@@ -96,6 +96,12 @@ public static class LinkedListExtensions
     public static bool TryFindNode<T>(
         this LinkedListNode<T> node, [MaybeNullWhen(false)] out LinkedListNode<T> result, Func<T, bool> predicate)
     {
+        return node.TryFindNode(s => s.Next, out result, predicate);
+    }
+
+    public static bool TryFindNode<T>(
+        this LinkedListNode<T> node, Func<LinkedListNode<T>, LinkedListNode<T>?> next, [MaybeNullWhen(false)] out LinkedListNode<T> result, Func<T, bool> predicate)
+    {
         result = default;
 
         var current = node;
@@ -109,7 +115,38 @@ public static class LinkedListExtensions
                 return true;
             }
 
-            current = current.Next;
+            current = next(current);
+        }
+
+        return false;
+    }
+
+    public static bool TryFind<TNode, TItem>(
+        this LinkedListNode<TNode> source,
+        Func<LinkedListNode<TNode>, LinkedListNode<TNode>?> next,
+        Func<TNode, TItem> selector,
+        Func<TItem, bool> predicate,
+        [MaybeNullWhen(false)] out TItem item,
+        [MaybeNullWhen(false)] out LinkedListNode<TNode> node)
+    {
+        item = default;
+        node = default;
+
+        var current = source;
+
+        while (current != null)
+        {
+            var data = selector(current.Value);
+
+            if (predicate(data))
+            {
+                item = data;
+                node = current;
+
+                return true;
+            }
+
+            current = next(current);
         }
 
         return false;
