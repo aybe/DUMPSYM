@@ -32,6 +32,11 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT };
     }
 
+    public static bool IsType(this ISymbol symbol)
+    {
+        return IsType(symbol, out _);
+    }
+
     public static bool IsType(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
     {
         result = null;
