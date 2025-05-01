@@ -117,7 +117,7 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         {
             var symbol = n.Value;
 
-            if (Ignore(symbol))
+            if (Ignore(symbol, ref n))
             {
                 continue;
             }
@@ -133,8 +133,17 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         return;
 
         [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
-        static bool Ignore(ISymbol symbol)
+        static bool Ignore(ISymbol symbol, ref LinkedListNode<ISymbol> node)
         {
+            if (symbol is ISymbolFunction) // TODO parse functions
+            {
+                var b = node.TryFindNode(out var result, s => s.IsFunctionFooter());
+                Assert.IsTrue(b);
+                Assert.IsNotNull(result);
+                node = result;
+                return true;
+            }
+
             switch (symbol)
             {
                 case ISymbolFileStart:
