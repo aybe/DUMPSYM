@@ -526,11 +526,18 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             throw new ArgumentOutOfRangeException(nameof(node), node, null);
         }
 
+        // BUG Palette is resolved as MinMax
+
         for (var n = node.Previous; n != null; n = n.Previous)
         {
             if (n.Value is not ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF, Type.Kind: SymbolTypeKind.STRUCT } d)
             {
                 continue;
+            }
+
+            if (d.Tag == d.Name)
+            {
+                continue; // Def2 class TPDEF type STRUCT size 8 dims 0 tag Sprite name Sprite // BUG adds struct to typedef
             }
 
             if (d.Tag == def.Tag)
