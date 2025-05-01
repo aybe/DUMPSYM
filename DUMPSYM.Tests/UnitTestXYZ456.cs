@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
@@ -21,6 +22,8 @@ public sealed class UnitTestXYZ456 : UnitTestBase
     private static Regex RegexFakeName { get; } = new(@"^\.(\d+fake)", RegexOptions.Compiled);
 
     private IndentedTextWriter Writer { get; } = GetWriter();
+
+    private ImmutableList<ISymbolDefinition> Typedefs { get; set; }
 
     private HashSet<ISymbolDefinition> Typedefs1 { get; } = [];
 
@@ -47,7 +50,11 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         Writer.WriteLine("// ReSharper disable GrammarMistakeInComment");
         Writer.WriteLine("#pragma warning(push, 4)");
 
-        Parse([.. Sample.Default.Symbols.Select(s => s.Record)]);
+        var symbols = Sample.Default.Symbols.Select(s => s.Record).Cast<ISymbol>().ToArray();
+
+        Typedefs = symbols.Where(s => s.IsTypedef()).Cast<ISymbolDefinition>().ToImmutableList();
+
+        Parse([.. symbols]);
 
         Writer.WriteLine("#pragma warning(pop)");
         Writer.WriteLine();
@@ -311,8 +318,6 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             return value;
         }
 
-        var typedefs = node.List!.Where(s => s.IsTypedef()).Cast<ISymbolDefinition>().ToArray();
-
         var pointers = new string('*', symbol.Type.Modifiers.Count(s => s is SymbolTypeModifier.PTR));
 
         if (symbol is ISymbolDefinition2 complex)
@@ -387,7 +392,7 @@ public sealed class UnitTestXYZ456 : UnitTestBase
 
         // #1 same by type // BUG 'Def class MOS type PTR PTR VOID size 0 name Start' = SpuIRQCallbackProc
 
-        var def1 = typedefs.FirstOrDefault(s => s.Type == symbol.Type);
+        var def1 = Typedefs.FirstOrDefault(s => s.Type == symbol.Type);
 
         if (def1 != null)
         {
@@ -396,7 +401,7 @@ public sealed class UnitTestXYZ456 : UnitTestBase
 
         // #2 same by kind
 
-        var def2 = typedefs.FirstOrDefault(s => s.Type.Kind == symbol.Type.Kind && !s.Type.Modifiers.Any());
+        var def2 = Typedefs.FirstOrDefault(s => s.Type.Kind == symbol.Type.Kind && !s.Type.Modifiers.Any());
 
         if (def2 != null)
         {
