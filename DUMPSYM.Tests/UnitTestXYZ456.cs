@@ -511,7 +511,29 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         }
         else
         {
-            value = $"{ToString(def.Class)} {ToString(def.Type.Kind)} {GetSafeName(def.Tag)}{pointers} {def.Name};";
+            // add struct only if really necessary:
+            // Def2 class TPDEF type STRUCT size 8 dims 0 tag Sprite name Sprite
+            // Def2 class TPDEF type PTR STRUCT size 8 dims 0 tag Sprite name SpritePtr -> useless, sprite has typedef
+
+            var kind = true;
+
+            for (var n = node.Previous; n != null; n = n.Previous)
+            {
+                if (n.Value is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF, Type.Kind: SymbolTypeKind.STRUCT or SymbolTypeKind.UNION } e && e.Name == def.Tag)
+                {
+                    kind = false;
+                    break;
+                }
+            }
+
+            if (kind)
+            {
+                value = $"{ToString(def.Class)} {ToString(def.Type.Kind)} {GetSafeName(def.Tag)}{pointers} {def.Name};";
+            }
+            else
+            {
+                value = $"{ToString(def.Class)} {GetSafeName(def.Tag)}{pointers} {def.Name};";
+            }
         }
 
 #if LOG_PARSE_TYPEDEF_2
