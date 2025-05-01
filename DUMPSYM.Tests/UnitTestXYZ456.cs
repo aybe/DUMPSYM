@@ -1,4 +1,4 @@
-﻿#define LOG_PARSE_TYPEDEF_2
+﻿// #define LOG_PARSE_TYPEDEF_2
 using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
