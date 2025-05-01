@@ -1,4 +1,5 @@
-﻿using System.CodeDom.Compiler;
+﻿#define LOG_PARSE_TYPEDEF_2
+using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
@@ -503,6 +504,11 @@ public sealed class UnitTestXYZ456 : UnitTestBase
         {
             value = $"{ToString(def.Class)} {ToString(def.Type.Kind)} {GetSafeName(def.Tag)}{pointers} {def.Name};";
         }
+
+#if LOG_PARSE_TYPEDEF_2
+        WriteLineVar(type);
+        WriteLineVar(value);
+#endif
 
         Writer.WriteLine($"{value} // {def}");
     }
