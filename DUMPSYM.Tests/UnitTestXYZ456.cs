@@ -453,45 +453,10 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             return;
         }
 
-        if (node.Previous!.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } type && type.Tag == def.Tag)
+        if (node.Previous!.Value is ISymbolDefinition2 { Class: SymbolStorageClass.EOS } d && d.Tag == def.Tag)
         {
             return; // don't generate, associated struct becomes typedef struct
         }
-
-        var tag = default(string);
-
-        for (var n = node.Previous; n != null; n = n.Previous)
-        {
-            if (n.Value is not ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF, Type.Kind: SymbolTypeKind.STRUCT } d)
-            {
-                continue;
-            }
-
-            if (d.Tag != def.Tag)
-            {
-                continue;
-            }
-
-            tag = d.Name;
-            break;
-
-            // structs become typedef struct with consequences:
-            //
-            //     Def class STRTAG type STRUCT size 16 name .95fake
-            //     Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name EngineCoord
-            //     Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name CliPt
-            //
-            // result:
-            //
-            //     typedef struct EngineCoord { .95fake content };
-            //     typedef struct .95fake CliPt; // C2079 on usage
-            //
-            // fix:
-            //
-            //     typedef EngineCoord CliPt;
-        }
-
-        string value;
 
         var modifiers = def.Type.Modifiers.ToArray();
 
@@ -500,11 +465,15 @@ public sealed class UnitTestXYZ456 : UnitTestBase
             throw new InvalidOperationException($"Typedef shouldn't have {SymbolTypeModifier.FCN} modifier(s):\n{def}");
         }
 
+        string value;
+
+        var type = GetSafeType(def, node);
+
         var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
 
-        if (tag != null)
+        if (type != null)
         {
-            value = $"{ToString(def.Class)} {tag}{pointers} {def.Name};";
+            value = $"{ToString(def.Class)} {type}{pointers} {def.Name};";
         }
         else
         {
@@ -517,6 +486,60 @@ public sealed class UnitTestXYZ456 : UnitTestBase
     private static string GetSafeName(string name)
     {
         return RegexFakeName.IsMatch(name) ? $"_{name[1..]}" : name;
+    }
+
+    /// <summary>
+    ///     Gets the safe type to use for a typedef.
+    /// </summary>
+    /// <remarks>
+    ///     Types followed by a typedef are merged as one declaration, for instance:
+    ///     <code>
+    ///         Def class STRTAG type STRUCT size 16 name .95fake
+    ///         Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name EngineCoord
+    ///         ...
+    ///         Def2 class TPDEF type STRUCT size 16 dims 0 tag .95fake name CliPt
+    ///     </code>
+    ///     When generated, produces the following code:
+    ///     <code>
+    ///         typedef struct EngineCoord { .95fake members };
+    ///         ...
+    ///         typedef struct .95fake CliPt;
+    ///     </code>
+    ///     However, this causes errors in usages of the derived typedefs:
+    ///     <code>
+    ///         CliPt BPoints[9]; // C2079 'BPoints' uses undefined struct '.95fake'
+    ///     </code>
+    ///     To fix this, the type is remapped to its last definition:
+    ///     <code>
+    ///         typedef EngineCoord CliPt;
+    ///     </code>
+    /// </remarks>
+    private static string? GetSafeType(ISymbolDefinition2 def, LinkedListNode<ISymbol> node)
+    {
+        if (def.Class is not SymbolStorageClass.TPDEF)
+        {
+            throw new ArgumentOutOfRangeException(nameof(def), def, null);
+        }
+
+        if (node.Value != def)
+        {
+            throw new ArgumentOutOfRangeException(nameof(node), node, null);
+        }
+
+        for (var n = node.Previous; n != null; n = n.Previous)
+        {
+            if (n.Value is not ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF, Type.Kind: SymbolTypeKind.STRUCT } d)
+            {
+                continue;
+            }
+
+            if (d.Tag == def.Tag)
+            {
+                return d.Name;
+            }
+        }
+
+        return null;
     }
 
     private static string ToString(SymbolStorageClass value)
