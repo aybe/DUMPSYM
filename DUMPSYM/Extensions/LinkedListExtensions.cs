@@ -4,6 +4,11 @@ namespace DUMPSYM.Extensions;
 
 public static class LinkedListExtensions
 {
+    public static void Add<T>(this LinkedList<T> list, T value)
+    {
+        list.AddLast(value);
+    }
+
     public static void CopyFrom<T>(this LinkedList<T> list, LinkedListNode<T> head, LinkedListNode<T> tail)
         // TODO this assumes next is the next one
     {
