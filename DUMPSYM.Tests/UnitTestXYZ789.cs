@@ -19,9 +19,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var types = distinct.Where(s => s.Is(t => t.IsType())).ToArray();
 
-        var types109fake = GetTypesWithName(types, ".109fake", printFakes);
-        var types110fake = GetTypesWithName(types, ".110fake", printFakes);
-        var types111fake = GetTypesWithName(types, ".111fake", printFakes);
+        var types109fake = GetTypesWithName(types, ".109fake", printFakes); // TODO delete this and do it from lookup
 
         if (printTypes)
         {
@@ -67,11 +65,18 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             map2.Add(symbol, $"{symbolName}_{map1[symbolName]}");
         }
 
+        WriteLine("Symbols with duplicate names:");
+
         var groupings = types.ToLookup(s => ((ISymbolDefinition)s[0].Record).Name).OrderBy(s => s.Key, NaturalStringComparer.OrdinalIgnoreCase).ToArray();
 
         foreach (var grouping in groupings.Where(s => s.Count() > 1))
         {
-            WriteLine($"{grouping.Key}: {grouping.Count()}");
+            WriteLine($"{grouping.Key} ({grouping.Count()} duplicates)");
+
+            foreach (var symbols in grouping)
+            {
+                WriteLine($"\t{symbols[0]}");
+            }
         }
     }
 
