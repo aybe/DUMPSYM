@@ -93,6 +93,29 @@ public static class LinkedListExtensions
         return lists;
     }
 
+    public static IEnumerable<LinkedListNode<T>> Traverse<T>(this LinkedList<T> list)
+    {
+        return Traverse(list.First, s => s.Next);
+    }
+
+    public static IEnumerable<LinkedListNode<T>> Traverse<T>(this LinkedList<T> list, Func<LinkedListNode<T>, LinkedListNode<T>?> next)
+    {
+        return Traverse(list.First, next);
+    }
+
+    public static IEnumerable<LinkedListNode<T>> Traverse<T>(this LinkedListNode<T>? node)
+    {
+        return Traverse(node, s => s.Next);
+    }
+
+    public static IEnumerable<LinkedListNode<T>> Traverse<T>(this LinkedListNode<T>? node, Func<LinkedListNode<T>, LinkedListNode<T>?> next)
+    {
+        for (var n = node; n != null; n = next(n))
+        {
+            yield return n;
+        }
+    }
+
     public static bool TryFindNode<T>(
         this LinkedListNode<T> node, [MaybeNullWhen(false)] out LinkedListNode<T> result, Func<T, bool> predicate)
     {
