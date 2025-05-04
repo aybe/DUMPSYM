@@ -55,7 +55,7 @@ public sealed record SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
             return true;
         }
 
-        return Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Dimensions.SequenceEqual(other.Dimensions) && Tag == other.Tag && Name == other.Name;
+        return base.Equals(other) && Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Dimensions.SequenceEqual(other.Dimensions) && Tag == other.Tag && Name == other.Name;
     }
 
     [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]

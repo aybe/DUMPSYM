@@ -117,6 +117,8 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
                 _    => throw new NotImplementedException($"0x{hdr.Type:x2} @ {stream.Position - 5:X8}")
             };
 
+            rec.Header = hdr;
+
             symbols.Add(new Symbol(hdr, rec));
         }
 

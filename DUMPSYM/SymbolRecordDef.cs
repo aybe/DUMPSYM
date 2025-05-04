@@ -47,7 +47,7 @@ public sealed record SymbolRecordDef : SymbolRecord, ISymbolDefinition
             return true;
         }
 
-        return Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Name == other.Name;
+        return base.Equals(other) && Class == other.Class && Type.Equals(other.Type) && Size == other.Size && Name == other.Name;
     }
 
     [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
