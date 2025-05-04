@@ -49,6 +49,11 @@ public static class SymbolExtensions // TODO move
         return result != null;
     }
 
+    public static bool IsType(this ISymbol symbol, Predicate<ISymbolDefinition> predicate)
+    {
+        return IsType(symbol, predicate, out _);
+    }
+
     public static bool IsType(this ISymbol symbol, Predicate<ISymbolDefinition> predicate, [MaybeNullWhen(false)] out ISymbolDefinition result)
     {
         result = null;

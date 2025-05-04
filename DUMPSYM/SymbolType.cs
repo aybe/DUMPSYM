@@ -45,6 +45,16 @@ public record struct SymbolType
         }
     }
 
+    public readonly bool Equals(SymbolType other)
+    {
+        return Value == other.Value;
+    }
+
+    public readonly override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
+
     public override string ToString()
     {
         return string.Join(" ", string.Join(" ", Modifiers), Kind).Trim();
