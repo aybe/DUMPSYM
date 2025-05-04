@@ -17,6 +17,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var distinct = GetDistinctSymbols();
 
+        var linked = new LinkedList<Symbol>(distinct.SelectMany(s => s));
+
         var types = distinct.Where(s => s.Is(t => t.IsType())).ToArray();
 
         var types109fake = GetTypesWithName(types, ".109fake", printFakes); // TODO delete this and do it from lookup
@@ -65,17 +67,31 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             map2.Add(symbol, $"{symbolName}_{map1[symbolName]}");
         }
 
-        WriteLine("Symbols with duplicate names:");
+        WriteLine("Symbols with duplicate names and associated typedef if any:");
 
-        var groupings = types.ToLookup(s => ((ISymbolDefinition)s[0].Record).Name).OrderBy(s => s.Key, NaturalStringComparer.OrdinalIgnoreCase).ToArray();
+        var lookup = types.ToLookup(s => ((ISymbolDefinition)s[0].Record).Name);
 
-        foreach (var grouping in groupings.Where(s => s.Count() > 1))
+        foreach (var group in lookup.Where(s => s.Count() > 1))
         {
-            WriteLine($"{grouping.Key} ({grouping.Count()} duplicates)");
+            WriteLine($"{group.Key} ({group.Count()} duplicates)");
 
-            foreach (var symbols in grouping)
+            foreach (var symbols in group)
             {
-                WriteLine($"\t{symbols[0]}");
+                var find = linked.Find(symbols[0])!;
+
+                WriteLine($"\t{find.Value}");
+
+                for (var n = find.Next; n != null; n = n.Next)
+                {
+                    if (n.Value.IsTypeEnd(out var eos))
+                    {
+                        var b = n.Next!.Value.Record.IsTypedef2(out var typedef, s => s.Tag == eos.Tag);
+
+                        WriteLine($"\t\ttypedef: {(b ? typedef!.Name : "NULL")}");
+
+                        break;
+                    }
+                }
             }
         }
     }

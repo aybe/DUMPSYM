@@ -107,6 +107,18 @@ public static class SymbolExtensions // TODO move
         return result != null;
     }
 
+    public static bool IsTypedef2(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition2 result, Func<ISymbolDefinition2, bool> predicate)
+    {
+        result = null;
+
+        if (symbol.IsTypedef2(out var def) && predicate(def))
+        {
+            result = def;
+        }
+
+        return result != null;
+    }
+
     public static bool IsTypedef(this ISymbol symbol, Predicate<ISymbolDefinition> predicate)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def && predicate(def);
@@ -250,6 +262,18 @@ public static class SymbolExtensions // TODO move
     public static bool IsTypeFooter(this ISymbol symbol, ISymbolDefinition type)
     {
         return symbol is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def && def.Tag == type.Name;
+    }
+
+    public static bool IsTypeFooter(this ISymbol symbol, ISymbolDefinition type, [MaybeNullWhen(false)] out ISymbolDefinition2 result)
+    {
+        result = null;
+
+        if (symbol is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def && def.Tag == type.Name)
+        {
+            result = def;
+        }
+
+        return result != null;
     }
 
     #endregion
