@@ -11,7 +11,7 @@ namespace DUMPSYM.Tests;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public sealed class UnitTestXYZ789 : UnitTestBase
 {
-    private SymbolFactory Factory { get; } = new();
+    private SymbolFactory Factory { get; } = new(Sample.Default);
 
     [TestMethod]
     public void TestSplitByFiles()
@@ -19,13 +19,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         var printTypes = false;
         var printTypedefs = false;
 
-        Factory.Initialize(Sample.Default);
-
-        var split = Symbol.Split(Factory.Symbols);
-
-        var distinct = split.Distinct(SymbolArrayEqualityComparer.Instance).ToArray(); // TODO this is the good one with 3 more
-
-        var types = distinct.Where(s => s[0].IsTypeHeader).ToArray();
+        var types = Factory.SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
 
         if (printTypes)
         {
@@ -39,7 +33,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             WriteLine();
         }
 
-        var typedefs = distinct.Where(s => s[0].IsTypeDefinition).ToArray();
+        var typedefs = Factory.SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
 
         if (printTypedefs)
         {
@@ -154,24 +148,7 @@ public static class SymbolHelper
 
 public sealed class SymbolFactory
 {
-    /// <summary>
-    ///     The symbols represented as an array.
-    /// </summary>
-    public Symbol[] Symbols { get; private set; } = null!;
-
-    /// <summary>
-    ///     The symbols represented as a linked list.
-    /// </summary>
-    private LinkedList<Symbol> SymbolsList { get; set; } = null!;
-
-    /// <summary>
-    ///     Dictionary to map a symbol to its linked list node.
-    /// </summary>
-    private Dictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; set; } = null!;
-
-    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-    public void Initialize(SymbolFile file) // TODO ctor
+    public SymbolFactory(SymbolFile file)
     {
         Symbols = file.Symbols.ToArray();
 
@@ -179,8 +156,39 @@ public sealed class SymbolFactory
 
         SymbolsMap = SymbolsList.Traverse().ToDictionary(s => s.Value, s => s);
 
+        Split = Symbol.Split(Symbols);
+
+        SplitDistinct = Split.Distinct(SymbolArrayEqualityComparer.Instance).ToArray();
+
         Assert.AreEqual(SymbolsList.Count, SymbolsMap.Count);
     }
+
+    /// <summary>
+    ///     Symbols as an array.
+    /// </summary>
+    public Symbol[] Symbols { get; }
+
+    /// <summary>
+    ///     Symbols as a linked list.
+    /// </summary>
+    public LinkedList<Symbol> SymbolsList { get; }
+
+    /// <summary>
+    ///     Symbols dictionary from/to symbol/linked list node.
+    /// </summary>
+    public Dictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; }
+
+    /// <summary>
+    ///     Symbols split by kind.
+    /// </summary>
+    public Symbol[][] Split { get; }
+
+    /// <summary>
+    ///     Symbols split by kind, distinct.
+    /// </summary>
+    public Symbol[][] SplitDistinct { get; }
+
+    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     public static string GetSafeName(string name)
     {
