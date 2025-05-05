@@ -260,47 +260,47 @@ public sealed class SymbolFactory
 
         return safeName;
     }
-}
 
-public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
-{
-    public static SymbolArrayEqualityComparer Instance { get; } = new();
-
-    public override bool Equals(Symbol[]? x, Symbol[]? y)
+    private sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
     {
-        if (x is null && y is null)
+        public static SymbolArrayEqualityComparer Instance { get; } = new();
+
+        public override bool Equals(Symbol[]? x, Symbol[]? y)
         {
-            return true;
-        }
+            if (x is null && y is null)
+            {
+                return true;
+            }
 
-        if (x is null || y is null)
-        {
-            return false;
-        }
-
-        if (x.Length != y.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < x.Length; i++)
-        {
-            var a = x[i].Record;
-
-            var b = y[i].Record;
-
-            if (!a.Equals(b))
+            if (x is null || y is null)
             {
                 return false;
             }
+
+            if (x.Length != y.Length)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < x.Length; i++)
+            {
+                var a = x[i].Record;
+
+                var b = y[i].Record;
+
+                if (!a.Equals(b))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        return true;
-    }
-
-    public override int GetHashCode(Symbol[] obj)
-    {
-        return obj.GetHashCode(s => s.Record);
+        public override int GetHashCode(Symbol[] obj)
+        {
+            return obj.GetHashCode(s => s.Record);
+        }
     }
 }
 
