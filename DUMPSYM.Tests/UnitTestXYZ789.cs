@@ -74,6 +74,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 }
 
 public sealed class SymbolFactory
+// TODO why does FLOATLIB.C (last file) has ~2000 names at end?
 {
     public SymbolFactory(SymbolFile file)
     {
@@ -230,9 +231,7 @@ public sealed class SymbolFactory
         }
     }
 
-    [SuppressMessage("ReSharper", "CommentTypo")]
     private static class SymbolHelper
-    // TODO why does FLOATLIB.C (last file) has ~2000 names at end?
     {
         private static List<int> FindIndices<T>(T[] array, Predicate<T> predicate)
         {
@@ -278,7 +277,7 @@ public sealed class SymbolFactory
         /// <summary>
         ///     Split by <see cref="SymbolRecordSetSldToLineOfFile" />.
         /// </summary>
-        public static Symbol[][] SplitByFiles(Symbol[] symbols) // TODO use it
+        public static Symbol[][] SplitByFiles(Symbol[] symbols)
         {
             return Split(symbols, s => s.Record.IsFileHeader());
         }
