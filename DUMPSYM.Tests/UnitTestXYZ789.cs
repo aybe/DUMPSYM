@@ -248,7 +248,7 @@ public sealed class SymbolFactory
 
         def = GetTypeDefinition(eos);
 
-        var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}" : typeName);
+        var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x6}" : typeName);
 
         return safeName;
     }
