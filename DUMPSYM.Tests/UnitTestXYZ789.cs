@@ -103,7 +103,7 @@ public sealed class SymbolFactory
 
         SymbolsList = new LinkedList<Symbol>([..Symbols]);
 
-        SymbolsMap = SymbolsList.Traverse().ToDictionary(s => s.Value, s => s);
+        SymbolsMap = SymbolsList.Traverse().ToDictionary(s => s.Value, s => s).ToFrozenDictionary();
 
         Lines = GetLines(Symbols);
 
@@ -127,7 +127,7 @@ public sealed class SymbolFactory
     /// <summary>
     ///     Symbols dictionary from/to symbol/linked list node.
     /// </summary>
-    public Dictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; }
+    public FrozenDictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; }
 
     /// <summary>
     ///     Symbols dictionary from/to symbol/line.
