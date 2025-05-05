@@ -285,10 +285,12 @@ public sealed class SymbolFactory
 
                 var b = y[i].Record;
 
-                if (!a.Equals(b))
+                if (a.Equals(b))
                 {
-                    return false;
+                    continue;
                 }
+
+                return false;
             }
 
             return true;
