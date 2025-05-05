@@ -55,7 +55,9 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var lookup = types.ToLookup(s => ((ISymbolDefinition)s[0].Record).Name);
 
-        foreach (var group in lookup.Where(s => s.Count() > 1))
+        var onlyDuplicates = false;
+
+        foreach (var group in lookup.Where(s => onlyDuplicates ? s.Count() > 1 : true))
         {
             WriteLine($"{group.Key} ({group.Count()} duplicates)");
 
@@ -67,7 +69,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 WriteLine($"\t{hdr}");
 
-                WriteLine($"\t\t{Factory.GetFakeTypeName(hdr, eos)}");
+                WriteLine($"\t\t{Factory.GetTypeName(hdr, eos)}");
             }
         }
     }
@@ -186,7 +188,7 @@ public sealed class SymbolFactory
         return RegexFakeName.IsMatch(name);
     }
 
-    private Symbol? GetFakeTypeDefinition(Symbol eos)
+    private Symbol? GetTypeDefinition(Symbol eos)
     {
         var tag = eos.Tag!;
 
@@ -227,17 +229,22 @@ public sealed class SymbolFactory
         return null; // none found, fake type name should be transformed to be unique
     }
 
-    public string GetFakeTypeName(Symbol hdr, Symbol eos)
+    public string GetTypeName(Symbol hdr, Symbol eos)
     {
         var typeName = hdr.Name!;
 
-        Assert.IsTrue(hdr.IsTypeHeader && HasFakeName(typeName));
+        if (!HasFakeName(typeName))
+        {
+            return typeName;
+        }
+
+        Assert.IsTrue(hdr.IsTypeHeader);
 
         Assert.IsTrue(eos.IsTypeFooter);
 
-        var typedef = GetFakeTypeDefinition(eos);
+        var typedef = GetTypeDefinition(eos);
 
-        var safeName = typedef?.Name ?? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}";
+        var safeName = typedef?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}" : typeName);
 
         return safeName;
     }
