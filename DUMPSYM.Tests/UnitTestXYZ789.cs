@@ -25,7 +25,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var distinct = split.Distinct(SymbolArrayEqualityComparer.Instance).ToArray(); // TODO this is the good one with 3 more
 
-        var types = distinct.Where(s => s.Is(t => t.IsType())).ToArray();
+        var types = distinct.Where(s => s[0].IsTypeHeader).ToArray();
 
         if (printTypes)
         {
@@ -39,7 +39,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             WriteLine();
         }
 
-        var typedefs = distinct.Where(s => s.Is(t => t.IsTypedef())).ToArray();
+        var typedefs = distinct.Where(s => s[0].IsTypeDefinition).ToArray();
 
         if (printTypedefs)
         {
@@ -298,14 +298,6 @@ public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
     public override int GetHashCode(Symbol[] obj)
     {
         return obj.GetHashCode(s => s.Record);
-    }
-}
-
-public static class SymbolArrayExtensions
-{
-    public static bool Is(this Symbol[] symbols, Func<ISymbol, bool> predicate)
-    {
-        return predicate(symbols[0].Record);
     }
 }
 
