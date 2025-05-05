@@ -84,7 +84,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 var c1 = $"[{hdr}]({uri}:{Factory.LineOf(hdr)})";
 
-                var c2 = def == null ? hdr.Name : $"[{def.Name}]({uri}:{Factory.LineOf(def)})";
+                var c2 = def == null ? name : $"[{def.Name}]({uri}:{Factory.LineOf(def)})";
 
                 sb.AppendLine($"| {c1} | {c2} |");
             }
