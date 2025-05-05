@@ -279,22 +279,6 @@ public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
         return true;
     }
 
-    private bool Equals<T>(IEnumerable<T> x, IEnumerable<T> y) where T : notnull
-    {
-        using var a = x.GetEnumerator();
-        using var b = y.GetEnumerator();
-
-        while (a.MoveNext() && b.MoveNext())
-        {
-            if (!a.Current.Equals(b.Current))
-            {
-                return false;
-            }
-        }
-
-        return !a.MoveNext() && !b.MoveNext();
-    }
-
     public override int GetHashCode(Symbol[] obj)
     {
         return obj.GetHashCode(s => s.Record);
