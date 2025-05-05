@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -58,8 +59,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var sb = new StringBuilder();
 
-        sb.AppendLine("| Symbol | Name |");
-        sb.AppendLine("|--------|------|");
+        sb.AppendLine("| Type | Typedef | Name |");
+        sb.AppendLine("|------|---------|------|");
 
         const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.txt"; // TODO as parameter
 
@@ -81,11 +82,17 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 WriteLine($"\t\t{name}");
 
-                var sym = $"[{hdr}]({uri}:{Array.IndexOf(Factory.Symbols, hdr) + 4})";
+                var c1 = $"[{hdr}]({uri}:{Factory.LineOf(hdr)})";
 
-                var org = def == null ? name : $"[{def.Name}]({uri}:{Array.IndexOf(Factory.Symbols, def) + 4})";
+                var c2 = def == null
+                    ? ""
+                    : $"[{def.Name}]({uri}:{Factory.LineOf(def)})";
 
-                sb.AppendLine($"| {sym} | {org} |");
+                var c3 = def == null
+                    ? $"[{hdr.Name}]({uri}:{Factory.LineOf(hdr)})"
+                    : $"[{def.Name}]({uri}:{Factory.LineOf(def)})";
+
+                sb.AppendLine($"| {c1} | {c2} | {c3} | ");
             }
         }
 
@@ -103,6 +110,8 @@ public sealed class SymbolFactory
         SymbolsList = new LinkedList<Symbol>([..Symbols]);
 
         SymbolsMap = SymbolsList.Traverse().ToDictionary(s => s.Value, s => s);
+
+        Lines = GetLines(Symbols);
 
         Split = Symbol.Split(Symbols);
 
@@ -127,6 +136,11 @@ public sealed class SymbolFactory
     public Dictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; }
 
     /// <summary>
+    ///     Symbols dictionary from/to symbol/line.
+    /// </summary>
+    public FrozenDictionary<Symbol, int> Lines { get; }
+
+    /// <summary>
     ///     Symbols split by kind.
     /// </summary>
     public Symbol[][] Split { get; }
@@ -137,6 +151,40 @@ public sealed class SymbolFactory
     public Symbol[][] SplitDistinct { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static FrozenDictionary<Symbol, int> GetLines(Symbol[] symbols)
+    {
+        var dictionary = new Dictionary<Symbol, int>();
+
+        var index = 4;
+
+        foreach (var symbol in symbols)
+        {
+            var s = symbol.ToString();
+
+            using var reader = new StringReader(s);
+
+            var count = 0;
+
+            while (true)
+            {
+                var line = reader.ReadLine();
+
+                if (line == null)
+                {
+                    break;
+                }
+
+                count++;
+            }
+
+            dictionary[symbol] = index;
+
+            index += count;
+        }
+
+        return dictionary.ToFrozenDictionary();
+    }
 
     public static string GetSafeName(string name)
     {
@@ -209,6 +257,11 @@ public sealed class SymbolFactory
         var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}" : typeName);
 
         return safeName;
+    }
+
+    public int LineOf(Symbol symbol)
+    {
+        return Lines[symbol];
     }
 
     private sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
