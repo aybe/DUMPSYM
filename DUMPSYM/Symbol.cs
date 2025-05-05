@@ -3,7 +3,7 @@ using DUMPSYM.Extensions;
 namespace DUMPSYM;
 
 [Serializable]
-public sealed class Symbol
+public sealed partial class Symbol
 {
     public Symbol()
     {
@@ -40,7 +40,7 @@ public sealed class Symbol
             new(s => s.IsFileHeader(), s => s.IsFileFooter()),
             new(s => s.IsFunctionHeader(), s => s.IsFunctionFooter()),
             new(s => s.IsStructHeader(), s => s.IsTypeFooter()),
-            new(s => s.IsUnionHeader(), s => s.IsTypeFooter())
+            new(s => s.IsUnionHeader(), s => s.IsTypeFooter()),
         };
 
         for (var i = 0; i < records.Length; i++)
@@ -75,4 +75,39 @@ public sealed class Symbol
     }
 
     private sealed record SymbolSearch(Predicate<ISymbol> Header, Predicate<ISymbol> Footer);
+}
+
+public sealed partial class Symbol
+{
+    #region ISymbolDefinition
+
+    public SymbolStorageClass? Class => Record is ISymbolDefinition d ? d.Class : null;
+
+    public SymbolType? Type => Record is ISymbolDefinition d ? d.Type : null;
+
+    public uint? Size => Record is ISymbolDefinition d ? d.Size : null;
+
+    public string? Name => Record is ISymbolDefinition d ? d.Name : null;
+
+    #endregion
+
+    #region ISymbolDefinition2
+
+    public uint[]? Dimensions => Record is ISymbolDefinition2 d ? d.Dimensions : null;
+
+    public string? Tag => Record is ISymbolDefinition2 d ? d.Tag : null;
+
+    #endregion
+
+    #region Is*
+
+    public bool IsFunction => Record is ISymbolFunction;
+
+    public bool IsTypeDefinition => Class is SymbolStorageClass.TPDEF;
+
+    public bool IsTypeHeader => Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG;
+
+    public bool IsTypeFooter => Class is SymbolStorageClass.EOS;
+
+    #endregion
 }

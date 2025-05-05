@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
+
+// ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
 
@@ -8,20 +11,21 @@ namespace DUMPSYM.Tests;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public sealed class UnitTestXYZ789 : UnitTestBase
 {
+    private SymbolFactory Factory { get; } = new();
+
     [TestMethod]
     public void TestSplitByFiles()
     {
-        var printFakes = false;
         var printTypes = false;
         var printTypedefs = false;
 
-        var distinct = GetDistinctSymbols();
+        Factory.Initialize(Sample.Default);
 
-        var linked = new LinkedList<Symbol>(distinct.SelectMany(s => s));
+        var split = Symbol.Split(Factory.Symbols);
+
+        var distinct = split.Distinct(SymbolArrayEqualityComparer.Instance).ToArray(); // TODO this is the good one with 3 more
 
         var types = distinct.Where(s => s.Is(t => t.IsType())).ToArray();
-
-        var types109fake = GetTypesWithName(types, ".109fake", printFakes); // TODO delete this and do it from lookup
 
         if (printTypes)
         {
@@ -47,27 +51,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             }
         }
 
-        var map1 = new Dictionary<string, int>();
-
-        var map2 = new Dictionary<Symbol, string>();
-
-        foreach (var symbols in types109fake)
-        {
-            var symbol = symbols[0];
-
-            var symbolName = ((ISymbolDefinition)symbol.Record).Name;
-
-            if (!map1.TryGetValue(symbolName, out var nameIndex))
-            {
-                map1[symbolName] = nameIndex = 0;
-            }
-
-            map1[symbolName] = nameIndex + 1;
-
-            map2.Add(symbol, $"{symbolName}_{map1[symbolName]}");
-        }
-
-        WriteLine("Symbols with duplicate names and associated typedef if any:");
+        WriteLine("Symbols with duplicate names and resolved names:");
 
         var lookup = types.ToLookup(s => ((ISymbolDefinition)s[0].Record).Name);
 
@@ -77,63 +61,15 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
             foreach (var symbols in group)
             {
-                var find = linked.Find(symbols[0])!;
+                var hdr = symbols[0];
 
-                WriteLine($"\t{find.Value}");
+                var eos = symbols[^1];
 
-                for (var n = find.Next; n != null; n = n.Next)
-                {
-                    if (n.Value.IsTypeEnd(out var eos))
-                    {
-                        var b = n.Next!.Value.Record.IsTypedef2(out var typedef, s => s.Tag == eos.Tag);
+                WriteLine($"\t{hdr}");
 
-                        WriteLine($"\t\ttypedef: {(b ? typedef!.Name : "NULL")}");
-
-                        break;
-                    }
-                }
+                WriteLine($"\t\t{Factory.GetFakeTypeName(hdr, eos)}");
             }
         }
-    }
-
-    private Symbol[][] GetTypesWithName(Symbol[][] symbols, string name, bool print)
-    {
-        var types = FindTypesWithName(symbols, name);
-
-        if (print)
-        {
-            WriteLine($"{types.Length} types with name {name}:");
-
-            WriteLine();
-
-            foreach (var symbol in types)
-            {
-                foreach (var s in symbol)
-                {
-                    WriteLine(s);
-                }
-
-                WriteLine();
-            }
-        }
-
-        return types;
-    }
-
-    private static Symbol[][] FindTypesWithName(Symbol[][] types, string name)
-    {
-        return types.Where(s => s.Is(t => t.IsType(u => u.Name == name))).ToArray();
-    }
-
-    private static Symbol[][] GetDistinctSymbols()
-    {
-        var symbols = Sample.Default.Symbols.ToArray();
-
-        var split = Symbol.Split(symbols);
-
-        var distinct = split.Distinct(SymbolArrayEqualityComparer.Instance).ToArray(); // TODO this is the good one with 3 more
-
-        return distinct;
     }
 }
 
@@ -207,6 +143,103 @@ public static class SymbolHelper
         Debug.WriteLine($"{symbols[0].Record}, Length: {symbols.Length}, Indices: {join}, EOF: {eof}, Names: {slice.Any(s => s.Record.IsName())}");
 
         return slice;
+    }
+}
+
+public sealed class SymbolFactory
+{
+    /// <summary>
+    ///     The symbols represented as an array.
+    /// </summary>
+    public Symbol[] Symbols { get; private set; } = null!;
+
+    /// <summary>
+    ///     The symbols represented as a linked list.
+    /// </summary>
+    private LinkedList<Symbol> SymbolsList { get; set; } = null!;
+
+    /// <summary>
+    ///     Dictionary to map a symbol to its linked list node.
+    /// </summary>
+    private Dictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; set; } = null!;
+
+    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    public void Initialize(SymbolFile file) // TODO ctor
+    {
+        Symbols = file.Symbols.ToArray();
+
+        SymbolsList = new LinkedList<Symbol>([..Symbols]);
+
+        SymbolsMap = SymbolsList.Traverse().ToDictionary(s => s.Value, s => s);
+
+        Assert.AreEqual(SymbolsList.Count, SymbolsMap.Count);
+    }
+
+    public static string GetSafeName(string name)
+    {
+        return HasFakeName(name) ? $"_{name[1..]}" : name;
+    }
+
+    public static bool HasFakeName(string name)
+    {
+        return RegexFakeName.IsMatch(name);
+    }
+
+    private Symbol? GetFakeTypeDefinition(Symbol eos)
+    {
+        var tag = eos.Tag!;
+
+        Assert.IsTrue(eos.IsTypeFooter && HasFakeName(tag));
+
+        var node = SymbolsMap[eos];
+
+        for (var n = node.Next; n != null; n = n.Next)
+        {
+            var symbol = n.Value;
+
+            if (symbol.IsFunction)
+            {
+                // functions may have an appropriate typedef, but it makes no sense to peek into them:
+                // 149716: $00000000 94 Def class STRTAG type STRUCT size 3 name .109fake
+                // 14972c: $00000000 94 Def class MOS type UCHAR size 0 name Red
+                // 14973d: $00000001 94 Def class MOS type UCHAR size 0 name Green
+                // 149750: $00000002 94 Def class MOS type UCHAR size 0 name Blue
+                // 149762: $00000003 96 Def2 class EOS type NULL size 3 dims 0 tag .109fake name.eos
+                // ...
+                // 14b385: $800420cc 8c Function_start
+                // ...
+                // 14b41b: $00000000 96 Def2 class TPDEF type STRUCT size 3 dims 0 tag .109fake name Palette
+                return null;
+            }
+
+            if (symbol.IsTypeHeader)
+            {
+                return null; // another type can use the same fake name at any time
+            }
+
+            if (symbol.IsTypeDefinition && symbol.Tag == tag)
+            {
+                return symbol; // first match
+            }
+        }
+
+        return null; // none found, fake type name should be transformed to be unique
+    }
+
+    public string GetFakeTypeName(Symbol hdr, Symbol eos)
+    {
+        var typeName = hdr.Name!;
+
+        Assert.IsTrue(hdr.IsTypeHeader && HasFakeName(typeName));
+
+        Assert.IsTrue(eos.IsTypeFooter);
+
+        var typedef = GetFakeTypeDefinition(eos);
+
+        var safeName = typedef?.Name ?? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}";
+
+        return safeName;
     }
 }
 

@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace DUMPSYM;
 
 public abstract record SymbolRecord : ISymbol // TODO make these really true records without setters
@@ -8,6 +6,8 @@ public abstract record SymbolRecord : ISymbol // TODO make these really true rec
 
     public virtual bool Equals(SymbolRecord? other)
     {
+        return true; // BUG header equality screws finding duplicate fake types
+
         if (other is null)
         {
             return false;
@@ -21,9 +21,10 @@ public abstract record SymbolRecord : ISymbol // TODO make these really true rec
         return Header.Equals(other.Header);
     }
 
-    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode()
     {
+        return 0; // BUG header equality screws finding duplicate fake types
+
         return Header.GetHashCode();
     }
 
