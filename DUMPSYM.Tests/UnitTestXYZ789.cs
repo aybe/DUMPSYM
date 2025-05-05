@@ -51,15 +51,19 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             }
         }
 
-        WriteLine("Symbols with duplicate names and resolved names:");
+        var showDuplicates = true;
+        var showUniques = true;
 
-        var lookup = types.ToLookup(s => ((ISymbolDefinition)s[0].Record).Name);
+        var lookup = types
+            .ToLookup(s => s[0].Name)
+            .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
+            .ToArray();
 
-        var onlyDuplicates = false;
+        WriteLine($"{lookup.Length} types with resolved names, {nameof(showDuplicates)} = {showDuplicates}, {nameof(showUniques)} = {showUniques}:");
 
-        foreach (var group in lookup.Where(s => onlyDuplicates ? s.Count() > 1 : true))
+        foreach (var group in lookup)
         {
-            WriteLine($"{group.Key} ({group.Count()} duplicates)");
+            WriteLine($"{group.Key} ({group.Count()})");
 
             foreach (var symbols in group)
             {
