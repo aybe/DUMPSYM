@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
 
@@ -55,6 +56,15 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         WriteLine($"{lookup.Length} types with resolved names, {nameof(showDuplicates)} = {showDuplicates}, {nameof(showUniques)} = {showUniques}:");
 
+        var sb = new StringBuilder();
+
+        sb.AppendLine("| Symbol | Name |");
+        sb.AppendLine("|--------|------|");
+
+        const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.txt"; // TODO as parameter
+
+        var uri = new Uri(path).AbsoluteUri.Replace("file:///", "vscode://file/");
+
         foreach (var group in lookup)
         {
             WriteLine($"{group.Key} ({group.Count()})");
@@ -67,9 +77,19 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 WriteLine($"\t{hdr}");
 
-                WriteLine($"\t\t{Factory.GetTypeName(hdr, eos)}");
+                var name = Factory.GetTypeName(hdr, eos, out var def);
+
+                WriteLine($"\t\t{name}");
+
+                var sym = $"[{hdr}]({uri}:{Array.IndexOf(Factory.Symbols, hdr) + 4})";
+
+                var org = def == null ? name : $"[{def.Name}]({uri}:{Array.IndexOf(Factory.Symbols, def) + 4})";
+
+                sb.AppendLine($"| {sym} | {org} |");
             }
         }
+
+        File.WriteAllText(Path.ChangeExtension(path, "md"), sb.ToString());
     }
 }
 
@@ -169,8 +189,10 @@ public sealed class SymbolFactory
         return null; // none found, fake type name should be transformed to be unique
     }
 
-    public string GetTypeName(Symbol hdr, Symbol eos)
+    public string GetTypeName(Symbol hdr, Symbol eos, out Symbol? def)
     {
+        def = null;
+
         var typeName = hdr.Name!;
 
         if (!HasFakeName(typeName))
@@ -182,9 +204,9 @@ public sealed class SymbolFactory
 
         Assert.IsTrue(eos.IsTypeFooter);
 
-        var typedef = GetTypeDefinition(eos);
+        def = GetTypeDefinition(eos);
 
-        var safeName = typedef?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}" : typeName);
+        var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x}" : typeName);
 
         return safeName;
     }
