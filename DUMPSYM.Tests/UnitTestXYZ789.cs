@@ -66,6 +66,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var uri = new Uri(path).AbsoluteUri.Replace("file:///", "vscode://file/");
 
+        var tmp = new SortedDictionary<int, string>();
+
         foreach (var group in lookup)
         {
             WriteLine($"{group.Key} ({group.Count()})");
@@ -88,8 +90,13 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 var c2 = def == null ? name : $"[{def.Name}]({uri}:{Factory.LineOf(def)})";
 
-                sb.AppendLine($"| {ln} | {c1} | {c2} |");
+                tmp.Add(ln, $"| {ln} | {c1} | {c2} |");
             }
+        }
+
+        foreach (var row in tmp.Values)
+        {
+            sb.AppendLine(row);
         }
 
         File.WriteAllText(Path.ChangeExtension(path, "md"), sb.ToString());
