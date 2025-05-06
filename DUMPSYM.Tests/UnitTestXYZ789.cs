@@ -18,26 +18,20 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         var printTypes = false;
         var printTypedefs = false;
 
-        var distinctTypes = Factory.DistinctTypes;
-
         if (printTypes)
         {
-            Print(distinctTypes);
+            Print(Factory.DistinctTypes);
         }
-
-        WriteLine();
-
-        var distinctTypeDefinitions = Factory.DistinctTypeDefinitions;
 
         if (printTypedefs)
         {
-            Print(distinctTypeDefinitions);
+            Print(Factory.DistinctTypeDefinitions);
         }
 
         var showDuplicates = true;
         var showUniques = true;
 
-        var lookup = distinctTypes
+        var lookup = Factory.DistinctTypes
             .ToLookup(s => s[0].Name!)
             .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
             .ToArray();
