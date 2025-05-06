@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 // ReSharper disable CommentTypo
@@ -22,26 +23,16 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         if (printTypes)
         {
-            WriteLineVar(types.Length);
-
-            foreach (var symbols in types)
-            {
-                WriteLine(symbols[0]);
-            }
-
-            WriteLine();
+            Print(types);
         }
+
+        WriteLine();
 
         var typedefs = Factory.GetDistinctTypeDefinitions();
 
         if (printTypedefs)
         {
-            WriteLineVar(typedefs.Length);
-
-            foreach (var symbols in typedefs)
-            {
-                WriteLine(symbols[0]);
-            }
+            Print(typedefs);
         }
 
         var showDuplicates = true;
@@ -117,5 +108,15 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         }
 
         File.WriteAllText(output, sb.ToString());
+    }
+
+    private void Print(Symbol[][] symbols, [CallerArgumentExpression(nameof(symbols))] string symbolsName = null!)
+    {
+        WriteLine($"{symbolsName}: {symbols.Length}");
+
+        foreach (var array in symbols)
+        {
+            WriteLine(array[0]);
+        }
     }
 }
