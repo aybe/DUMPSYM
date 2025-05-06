@@ -19,37 +19,33 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         var printTypes = false;
         var printTypedefs = false;
 
-        var types = Factory.GetDistinctTypes();
-
-        Assert.AreEqual(311, types.Length);
+        var distinctTypes = Factory.DistinctTypes;
 
         if (printTypes)
         {
-            Print(types);
+            Print(distinctTypes);
         }
 
         WriteLine();
 
-        var typedefs = Factory.GetDistinctTypeDefinitions();
-
-        Assert.AreEqual(203, typedefs.Length);
+        var distinctTypeDefinitions = Factory.DistinctTypeDefinitions;
 
         if (printTypedefs)
         {
-            Print(typedefs);
+            Print(distinctTypeDefinitions);
         }
 
         var showDuplicates = true;
         var showUniques = true;
 
-        var lookup = types
+        var lookup = distinctTypes
             .ToLookup(s => s[0].Name!)
             .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
             .ToArray();
 
         Assert.AreEqual(300, lookup.Length);
 
-        var mapType2TypeDefinition = types.ToFrozenDictionary(s => s, s => Factory.GetTypeDefinition(s[^1]));
+        var mapType2TypeDefinition = distinctTypes.ToFrozenDictionary(s => s, s => Factory.GetTypeDefinition(s[^1]));
         var compilerGenerated = mapType2TypeDefinition.Where(s => SymbolFactory.HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
         var compilerGeneratedStructurallySame = compilerGenerated.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
 

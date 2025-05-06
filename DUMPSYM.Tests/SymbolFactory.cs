@@ -23,6 +23,14 @@ public sealed class SymbolFactory
 
         SplitDistinct = Split.Distinct(SymbolArrayEqualityComparer.Everything).ToArray();
 
+        DistinctTypes = SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
+
+        Assert.AreEqual(311, DistinctTypes.Length); // TODO delete
+
+        DistinctTypeDefinitions = SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
+
+        Assert.AreEqual(203, DistinctTypeDefinitions.Length); // TODO delete
+
         Assert.AreEqual(SymbolsList.Count, SymbolsMap.Count);
     }
 
@@ -55,6 +63,16 @@ public sealed class SymbolFactory
     ///     Symbols split by kind, distinct.
     /// </summary>
     public Symbol[][] SplitDistinct { get; }
+
+    /// <summary>
+    ///     Gets distinct types throughout .SYM file.
+    /// </summary>
+    public Symbol[][] DistinctTypes { get; }
+
+    /// <summary>
+    ///     Gets distinct typedefs throughout .SYM file.
+    /// </summary>
+    public Symbol[][] DistinctTypeDefinitions { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -163,19 +181,5 @@ public sealed class SymbolFactory
     public int LineOf(Symbol symbol)
     {
         return Lines[symbol];
-    }
-
-    public Symbol[][] GetDistinctTypes()
-    {
-        var symbols = SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
-
-        return symbols;
-    }
-
-    public Symbol[][] GetDistinctTypeDefinitions()
-    {
-        var symbols = SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
-
-        return symbols;
     }
 }
