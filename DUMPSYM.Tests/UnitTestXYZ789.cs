@@ -51,9 +51,25 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         var showUniques = true;
 
         var lookup = types
-            .ToLookup(s => s[0].Name)
+            .ToLookup(s => s[0].Name!)
             .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
             .ToArray();
+
+        var mapType2TypeDefinition = types.ToFrozenDictionary(s => s, s => Factory.GetTypeDefinition(s[^1]));
+        var compilerGenerated = mapType2TypeDefinition.Where(s => SymbolFactory.HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
+        var compilerGeneratedStructurallySame = compilerGenerated.GroupBy(s => s, SymbolFactory.SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
+
+        foreach (var grouping in compilerGeneratedStructurallySame)
+        {
+            var name = grouping.Key[0].Name!;
+
+            WriteLine(name);
+
+            foreach (var symbols in grouping)
+            {
+                WriteLine("\t" + symbols[0]);
+            }
+        }
 
         const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.txt"; // TODO as parameter
 
@@ -203,7 +219,7 @@ public sealed class SymbolFactory
         return RegexFakeName.IsMatch(name);
     }
 
-    private Symbol? GetTypeDefinition(Symbol eos)
+    public Symbol? GetTypeDefinition(Symbol eos)
     {
         var tag = eos.Tag!;
 
@@ -266,7 +282,7 @@ public sealed class SymbolFactory
         return Lines[symbol];
     }
 
-    private sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
+    public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
     {
         private SymbolArrayEqualityComparer(Range? range = null)
         {
