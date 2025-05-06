@@ -29,6 +29,10 @@ public sealed class SymbolFactory
 
         DistinctTypesDefinitionsMap = DistinctTypes.ToFrozenDictionary(s => s, s => GetTypeDefinition(s[^1]));
 
+        CompilerGeneratedTypes = DistinctTypesDefinitionsMap.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
+
+        CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
+
         DistinctTypeDefinitions = SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
 
         Assert.AreEqual(203, DistinctTypeDefinitions.Length); // TODO delete
@@ -65,6 +69,19 @@ public sealed class SymbolFactory
     ///     Symbols split by kind, distinct.
     /// </summary>
     public Symbol[][] SplitDistinct { get; }
+
+    /// <summary>
+    ///     Gets compiler-generated types from <see cref="DistinctTypes" />.
+    /// </summary>
+    public Symbol[][] CompilerGeneratedTypes { get; }
+
+    /// <summary>
+    ///     Gets compiler-generated types that are duplicates by-member from <see cref="CompilerGeneratedTypes" />.
+    /// </summary>
+    /// <remarks>
+    ///     Each grouping contains types that structurally same by-member but not by name.
+    /// </remarks>
+    public IGrouping<Symbol[], Symbol[]>[] CompilerGeneratedTypesDuplicates { get; }
 
     /// <summary>
     ///     Gets distinct types throughout .SYM file.

@@ -1,5 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -45,10 +44,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         Assert.AreEqual(300, lookup.Length);
 
-        var compilerGenerated = Factory.DistinctTypesDefinitionsMap.Where(s => SymbolFactory.HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
-        var compilerGeneratedStructurallySame = compilerGenerated.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
-
-        foreach (var grouping in compilerGeneratedStructurallySame)
+        foreach (var grouping in Factory.CompilerGeneratedTypesDuplicates)
         {
             var name = grouping.Key[0].Name!;
 
