@@ -45,8 +45,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         Assert.AreEqual(300, lookup.Length);
 
-        var mapType2TypeDefinition = distinctTypes.ToFrozenDictionary(s => s, s => Factory.GetTypeDefinition(s[^1]));
-        var compilerGenerated = mapType2TypeDefinition.Where(s => SymbolFactory.HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
+        var compilerGenerated = Factory.DistinctTypesDefinitionsMap.Where(s => SymbolFactory.HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
         var compilerGeneratedStructurallySame = compilerGenerated.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
 
         foreach (var grouping in compilerGeneratedStructurallySame)

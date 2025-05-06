@@ -27,6 +27,8 @@ public sealed class SymbolFactory
 
         Assert.AreEqual(311, DistinctTypes.Length); // TODO delete
 
+        DistinctTypesDefinitionsMap = DistinctTypes.ToFrozenDictionary(s => s, s => GetTypeDefinition(s[^1]));
+
         DistinctTypeDefinitions = SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
 
         Assert.AreEqual(203, DistinctTypeDefinitions.Length); // TODO delete
@@ -68,6 +70,11 @@ public sealed class SymbolFactory
     ///     Gets distinct types throughout .SYM file.
     /// </summary>
     public Symbol[][] DistinctTypes { get; }
+
+    /// <summary>
+    ///     Gets the type definition for a type from <see cref="DistinctTypes" />.
+    /// </summary>
+    public FrozenDictionary<Symbol[], Symbol?> DistinctTypesDefinitionsMap { get; }
 
     /// <summary>
     ///     Gets distinct typedefs throughout .SYM file.
