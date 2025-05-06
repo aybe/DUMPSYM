@@ -122,7 +122,7 @@ public sealed class SymbolFactory
 
         Split = Symbol.Split(Symbols);
 
-        SplitDistinct = Split.Distinct(SymbolArrayEqualityComparer.Instance).ToArray();
+        SplitDistinct = Split.Distinct(SymbolArrayEqualityComparer.Everything).ToArray();
 
         Assert.AreEqual(SymbolsList.Count, SymbolsMap.Count);
     }
@@ -268,7 +268,22 @@ public sealed class SymbolFactory
 
     private sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
     {
-        public static SymbolArrayEqualityComparer Instance { get; } = new();
+        private SymbolArrayEqualityComparer(Range? range = null)
+        {
+            Range = range ?? Range.All;
+        }
+
+        /// <summary>
+        ///     Compare header/footer/members.
+        /// </summary>
+        public static SymbolArrayEqualityComparer Everything { get; } = new(new Range(0, ^0));
+
+        /// <summary>
+        ///     Compare members only.
+        /// </summary>
+        public static SymbolArrayEqualityComparer Members { get; } = new(new Range(1, ^1));
+
+        private Range Range { get; }
 
         public override bool Equals(Symbol[]? x, Symbol[]? y)
         {
@@ -287,26 +302,40 @@ public sealed class SymbolFactory
                 return false;
             }
 
-            for (var i = 0; i < x.Length; i++)
-            {
-                var a = x[i].Record;
+            var r = GetSafeRange(Range, x.Length);
 
-                var b = y[i].Record;
+            var a = x[r];
 
-                if (a.Equals(b))
-                {
-                    continue;
-                }
+            var b = y[r];
 
-                return false;
-            }
-
-            return true;
+            return a.Zip(b).All(s => s.First.Record.Equals(s.Second.Record));
         }
 
         public override int GetHashCode(Symbol[] obj)
         {
-            return obj.GetHashCode(s => s.Record);
+            var code = new HashCode();
+
+            var symbols = obj[GetSafeRange(Range, obj.Length)];
+
+            foreach (var symbol in symbols)
+            {
+                code.Add(symbol.Record);
+            }
+
+            return code.ToHashCode();
+        }
+
+        private static Range GetSafeRange(Range range, int length)
+        {
+            var len = length - 1;
+
+            var min = Math.Min(range.Start.Value, len);
+
+            var max = Math.Min(range.End.Value, len);
+
+            var rng = new Range(Index.FromStart(min), Index.FromEnd(max));
+
+            return rng;
         }
     }
 
@@ -379,22 +408,5 @@ public sealed class SymbolFactory
 
             return slice;
         }
-    }
-}
-
-public static class HashCodeExtensions
-{
-    public static int GetHashCode<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
-        where TSource : notnull
-        where TResult : notnull
-    {
-        var hash = new HashCode();
-
-        foreach (var value in source)
-        {
-            hash.Add(selector(value).GetHashCode());
-        }
-
-        return hash.ToHashCode();
     }
 }
