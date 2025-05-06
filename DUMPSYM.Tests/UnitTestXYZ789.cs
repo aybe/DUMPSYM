@@ -59,8 +59,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var sb = new StringBuilder();
 
-        sb.AppendLine("| Type | Name |");
-        sb.AppendLine("|------|------|");
+        sb.AppendLine("| Line | Type | Name |");
+        sb.AppendLine("|------|------|------|");
 
         const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.txt"; // TODO as parameter
 
@@ -82,11 +82,13 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 WriteLine($"\t\t{name}");
 
-                var c1 = $"[{hdr}]({uri}:{Factory.LineOf(hdr)})";
+                var ln = Factory.LineOf(hdr);
+
+                var c1 = $"[{hdr}]({uri}:{ln})";
 
                 var c2 = def == null ? name : $"[{def.Name}]({uri}:{Factory.LineOf(def)})";
 
-                sb.AppendLine($"| {c1} | {c2} |");
+                sb.AppendLine($"| {ln} | {c1} | {c2} |");
             }
         }
 
