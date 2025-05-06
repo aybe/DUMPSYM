@@ -18,7 +18,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         var printTypes = false;
         var printTypedefs = false;
 
-        var types = Factory.SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
+        var types = Factory.GetDistinctTypes();
 
         if (printTypes)
         {
@@ -32,7 +32,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             WriteLine();
         }
 
-        var typedefs = Factory.SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
+        var typedefs = Factory.GetDistinctTypeDefinitions();
 
         if (printTypedefs)
         {

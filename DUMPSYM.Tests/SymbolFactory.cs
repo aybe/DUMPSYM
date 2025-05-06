@@ -164,4 +164,18 @@ public sealed class SymbolFactory
     {
         return Lines[symbol];
     }
+
+    public Symbol[][] GetDistinctTypes()
+    {
+        var symbols = SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
+
+        return symbols;
+    }
+
+    public Symbol[][] GetDistinctTypeDefinitions()
+    {
+        var symbols = SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
+
+        return symbols;
+    }
 }
