@@ -55,14 +55,18 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
             .ToArray();
 
+        const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.txt"; // TODO as parameter
+
+        var output = Path.ChangeExtension(path, "md");
+
+        WriteLine(new Uri(output).AbsoluteUri);
+
         WriteLine($"{lookup.Length} types with resolved names, {nameof(showDuplicates)} = {showDuplicates}, {nameof(showUniques)} = {showUniques}:");
 
         var sb = new StringBuilder();
 
         sb.AppendLine("| Line | Type | Name |");
         sb.AppendLine("|------|------|------|");
-
-        const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.txt"; // TODO as parameter
 
         var uri = new Uri(path).AbsoluteUri.Replace("file:///", "vscode://file/");
 
@@ -99,7 +103,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             sb.AppendLine(row);
         }
 
-        File.WriteAllText(Path.ChangeExtension(path, "md"), sb.ToString());
+        File.WriteAllText(output, sb.ToString());
     }
 }
 
