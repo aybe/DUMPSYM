@@ -27,9 +27,9 @@ public sealed class SymbolFactory
 
         Assert.AreEqual(311, DistinctTypes.Length); // TODO delete
 
-        DistinctTypesDefinitionsMap = DistinctTypes.ToFrozenDictionary(s => s, s => GetTypeDefinition(s[^1]));
+        DistinctTypeToTypeDefinition = DistinctTypes.ToFrozenDictionary(s => s, s => GetTypeDefinition(s[^1]));
 
-        CompilerGeneratedTypes = DistinctTypesDefinitionsMap.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
+        CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
 
         CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
 
@@ -71,31 +71,37 @@ public sealed class SymbolFactory
     public Symbol[][] SplitDistinct { get; }
 
     /// <summary>
-    ///     Gets compiler-generated types from <see cref="DistinctTypes" />.
+    ///     Gets compiler-generated types present in <see cref="DistinctTypes" />.
     /// </summary>
     public Symbol[][] CompilerGeneratedTypes { get; }
 
     /// <summary>
-    ///     Gets compiler-generated types that are duplicates by-member from <see cref="CompilerGeneratedTypes" />.
+    ///     Gets compiler-generated types present in <see cref="DistinctTypes" /> that are duplicates by-member.
     /// </summary>
     /// <remarks>
-    ///     Each grouping contains types that structurally same by-member but not by name.
+    ///     Each grouping contains types that are same by-member but not necessarily by name.
     /// </remarks>
     public IGrouping<Symbol[], Symbol[]>[] CompilerGeneratedTypesDuplicates { get; }
 
     /// <summary>
     ///     Gets distinct types throughout .SYM file.
     /// </summary>
+    /// <remarks>
+    ///     This property filters out types repeated across TUs.
+    /// </remarks>
     public Symbol[][] DistinctTypes { get; }
 
     /// <summary>
-    ///     Gets the type definition for a type from <see cref="DistinctTypes" />.
+    ///     Gets the type definition, if any, for a type from <see cref="DistinctTypes" />.
     /// </summary>
-    public FrozenDictionary<Symbol[], Symbol?> DistinctTypesDefinitionsMap { get; }
+    public FrozenDictionary<Symbol[], Symbol?> DistinctTypeToTypeDefinition { get; }
 
     /// <summary>
-    ///     Gets distinct typedefs throughout .SYM file.
+    ///     Gets distinct type definitions throughout .SYM file.
     /// </summary>
+    /// <remarks>
+    ///     This property filters out type definitions repeated across TUs.
+    /// </remarks>
     public Symbol[][] DistinctTypeDefinitions { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
