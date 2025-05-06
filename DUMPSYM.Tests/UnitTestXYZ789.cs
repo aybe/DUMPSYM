@@ -207,7 +207,7 @@ public sealed class SymbolFactory
     {
         var tag = eos.Tag!;
 
-        Assert.IsTrue(eos.IsTypeFooter && HasFakeName(tag));
+        Assert.IsTrue(eos.IsTypeFooter);
 
         var node = SymbolsMap[eos];
 
@@ -235,7 +235,7 @@ public sealed class SymbolFactory
                 return null; // another type can use the same fake name at any time
             }
 
-            if (symbol.IsTypeDefinition && symbol.Tag == tag)
+            if (symbol.IsTypeDefinition && symbol.Tag == tag && symbol.Type is { } t && !t.Modifiers.Any())
             {
                 return symbol; // first match
             }
@@ -249,11 +249,6 @@ public sealed class SymbolFactory
         def = null;
 
         var typeName = hdr.Name!;
-
-        if (!HasFakeName(typeName))
-        {
-            return typeName;
-        }
 
         Assert.IsTrue(hdr.IsTypeHeader);
 
