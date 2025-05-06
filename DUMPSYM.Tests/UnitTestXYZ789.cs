@@ -21,6 +21,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         var types = Factory.GetDistinctTypes();
 
+        Assert.AreEqual(311, types.Length);
+
         if (printTypes)
         {
             Print(types);
@@ -29,6 +31,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         WriteLine();
 
         var typedefs = Factory.GetDistinctTypeDefinitions();
+
+        Assert.AreEqual(203, typedefs.Length);
 
         if (printTypedefs)
         {
@@ -42,6 +46,8 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             .ToLookup(s => s[0].Name!)
             .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
             .ToArray();
+
+        Assert.AreEqual(300, lookup.Length);
 
         var mapType2TypeDefinition = types.ToFrozenDictionary(s => s, s => Factory.GetTypeDefinition(s[^1]));
         var compilerGenerated = mapType2TypeDefinition.Where(s => SymbolFactory.HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
