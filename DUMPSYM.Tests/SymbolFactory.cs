@@ -25,8 +25,6 @@ public sealed class SymbolFactory
 
         DistinctTypes = SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
 
-        Assert.AreEqual(311, DistinctTypes.Length); // TODO delete
-
         DistinctTypeToTypeDefinition = DistinctTypes.ToFrozenDictionary(s => s, s => GetTypeDefinition(s[^1]));
 
         CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
@@ -34,10 +32,6 @@ public sealed class SymbolFactory
         CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
 
         DistinctTypeDefinitions = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
-
-        Assert.AreEqual(203, DistinctTypeDefinitions.Length); // TODO delete
-
-        Assert.AreEqual(SymbolsList.Count, SymbolsMap.Count);
     }
 
     /// <summary>

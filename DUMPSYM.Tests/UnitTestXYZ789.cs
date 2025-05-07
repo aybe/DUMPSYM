@@ -15,6 +15,10 @@ public sealed class UnitTestXYZ789 : UnitTestBase
     [TestMethod]
     public void TestSplitByFiles()
     {
+        Assert.AreEqual(311, Factory.DistinctTypes.Length);
+
+        Assert.AreEqual(203, Factory.DistinctTypeDefinitions.Length);
+
         var printTypes = false;
         var printTypedefs = false;
 
