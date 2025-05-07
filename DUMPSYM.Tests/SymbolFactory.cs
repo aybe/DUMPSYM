@@ -33,7 +33,7 @@ public sealed class SymbolFactory
 
         CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
 
-        DistinctTypeDefinitions = SplitDistinct.Where(s => s[0].IsTypeDefinition).ToArray();
+        DistinctTypeDefinitions = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
 
         Assert.AreEqual(203, DistinctTypeDefinitions.Length); // TODO delete
 
@@ -105,7 +105,7 @@ public sealed class SymbolFactory
     /// <remarks>
     ///     Type definitions of types may refer to fake types that share the same fake names.
     /// </remarks>
-    public Symbol[][] DistinctTypeDefinitions { get; }
+    public Symbol[] DistinctTypeDefinitions { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 

@@ -101,13 +101,13 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         File.WriteAllText(output, sb.ToString());
     }
 
-    private void Print(Symbol[][] symbols, [CallerArgumentExpression(nameof(symbols))] string symbolsName = null!)
+    private void Print(Array array, [CallerArgumentExpression(nameof(array))] string arrayName = null!)
     {
-        WriteLine($"{symbolsName}: {symbols.Length}");
+        WriteLine($"{arrayName}: {array.Length}");
 
-        foreach (var array in symbols)
+        foreach (var item in array)
         {
-            WriteLine(array[0]);
+            WriteLine(item is Array a ? a.GetValue(0) : item);
         }
     }
 }
