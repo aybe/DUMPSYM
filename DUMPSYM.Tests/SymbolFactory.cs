@@ -41,66 +41,69 @@ public sealed class SymbolFactory
     }
 
     /// <summary>
-    ///     Symbols as an array.
+    ///     Symbols in original form, one-to-one relationship with DUMPSYM output.
     /// </summary>
     public Symbol[] Symbols { get; }
 
     /// <summary>
-    ///     Symbols as a linked list.
+    ///     <see cref="Symbols" /> as a linked list.
     /// </summary>
     public LinkedList<Symbol> SymbolsList { get; }
 
     /// <summary>
-    ///     Symbols dictionary from/to symbol/linked list node.
+    ///     Dictionary to map a symbol to its corresponding linked list node.
     /// </summary>
     public FrozenDictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; }
 
     /// <summary>
-    ///     Symbols dictionary from/to symbol/line.
+    ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
     /// </summary>
     public FrozenDictionary<Symbol, int> Lines { get; }
 
     /// <summary>
-    ///     Symbols split by kind.
+    ///     Symbols split by kind: definitions, externals, files, functions, names, statics, types.
     /// </summary>
     public Symbol[][] Split { get; }
 
     /// <summary>
-    ///     Symbols split by kind, distinct.
+    ///     <see cref="Split" /> without duplicates.
     /// </summary>
     public Symbol[][] SplitDistinct { get; }
 
     /// <summary>
-    ///     Gets compiler-generated types present in <see cref="DistinctTypes" />.
+    ///     Arrays containing headers of compiler-generated types in <see cref="DistinctTypes" />.
     /// </summary>
+    /// <remarks>
+    ///     Types in these arrays may share the same fake names.
+    /// </remarks>
     public Symbol[][] CompilerGeneratedTypes { get; }
 
     /// <summary>
-    ///     Gets compiler-generated types present in <see cref="DistinctTypes" /> that are duplicates by-member.
+    ///     Groupings of <see cref="CompilerGeneratedTypes" /> where types are same by-member.
     /// </summary>
     /// <remarks>
-    ///     Each grouping contains types that are same by-member but not necessarily by name.
+    ///     Types in these groupings may share the same fake names.
     /// </remarks>
     public IGrouping<Symbol[], Symbol[]>[] CompilerGeneratedTypesDuplicates { get; }
 
     /// <summary>
-    ///     Gets distinct types throughout .SYM file.
+    ///     Array containing headers of distinct types in the .SYM file.
     /// </summary>
     /// <remarks>
-    ///     This property filters out types repeated across TUs.
+    ///     Types are all different by-member, fake types may share the same fake names.
     /// </remarks>
     public Symbol[][] DistinctTypes { get; }
 
     /// <summary>
-    ///     Gets the type definition, if any, for a type from <see cref="DistinctTypes" />.
+    ///     Dictionary to map a type from <see cref="DistinctTypes" /> to its corresponding type definition, if any.
     /// </summary>
     public FrozenDictionary<Symbol[], Symbol?> DistinctTypeToTypeDefinition { get; }
 
     /// <summary>
-    ///     Gets distinct type definitions throughout .SYM file.
+    ///     Array containing distinct type definitions in the .SYM file.
     /// </summary>
     /// <remarks>
-    ///     This property filters out type definitions repeated across TUs.
+    ///     Type definitions of types may refer to fake types that share the same fake names.
     /// </remarks>
     public Symbol[][] DistinctTypeDefinitions { get; }
 
