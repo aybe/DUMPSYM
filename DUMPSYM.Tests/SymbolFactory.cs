@@ -109,38 +109,29 @@ public sealed class SymbolFactory
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static FrozenDictionary<Symbol, int> GetLines(Symbol[] symbols)
+    private static FrozenDictionary<Symbol, int> GetLines(IEnumerable<Symbol> symbols)
     {
-        var dictionary = new Dictionary<Symbol, int>();
+        var lines = new Dictionary<Symbol, int>();
 
         var index = 4;
 
         foreach (var symbol in symbols)
         {
-            var s = symbol.ToString();
-
-            using var reader = new StringReader(s);
+            using var reader = new StringReader(symbol.ToString());
 
             var count = 0;
 
-            while (true)
+            while (reader.ReadLine() is not null)
             {
-                var line = reader.ReadLine();
-
-                if (line == null)
-                {
-                    break;
-                }
-
                 count++;
             }
 
-            dictionary[symbol] = index;
+            lines[symbol] = index;
 
             index += count;
         }
 
-        return dictionary.ToFrozenDictionary();
+        return lines.ToFrozenDictionary();
     }
 
     public static string GetSafeName(string name)
