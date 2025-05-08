@@ -1,6 +1,5 @@
 ﻿using System.Collections.Frozen;
 using System.Text.RegularExpressions;
-using DUMPSYM.Extensions;
 
 // ReSharper disable CommentTypo
 
@@ -13,9 +12,7 @@ public sealed class SymbolFactory
     {
         Symbols = file.Symbols.ToArray();
 
-        SymbolsList = new LinkedList<Symbol>([..Symbols]);
-
-        SymbolsMap = SymbolsList.Traverse().ToDictionary(s => s.Value, s => s).ToFrozenDictionary();
+        SymbolsIndices = Symbols.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
 
         Lines = GetLines(Symbols);
 
@@ -40,14 +37,9 @@ public sealed class SymbolFactory
     public Symbol[] Symbols { get; }
 
     /// <summary>
-    ///     <see cref="Symbols" /> as a linked list.
+    ///     Dictionary to map a symbol to its corresponding index in <see cref="Symbols" />.
     /// </summary>
-    public LinkedList<Symbol> SymbolsList { get; }
-
-    /// <summary>
-    ///     Dictionary to map a symbol to its corresponding linked list node.
-    /// </summary>
-    public FrozenDictionary<Symbol, LinkedListNode<Symbol>> SymbolsMap { get; }
+    public FrozenDictionary<Symbol, int> SymbolsIndices { get; }
 
     /// <summary>
     ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
@@ -144,12 +136,10 @@ public sealed class SymbolFactory
 
         Assert.IsTrue(eos.IsTypeFooter);
 
-        var node = SymbolsMap[eos];
+        var symbols = Symbols.AsSpan(SymbolsIndices[eos] + 1);
 
-        for (var n = node.Next; n != null; n = n.Next)
+        foreach (var symbol in symbols)
         {
-            var symbol = n.Value;
-
             if (symbol.IsFunction)
             {
                 // functions may have an appropriate typedef, but it makes no sense to peek into them:
