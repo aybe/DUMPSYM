@@ -79,11 +79,9 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             {
                 var hdr = symbols[0];
 
-                var eos = symbols[^1];
-
                 WriteLine($"\t{hdr}");
 
-                var name = Factory.GetTypeName(hdr, eos, out var def);
+                var name = Factory.GetTypeName(symbols, out var def);
 
                 WriteLine($"\t\t{name}");
 

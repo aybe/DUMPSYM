@@ -22,7 +22,7 @@ public sealed class SymbolFactory
 
         DistinctTypes = SplitDistinct.Where(s => s[0].IsTypeHeader).ToArray();
 
-        DistinctTypeToTypeDefinition = DistinctTypes.ToFrozenDictionary(s => s, s => GetTypeDefinition(s[^1]));
+        DistinctTypeToTypeDefinition = DistinctTypes.ToFrozenDictionary(s => s, GetTypeDefinition);
 
         CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
 
@@ -130,8 +130,10 @@ public sealed class SymbolFactory
         return RegexFakeName.IsMatch(name);
     }
 
-    public Symbol? GetTypeDefinition(Symbol eos)
+    public Symbol? GetTypeDefinition(Symbol[] type)
     {
+        var eos = type[^1];
+
         var tag = eos.Tag!;
 
         Assert.IsTrue(eos.IsTypeFooter);
@@ -169,17 +171,21 @@ public sealed class SymbolFactory
         return null; // none found, fake type name should be transformed to be unique
     }
 
-    public string GetTypeName(Symbol hdr, Symbol eos, out Symbol? def)
+    public string GetTypeName(Symbol[] type, out Symbol? def)
     {
         def = null;
 
-        var typeName = hdr.Name!;
+        var hdr = type[0];
 
         Assert.IsTrue(hdr.IsTypeHeader);
 
+        var eos = type[^1];
+
         Assert.IsTrue(eos.IsTypeFooter);
 
-        def = GetTypeDefinition(eos);
+        var typeName = hdr.Name!;
+
+        def = DistinctTypeToTypeDefinition[type];
 
         var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x6}" : typeName);
 
