@@ -172,19 +172,14 @@ public sealed class SymbolFactory
 
     public string GetTypeName(Symbol[] type, out Symbol? def)
     {
-        def = null;
-
-        var hdr = type[0];
-
-        Assert.IsTrue(hdr.IsTypeHeader);
-
-        var eos = type[^1];
-
-        Assert.IsTrue(eos.IsTypeFooter);
-
-        var typeName = hdr.Name!;
+        if (type[0] is not { IsTypeHeader: true } hdr)
+        {
+            throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
 
         def = DistinctTypeToTypeDefinition[type];
+
+        var typeName = hdr.Name!;
 
         var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x6}" : typeName);
 
