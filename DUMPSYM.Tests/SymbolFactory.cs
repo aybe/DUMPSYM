@@ -185,9 +185,4 @@ public sealed class SymbolFactory
 
         return safeName;
     }
-
-    public int LineOf(Symbol symbol)
-    {
-        return SymbolLine[symbol];
-    }
 }
