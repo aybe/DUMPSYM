@@ -132,11 +132,10 @@ public sealed class SymbolFactory
 
     public Symbol? GetTypeDefinition(Symbol[] type)
     {
-        var eos = type[^1];
-
-        var tag = eos.Tag!;
-
-        Assert.IsTrue(eos.IsTypeFooter);
+        if (type[^1] is not { IsTypeFooter: true } eos)
+        {
+            throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
 
         var symbols = Symbols.AsSpan(SymbolsIndices[eos] + 1);
 
@@ -162,7 +161,7 @@ public sealed class SymbolFactory
                 return null; // another type can use the same fake name at any time
             }
 
-            if (symbol.IsTypeDefinition && symbol.Tag == tag && symbol.Type is { } t && !t.Modifiers.Any())
+            if (symbol.IsTypeDefinition && symbol.Tag == eos.Tag && symbol.Type is { } t && !t.Modifiers.Any())
             {
                 return symbol; // first match
             }
