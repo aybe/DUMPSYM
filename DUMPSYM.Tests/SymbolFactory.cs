@@ -22,7 +22,7 @@ public sealed class SymbolFactory
 
         DistinctType = SplitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
 
-        DistinctTypeDefinitions = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
+        DistinctTypeDefinition = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
 
         DistinctTypeToTypeDefinition = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
 
@@ -88,7 +88,7 @@ public sealed class SymbolFactory
     /// <remarks>
     ///     Type definitions of types may refer to fake types that share the same fake names.
     /// </remarks>
-    public Symbol[] DistinctTypeDefinitions { get; }
+    public Symbol[] DistinctTypeDefinition { get; }
 
     /// <summary>
     ///     Dictionary to map a type from <see cref="DistinctType" /> to its corresponding type definition, if any.

@@ -17,7 +17,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
     {
         Assert.AreEqual(311, Factory.DistinctType.Count);
 
-        Assert.AreEqual(203, Factory.DistinctTypeDefinitions.Length);
+        Assert.AreEqual(203, Factory.DistinctTypeDefinition.Length);
 
         var printTypes = false;
         var printTypedefs = false;
@@ -34,9 +34,9 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         if (printTypedefs)
         {
-            WriteLineVar(Factory.DistinctTypeDefinitions.Length);
+            WriteLineVar(Factory.DistinctTypeDefinition.Length);
 
-            foreach (var symbol in Factory.DistinctTypeDefinitions)
+            foreach (var symbol in Factory.DistinctTypeDefinition)
             {
                 WriteLine(symbol);
             }
