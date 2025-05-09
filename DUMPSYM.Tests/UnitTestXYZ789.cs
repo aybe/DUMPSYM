@@ -15,7 +15,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
     [TestMethod]
     public void TestSplitByFiles()
     {
-        Assert.AreEqual(311, Factory.DistinctTypes.Count);
+        Assert.AreEqual(311, Factory.DistinctType.Count);
 
         Assert.AreEqual(203, Factory.DistinctTypeDefinitions.Length);
 
@@ -24,9 +24,9 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         if (printTypes)
         {
-            WriteLineVar(Factory.DistinctTypes.Count);
+            WriteLineVar(Factory.DistinctType.Count);
 
-            foreach (var symbols in Factory.DistinctTypes)
+            foreach (var symbols in Factory.DistinctType)
             {
                 WriteLine(symbols[0]);
             }
@@ -45,7 +45,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         var showDuplicates = true;
         var showUniques = true;
 
-        var lookup = Factory.DistinctTypes
+        var lookup = Factory.DistinctType
             .ToLookup(s => s[0].Name!)
             .Where(s => (showDuplicates && s.Count() > 1) || (showUniques && s.Count() == 1))
             .ToArray();

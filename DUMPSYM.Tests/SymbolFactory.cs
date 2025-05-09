@@ -20,11 +20,11 @@ public sealed class SymbolFactory
 
         SplitDistinct = Split.Distinct(SymbolArrayEqualityComparer.Everything).ToArray();
 
-        DistinctTypes = SplitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
+        DistinctType = SplitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
 
-        DistinctTypeToTypeDefinition = DistinctTypes.ToFrozenDictionary(s => s, GetTypeDefinition);
+        DistinctTypeToTypeDefinition = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
 
-        DistinctTypeName = DistinctTypes.ToFrozenDictionary(s => s, GetTypeName);
+        DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
 
         CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
 
@@ -59,7 +59,7 @@ public sealed class SymbolFactory
     public Symbol[][] SplitDistinct { get; }
 
     /// <summary>
-    ///     Arrays containing headers of compiler-generated types in <see cref="DistinctTypes" />.
+    ///     Arrays containing headers of compiler-generated types in <see cref="DistinctType" />.
     /// </summary>
     /// <remarks>
     ///     Types in these arrays may share the same fake names.
@@ -80,10 +80,10 @@ public sealed class SymbolFactory
     /// <remarks>
     ///     Types are all different by-member, fake types may share the same fake names.
     /// </remarks>
-    public FrozenSet<Symbol[]> DistinctTypes { get; }
+    public FrozenSet<Symbol[]> DistinctType { get; }
 
     /// <summary>
-    ///     Dictionary to map a type from <see cref="DistinctTypes" /> to its corresponding type definition, if any.
+    ///     Dictionary to map a type from <see cref="DistinctType" /> to its corresponding type definition, if any.
     /// </summary>
     public FrozenDictionary<Symbol[], Symbol?> DistinctTypeToTypeDefinition { get; }
 
@@ -96,7 +96,7 @@ public sealed class SymbolFactory
     public Symbol[] DistinctTypeDefinitions { get; }
 
     /// <summary>
-    ///     Gets the name of a type from <see cref="DistinctTypes" />;
+    ///     Gets the name of a type from <see cref="DistinctType" />;
     /// </summary>
     public FrozenDictionary<Symbol[], string> DistinctTypeName { get; }
 
