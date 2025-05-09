@@ -52,13 +52,13 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         Assert.AreEqual(300, lookup.Length);
 
-        foreach (var grouping in Factory.GeneratedTypeGroup)
+        foreach (var (key, set) in Factory.GeneratedTypeGroup)
         {
-            var name = grouping.Key[0].Name!;
+            var name = key[0].Name!;
 
             WriteLine(name);
 
-            foreach (var symbols in grouping)
+            foreach (var symbols in set)
             {
                 WriteLine("\t" + symbols[0]);
             }

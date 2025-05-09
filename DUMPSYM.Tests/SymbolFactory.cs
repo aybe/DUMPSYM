@@ -28,9 +28,9 @@ public sealed class SymbolFactory
 
         DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
 
-        GeneratedType = DistinctTypeDefinitionMap.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
+        GeneratedType = DistinctTypeDefinitionMap.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToFrozenSet();
 
-        GeneratedTypeGroup = GeneratedType.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
+        GeneratedTypeGroup = GeneratedType.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToFrozenDictionary(s => s.Key, s => s.ToFrozenSet());
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class SymbolFactory
     /// <remarks>
     ///     Types in these arrays may share the same fake names.
     /// </remarks>
-    public Symbol[][] GeneratedType { get; }
+    public FrozenSet<Symbol[]> GeneratedType { get; }
 
     /// <summary>
     ///     Groupings of <see cref="GeneratedType" /> where types are same by-member.
@@ -104,7 +104,7 @@ public sealed class SymbolFactory
     /// <remarks>
     ///     Types in these groupings may share the same fake names.
     /// </remarks>
-    public IGrouping<Symbol[], Symbol[]>[] GeneratedTypeGroup { get; }
+    public FrozenDictionary<Symbol[], FrozenSet<Symbol[]>> GeneratedTypeGroup { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
