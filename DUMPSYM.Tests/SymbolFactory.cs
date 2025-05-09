@@ -10,13 +10,13 @@ public sealed class SymbolFactory
 {
     public SymbolFactory(SymbolFile file)
     {
-        Symbols = file.Symbols.ToArray();
+        var symbols = file.Symbols.ToArray();
 
-        MapIndex = Symbols.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
+        var indices = symbols.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
 
-        MapLine = GetLines(Symbols);
+        MapLine = GetLines(symbols);
 
-        var split = Symbol.Split(Symbols); // by kind: defs, exts, files, funcs, names, statics, types
+        var split = Symbol.Split(symbols); // by kind: defs, exts, files, funcs, names, statics, types
 
         var splitDistinct = split.Distinct(SymbolArrayEqualityComparer.Everything).ToArray(); // without duplicates
 
@@ -24,7 +24,7 @@ public sealed class SymbolFactory
 
         DistinctTypeDefinition = splitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToFrozenSet();
 
-        DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
+        DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, s => GetTypeDefinition(s, symbols, indices));
 
         DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
 
@@ -32,16 +32,6 @@ public sealed class SymbolFactory
 
         GeneratedTypeGroup = GeneratedType.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToFrozenDictionary(s => s.Key, s => s.ToFrozenSet());
     }
-
-    /// <summary>
-    ///     Symbols in original form, one-to-one relationship with DUMPSYM output.
-    /// </summary>
-    public Symbol[] Symbols { get; }
-
-    /// <summary>
-    ///     Dictionary to map a symbol to its corresponding index in <see cref="Symbols" />.
-    /// </summary>
-    public FrozenDictionary<Symbol, int> MapIndex { get; }
 
     /// <summary>
     ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
@@ -133,16 +123,16 @@ public sealed class SymbolFactory
         return RegexFakeName.IsMatch(name);
     }
 
-    private Symbol? GetTypeDefinition(Symbol[] type)
+    private static Symbol? GetTypeDefinition(Symbol[] type, Symbol[] symbols, FrozenDictionary<Symbol, int> indices)
     {
         if (type[^1] is not { IsTypeFooter: true } eos)
         {
             throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
 
-        var symbols = Symbols.AsSpan(MapIndex[eos] + 1);
+        var span = symbols.AsSpan(indices[eos] + 1);
 
-        foreach (var symbol in symbols)
+        foreach (var symbol in span)
         {
             if (symbol.IsFunction)
             {
