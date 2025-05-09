@@ -12,13 +12,25 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 {
     private SymbolFactory Factory { get; } = new(Sample.Default);
 
-    [TestMethod]
-    public void TestSplitByFiles()
+    [TestInitialize]
+    public void TestInitialize()
     {
         Assert.AreEqual(311, Factory.DistinctType.Count);
 
         Assert.AreEqual(203, Factory.DistinctTypeDefinition.Count);
+    }
 
+    [TestMethod]
+    public void TestGeneration()
+    {
+        var generator = new SymbolGenerator(Factory);
+
+        WriteLine(generator);
+    }
+
+    [TestMethod]
+    public void TestSplitByFiles()
+    {
         var printTypes = false;
         var printTypedefs = false;
 
