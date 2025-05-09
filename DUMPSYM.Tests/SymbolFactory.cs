@@ -24,11 +24,11 @@ public sealed class SymbolFactory
 
         DistinctTypeDefinition = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
 
-        DistinctTypeToTypeDefinition = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
+        DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
 
         DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
 
-        CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
+        CompilerGeneratedTypes = DistinctTypeDefinitionMap.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
 
         CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
     }
@@ -93,7 +93,7 @@ public sealed class SymbolFactory
     /// <summary>
     ///     Dictionary to map a type from <see cref="DistinctType" /> to its corresponding type definition, if any.
     /// </summary>
-    public FrozenDictionary<Symbol[], Symbol?> DistinctTypeToTypeDefinition { get; }
+    public FrozenDictionary<Symbol[], Symbol?> DistinctTypeDefinitionMap { get; }
 
     /// <summary>
     ///     Gets the name of a type from <see cref="DistinctType" />;
@@ -184,7 +184,7 @@ public sealed class SymbolFactory
             throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
 
-        var def = DistinctTypeToTypeDefinition[type];
+        var def = DistinctTypeDefinitionMap[type];
 
         var typeName = hdr.Name!;
 

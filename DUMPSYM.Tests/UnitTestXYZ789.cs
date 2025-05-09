@@ -93,7 +93,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 var name = Factory.DistinctTypeName[symbols];
 
-                var def = Factory.DistinctTypeToTypeDefinition[symbols];
+                var def = Factory.DistinctTypeDefinitionMap[symbols];
 
                 WriteLine($"\t\t{name}");
 
