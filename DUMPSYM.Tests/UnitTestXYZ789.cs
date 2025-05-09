@@ -52,7 +52,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         Assert.AreEqual(300, lookup.Length);
 
-        foreach (var grouping in Factory.CompilerGeneratedTypesDuplicates)
+        foreach (var grouping in Factory.GeneratedTypeGroup)
         {
             var name = grouping.Key[0].Name!;
 
