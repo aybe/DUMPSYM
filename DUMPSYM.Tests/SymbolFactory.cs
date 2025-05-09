@@ -167,10 +167,12 @@ public sealed class SymbolFactory
 
         var def = DistinctTypeDefinitionMap[type];
 
-        var typeName = hdr.Name!;
+        var name = hdr.Name!;
 
-        var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{(HasFakeName(typeName) ? $"_{typeName[1..]}" : typeName)}_{hdr.Header.Position:x6}" : typeName);
+        var fake = HasFakeName(name);
 
-        return safeName;
+        var safe = def?.Name ?? (fake ? $"{(fake ? $"_{name[1..]}" : name)}_{hdr.Header.Position:x6}" : name);
+
+        return safe;
     }
 }
