@@ -14,7 +14,7 @@ public sealed class SymbolFactory
 
         var indices = symbols.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
 
-        MapLine = GetLines(symbols);
+        LineOf = GetLines(symbols);
 
         var split = Symbol.Split(symbols); // by kind: defs, exts, files, funcs, names, statics, types
 
@@ -32,11 +32,6 @@ public sealed class SymbolFactory
 
         GeneratedTypeGroup = GeneratedType.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToFrozenDictionary(s => s.Key, s => s.ToFrozenSet());
     }
-
-    /// <summary>
-    ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
-    /// </summary>
-    public FrozenDictionary<Symbol, int> MapLine { get; }
 
     /// <summary>
     ///     Set containing headers of distinct types in .SYM file.
@@ -85,6 +80,11 @@ public sealed class SymbolFactory
     ///     Types in this dictionary may share the same fake names (see <see cref="GeneratedType" />).
     /// </remarks>
     public FrozenDictionary<Symbol[], FrozenSet<Symbol[]>> GeneratedTypeGroup { get; }
+
+    /// <summary>
+    ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
+    /// </summary>
+    public FrozenDictionary<Symbol, int> LineOf { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
