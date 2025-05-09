@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 
 // ReSharper disable CommentTypo
@@ -102,7 +103,13 @@ public sealed class UnitTestXYZ789 : UnitTestBase
             sb.AppendLine(row);
         }
 
-        File.WriteAllText(output, sb.ToString());
+        var md = sb.ToString();
+
+        var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(md)));
+
+        Assert.AreEqual("a461f9c42453d799deb60ddfce115de4b456ac46c0134ff371fd8e67593593be", hash, true);
+
+        File.WriteAllText(output, md);
     }
 
     private void Print(Array array, [CallerArgumentExpression(nameof(array))] string arrayName = null!)
