@@ -85,11 +85,11 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 WriteLine($"\t\t{name}");
 
-                var ln = Factory.SymbolLine[hdr];
+                var ln = Factory.MapLine[hdr];
 
                 var c1 = $"[{hdr}]({uri}:{ln})";
 
-                var c2 = def == null ? name : $"[{def.Name}]({uri}:{Factory.SymbolLine[def]})";
+                var c2 = def == null ? name : $"[{def.Name}]({uri}:{Factory.MapLine[def]})";
 
                 tmp.Add(ln, $"| {ln} | {c1} | {c2} |");
             }

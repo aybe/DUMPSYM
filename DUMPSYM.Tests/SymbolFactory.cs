@@ -12,9 +12,9 @@ public sealed class SymbolFactory
     {
         Symbols = file.Symbols.ToArray();
 
-        SymbolIndex = Symbols.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
+        MapIndex = Symbols.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
 
-        SymbolLine = GetLines(Symbols);
+        MapLine = GetLines(Symbols);
 
         Split = Symbol.Split(Symbols);
 
@@ -39,12 +39,12 @@ public sealed class SymbolFactory
     /// <summary>
     ///     Dictionary to map a symbol to its corresponding index in <see cref="Symbols" />.
     /// </summary>
-    public FrozenDictionary<Symbol, int> SymbolIndex { get; }
+    public FrozenDictionary<Symbol, int> MapIndex { get; }
 
     /// <summary>
     ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
     /// </summary>
-    public FrozenDictionary<Symbol, int> SymbolLine { get; }
+    public FrozenDictionary<Symbol, int> MapLine { get; }
 
     /// <summary>
     ///     Symbols split by kind: definitions, externals, files, functions, names, statics, types.
@@ -137,7 +137,7 @@ public sealed class SymbolFactory
             throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
 
-        var symbols = Symbols.AsSpan(SymbolIndex[eos] + 1);
+        var symbols = Symbols.AsSpan(MapIndex[eos] + 1);
 
         foreach (var symbol in symbols)
         {
