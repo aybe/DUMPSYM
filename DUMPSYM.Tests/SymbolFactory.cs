@@ -91,18 +91,18 @@ public sealed class SymbolFactory
     public FrozenDictionary<Symbol[], string> DistinctTypeName { get; }
 
     /// <summary>
-    ///     Arrays containing headers of compiler-generated types in <see cref="DistinctType" />.
+    ///     Set containing headers of compiler-generated types.
     /// </summary>
     /// <remarks>
-    ///     Types in these arrays may share the same fake names.
+    ///     Types in this set may share the same fake names (see <see cref="DistinctType" />).
     /// </remarks>
     public FrozenSet<Symbol[]> GeneratedType { get; }
 
     /// <summary>
-    ///     Groupings of <see cref="GeneratedType" /> where types are same by-member.
+    ///     Dictionary of compiler-generated types that are same by-member.
     /// </summary>
     /// <remarks>
-    ///     Types in these groupings may share the same fake names.
+    ///     Types in this dictionary may share the same fake names (see <see cref="GeneratedType" />).
     /// </remarks>
     public FrozenDictionary<Symbol[], FrozenSet<Symbol[]>> GeneratedTypeGroup { get; }
 
