@@ -161,9 +161,7 @@ public sealed class SymbolFactory
 
         var name = hdr.Name!;
 
-        var fake = hdr.HasFakeName;
-
-        var safe = def?.Name ?? (fake ? $"{(fake ? $"_{name[1..]}" : name)}_{hdr.Header.Position:x6}" : name);
+        var safe = def?.Name ?? (hdr.HasFakeName ? $"_{name[1..]}_{hdr.Header.Position:x6}" : name);
 
         return safe;
     }
