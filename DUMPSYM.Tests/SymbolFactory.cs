@@ -120,17 +120,17 @@ public sealed class SymbolFactory
         return lines.ToFrozenDictionary();
     }
 
-    public static string GetSafeName(string name)
+    private static string GetSafeName(string name)
     {
         return HasFakeName(name) ? $"_{name[1..]}" : name;
     }
 
-    public static bool HasFakeName(string name)
+    private static bool HasFakeName(string name)
     {
         return RegexFakeName.IsMatch(name);
     }
 
-    public Symbol? GetTypeDefinition(Symbol[] type)
+    private Symbol? GetTypeDefinition(Symbol[] type)
     {
         if (type[^1] is not { IsTypeFooter: true } eos)
         {
