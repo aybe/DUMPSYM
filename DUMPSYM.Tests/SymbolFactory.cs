@@ -95,9 +95,9 @@ public sealed class SymbolFactory
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static FrozenDictionary<Symbol, int> GetLines(IEnumerable<Symbol> symbols)
+    private static FrozenDictionary<Symbol, int> GetLines(Symbol[] symbols)
     {
-        var lines = new Dictionary<Symbol, int>();
+        var lines = new Dictionary<Symbol, int>(symbols.Length);
 
         var index = 4;
 
