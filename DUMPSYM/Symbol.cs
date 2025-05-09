@@ -1,4 +1,5 @@
 using DUMPSYM.Extensions;
+using System.Text.RegularExpressions;
 
 namespace DUMPSYM;
 
@@ -79,6 +80,8 @@ public sealed partial class Symbol
 
 public sealed partial class Symbol
 {
+    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     #region ISymbolDefinition
 
     public SymbolStorageClass? Class => Record is ISymbolDefinition d ? d.Class : null;
@@ -99,7 +102,9 @@ public sealed partial class Symbol
 
     #endregion
 
-    #region Is*
+    #region Extras
+
+    public bool HasFakeName => Name is not null && RegexFakeName.IsMatch(Name);
 
     public bool IsFunction => Record is ISymbolFunction;
 

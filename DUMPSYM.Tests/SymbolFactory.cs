@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using System.Text.RegularExpressions;
 
 // ReSharper disable CommentTypo
 
@@ -28,7 +27,7 @@ public sealed class SymbolFactory
 
         DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
 
-        GeneratedType = DistinctTypeDefinitionMap.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToFrozenSet();
+        GeneratedType = DistinctTypeDefinitionMap.Where(s => s.Key[0].HasFakeName && s.Value == null).Select(s => s.Key).ToFrozenSet();
 
         GeneratedTypeGroup = GeneratedType.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToFrozenDictionary(s => s.Key, s => s.ToFrozenSet());
     }
@@ -86,8 +85,6 @@ public sealed class SymbolFactory
     /// </summary>
     public FrozenDictionary<Symbol, int> LineOf { get; }
 
-    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     private static FrozenDictionary<Symbol, int> GetLines(Symbol[] symbols)
     {
         var lines = new Dictionary<Symbol, int>(symbols.Length);
@@ -111,11 +108,6 @@ public sealed class SymbolFactory
         }
 
         return lines.ToFrozenDictionary();
-    }
-
-    private static bool HasFakeName(string name)
-    {
-        return RegexFakeName.IsMatch(name);
     }
 
     private static Symbol? GetTypeDefinition(Symbol[] type, Symbol[] symbols, FrozenDictionary<Symbol, int> indices)
@@ -169,7 +161,7 @@ public sealed class SymbolFactory
 
         var name = hdr.Name!;
 
-        var fake = HasFakeName(name);
+        var fake = hdr.HasFakeName;
 
         var safe = def?.Name ?? (fake ? $"{(fake ? $"_{name[1..]}" : name)}_{hdr.Header.Position:x6}" : name);
 
