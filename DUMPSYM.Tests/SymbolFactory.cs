@@ -59,22 +59,6 @@ public sealed class SymbolFactory
     public Symbol[][] SplitDistinct { get; }
 
     /// <summary>
-    ///     Arrays containing headers of compiler-generated types in <see cref="DistinctType" />.
-    /// </summary>
-    /// <remarks>
-    ///     Types in these arrays may share the same fake names.
-    /// </remarks>
-    public Symbol[][] CompilerGeneratedTypes { get; }
-
-    /// <summary>
-    ///     Groupings of <see cref="CompilerGeneratedTypes" /> where types are same by-member.
-    /// </summary>
-    /// <remarks>
-    ///     Types in these groupings may share the same fake names.
-    /// </remarks>
-    public IGrouping<Symbol[], Symbol[]>[] CompilerGeneratedTypesDuplicates { get; }
-
-    /// <summary>
     ///     Set containing headers of distinct types in .SYM file.
     /// </summary>
     /// <remarks>
@@ -105,6 +89,22 @@ public sealed class SymbolFactory
     ///     See <see cref="DistinctType" />.
     /// </remarks>
     public FrozenDictionary<Symbol[], string> DistinctTypeName { get; }
+
+    /// <summary>
+    ///     Arrays containing headers of compiler-generated types in <see cref="DistinctType" />.
+    /// </summary>
+    /// <remarks>
+    ///     Types in these arrays may share the same fake names.
+    /// </remarks>
+    public Symbol[][] CompilerGeneratedTypes { get; }
+
+    /// <summary>
+    ///     Groupings of <see cref="CompilerGeneratedTypes" /> where types are same by-member.
+    /// </summary>
+    /// <remarks>
+    ///     Types in these groupings may share the same fake names.
+    /// </remarks>
+    public IGrouping<Symbol[], Symbol[]>[] CompilerGeneratedTypesDuplicates { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
