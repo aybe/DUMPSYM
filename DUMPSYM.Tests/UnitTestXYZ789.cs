@@ -81,7 +81,9 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
                 WriteLine($"\t{hdr}");
 
-                var name = Factory.GetTypeName(symbols, out var def);
+                var name = Factory.DistinctTypeName[symbols];
+
+                var def = Factory.DistinctTypeToTypeDefinition[symbols];
 
                 WriteLine($"\t\t{name}");
 

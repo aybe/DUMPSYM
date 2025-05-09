@@ -24,6 +24,8 @@ public sealed class SymbolFactory
 
         DistinctTypeToTypeDefinition = DistinctTypes.ToFrozenDictionary(s => s, GetTypeDefinition);
 
+        DistinctTypeName = DistinctTypes.ToFrozenDictionary(s => s, GetTypeName);
+
         CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
 
         CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
@@ -92,6 +94,11 @@ public sealed class SymbolFactory
     ///     Type definitions of types may refer to fake types that share the same fake names.
     /// </remarks>
     public Symbol[] DistinctTypeDefinitions { get; }
+
+    /// <summary>
+    ///     Gets the name of a type from <see cref="DistinctTypes" />;
+    /// </summary>
+    public FrozenDictionary<Symbol[], string> DistinctTypeName { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -170,14 +177,14 @@ public sealed class SymbolFactory
         return null; // none found, fake type name should be transformed to be unique
     }
 
-    public string GetTypeName(Symbol[] type, out Symbol? def)
+    private string GetTypeName(Symbol[] type)
     {
         if (type[0] is not { IsTypeHeader: true } hdr)
         {
             throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
 
-        def = DistinctTypeToTypeDefinition[type];
+        var def = DistinctTypeToTypeDefinition[type];
 
         var typeName = hdr.Name!;
 
