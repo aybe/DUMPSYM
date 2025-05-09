@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,7 +15,7 @@ public sealed class UnitTestXYZ789 : UnitTestBase
     [TestMethod]
     public void TestSplitByFiles()
     {
-        Assert.AreEqual(311, Factory.DistinctTypes.Length);
+        Assert.AreEqual(311, Factory.DistinctTypes.Count);
 
         Assert.AreEqual(203, Factory.DistinctTypeDefinitions.Length);
 
@@ -25,12 +24,22 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         if (printTypes)
         {
-            Print(Factory.DistinctTypes);
+            WriteLineVar(Factory.DistinctTypes.Count);
+
+            foreach (var symbols in Factory.DistinctTypes)
+            {
+                WriteLine(symbols[0]);
+            }
         }
 
         if (printTypedefs)
         {
-            Print(Factory.DistinctTypeDefinitions);
+            WriteLineVar(Factory.DistinctTypeDefinitions.Length);
+
+            foreach (var symbol in Factory.DistinctTypeDefinitions)
+            {
+                WriteLine(symbol);
+            }
         }
 
         var showDuplicates = true;
@@ -110,15 +119,5 @@ public sealed class UnitTestXYZ789 : UnitTestBase
         Assert.AreEqual("a461f9c42453d799deb60ddfce115de4b456ac46c0134ff371fd8e67593593be", hash, true);
 
         File.WriteAllText(output, md);
-    }
-
-    private void Print(Array array, [CallerArgumentExpression(nameof(array))] string arrayName = null!)
-    {
-        WriteLine($"{arrayName}: {array.Length}");
-
-        foreach (var item in array)
-        {
-            WriteLine(item is Array a ? a.GetValue(0) : item);
-        }
     }
 }
