@@ -113,11 +113,6 @@ public sealed class SymbolFactory
         return lines.ToFrozenDictionary();
     }
 
-    private static string GetSafeName(string name)
-    {
-        return HasFakeName(name) ? $"_{name[1..]}" : name;
-    }
-
     private static bool HasFakeName(string name)
     {
         return RegexFakeName.IsMatch(name);
@@ -174,7 +169,7 @@ public sealed class SymbolFactory
 
         var typeName = hdr.Name!;
 
-        var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{GetSafeName(typeName)}_{hdr.Header.Position:x6}" : typeName);
+        var safeName = def?.Name ?? (HasFakeName(typeName) ? $"{(HasFakeName(typeName) ? $"_{typeName[1..]}" : typeName)}_{hdr.Header.Position:x6}" : typeName);
 
         return safeName;
     }
