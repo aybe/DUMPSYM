@@ -16,13 +16,13 @@ public sealed class SymbolFactory
 
         MapLine = GetLines(Symbols);
 
-        Split = Symbol.Split(Symbols);
+        var split = Symbol.Split(Symbols); // by kind: defs, exts, files, funcs, names, statics, types
 
-        SplitDistinct = Split.Distinct(SymbolArrayEqualityComparer.Everything).ToArray();
+        var splitDistinct = split.Distinct(SymbolArrayEqualityComparer.Everything).ToArray(); // without duplicates
 
-        DistinctType = SplitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
+        DistinctType = splitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
 
-        DistinctTypeDefinition = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToFrozenSet();
+        DistinctTypeDefinition = splitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToFrozenSet();
 
         DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
 
@@ -47,16 +47,6 @@ public sealed class SymbolFactory
     ///     Dictionary to map a symbol to its corresponding line in DUMPSYM output.
     /// </summary>
     public FrozenDictionary<Symbol, int> MapLine { get; }
-
-    /// <summary>
-    ///     Symbols split by kind: definitions, externals, files, functions, names, statics, types.
-    /// </summary>
-    public Symbol[][] Split { get; }
-
-    /// <summary>
-    ///     <see cref="Split" /> without duplicates.
-    /// </summary>
-    public Symbol[][] SplitDistinct { get; }
 
     /// <summary>
     ///     Set containing headers of distinct types in .SYM file.
