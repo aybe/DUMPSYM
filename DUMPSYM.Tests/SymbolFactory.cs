@@ -75,29 +75,35 @@ public sealed class SymbolFactory
     public IGrouping<Symbol[], Symbol[]>[] CompilerGeneratedTypesDuplicates { get; }
 
     /// <summary>
-    ///     Array containing headers of distinct types in the .SYM file.
+    ///     Set containing headers of distinct types in .SYM file.
     /// </summary>
     /// <remarks>
-    ///     Types are all different by-member, fake types may share the same fake names.
+    ///     Types are all unique by-member, fake types may share names.
     /// </remarks>
     public FrozenSet<Symbol[]> DistinctType { get; }
 
     /// <summary>
-    ///     Array containing distinct type definitions in the .SYM file.
+    ///     Set containing distinct type definitions in .SYM file.
     /// </summary>
     /// <remarks>
-    ///     Type definitions of types may refer to fake types that share the same fake names.
+    ///     Type definitions may refer to fake types that share names.
     /// </remarks>
     public FrozenSet<Symbol> DistinctTypeDefinition { get; }
 
     /// <summary>
-    ///     Dictionary to map a type from <see cref="DistinctType" /> to its corresponding type definition, if any.
+    ///     Dictionary to map a distinct type to its definition, if any.
     /// </summary>
+    /// <remarks>
+    ///     See <see cref="DistinctType" />.
+    /// </remarks>
     public FrozenDictionary<Symbol[], Symbol?> DistinctTypeDefinitionMap { get; }
 
     /// <summary>
-    ///     Gets the name of a type from <see cref="DistinctType" />;
+    ///     Gets the real name of a distinct type.
     /// </summary>
+    /// <remarks>
+    ///     See <see cref="DistinctType" />.
+    /// </remarks>
     public FrozenDictionary<Symbol[], string> DistinctTypeName { get; }
 
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
