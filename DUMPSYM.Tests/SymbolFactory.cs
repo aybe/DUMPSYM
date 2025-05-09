@@ -22,6 +22,8 @@ public sealed class SymbolFactory
 
         DistinctType = SplitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
 
+        DistinctTypeDefinitions = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
+
         DistinctTypeToTypeDefinition = DistinctType.ToFrozenDictionary(s => s, GetTypeDefinition);
 
         DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
@@ -29,8 +31,6 @@ public sealed class SymbolFactory
         CompilerGeneratedTypes = DistinctTypeToTypeDefinition.Where(s => HasFakeName(s.Key[0].Name!) && s.Value == null).Select(s => s.Key).ToArray();
 
         CompilerGeneratedTypesDuplicates = CompilerGeneratedTypes.GroupBy(s => s, SymbolArrayEqualityComparer.Members).Where(s => s.Count() > 1).ToArray();
-
-        DistinctTypeDefinitions = SplitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToArray();
     }
 
     /// <summary>
@@ -83,17 +83,17 @@ public sealed class SymbolFactory
     public FrozenSet<Symbol[]> DistinctType { get; }
 
     /// <summary>
-    ///     Dictionary to map a type from <see cref="DistinctType" /> to its corresponding type definition, if any.
-    /// </summary>
-    public FrozenDictionary<Symbol[], Symbol?> DistinctTypeToTypeDefinition { get; }
-
-    /// <summary>
     ///     Array containing distinct type definitions in the .SYM file.
     /// </summary>
     /// <remarks>
     ///     Type definitions of types may refer to fake types that share the same fake names.
     /// </remarks>
     public Symbol[] DistinctTypeDefinitions { get; }
+
+    /// <summary>
+    ///     Dictionary to map a type from <see cref="DistinctType" /> to its corresponding type definition, if any.
+    /// </summary>
+    public FrozenDictionary<Symbol[], Symbol?> DistinctTypeToTypeDefinition { get; }
 
     /// <summary>
     ///     Gets the name of a type from <see cref="DistinctType" />;
