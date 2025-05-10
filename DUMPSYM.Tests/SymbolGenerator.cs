@@ -1,4 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.CodeDom.Compiler;
+using System.Diagnostics.CodeAnalysis;
+using DUMPSYM.Extensions;
+
+// ReSharper disable StringLiteralTypo
 
 // ReSharper disable CommentTypo
 
@@ -6,12 +10,24 @@ namespace DUMPSYM.Tests;
 
 public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG SpuStCallbackProc is typedef void (*SpuStCallbackProc)(unsigned long, long); in SDK but is Def class TPDEF type PTR FCN VOID size 0 name SpuStCallbackProc
+
+// BUG shall the types of members of types without any typedef shall be generated using no typedef?
+// e.g. EvCB, ULONG -> unsigned long
+// but problem, how to differentiate these types? whether it's fake or not?
+
+// TODO NCB hint https://github.com/joncampbell123/windows_sdk_collection/blob/main/win/3.1wfw/mswin/include/NCB.H
+// TODO NCB hint https://github.com/turican0/remc2/blob/development/remc2/sub_main.h#L415
+
+// BUG Camera ChaseCamera; /* case 1 */ // 00bdd9: $0000003c 96 Def2 class MOS type STRUCT size 60 dims 0 tag Camera name ChaseCamera
+// BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
+
+// TODO FIELD
 {
     private SymbolFactory Factory { get; } = factory;
 
-    private bool GenerateTypeEnabled { get; } = false;
+    private bool GenerateTypeEnabled { get; } = true;
 
-    private bool GenerateTypeDefinitionEnabled { get; } = true;
+    private bool GenerateTypeDefinitionEnabled { get; } = false;
 
     public override string ToString()
     {
@@ -27,39 +43,166 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             GenerateTypeDefinitions(dictionary);
         }
 
-        var s = string.Join(Environment.NewLine, dictionary);
+        var s = string.Join(Environment.NewLine, dictionary.Values);
+
+        Console.WriteLine(dictionary.Count);
 
         return s;
     }
 
-    private string GenerateType(Symbol[] type)
+    [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
+    [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
+    private string? GenerateType(Symbol[] type)
+        // TODO there can be a single method that just prepends typedef
     {
+        using var writer = new IndentedTextWriter(new StringWriter());
+
+        var def = Factory.DistinctTypeDefinitionMap[type];
+
         var header = type[0];
 
-        var value = $"TYPE = {header.Name!} -> {Factory.DistinctTypeName[type]} -> {Factory.DistinctTypeDefinitionMap[type]?.Name}";
+        var klass = ToString(header.Class!.Value);
 
-        return value;
+        var name = Factory.DistinctTypeName[type];
+
+        if (def == null)
+        {
+            writer.WriteLine2($"{klass} {name} {{", $"// {header}");
+        }
+        else
+        {
+            writer.WriteLine2($"{ToString(SymbolStorageClass.TPDEF)} {klass} {{", $"// {header}");
+        }
+
+        using (writer.GetIndentScope())
+        {
+            var members = type[1..^1];
+
+            foreach (var member in members)
+            {
+                writer.WriteLine2($"{GetMemberString(member)}", $"// {member}");
+            }
+        }
+
+        var footer = type[^1];
+
+        if (def == null)
+        {
+            writer.WriteLine2("};", $"// {footer}");
+        }
+        else
+        {
+            writer.WriteLine2($"}} {name};", $"// {footer}");
+        }
+
+        return writer.InnerWriter.ToString();
+    }
+
+    [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
+    [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+    private string? GetMemberString(Symbol member)
+        // TODO figure out which of C primitive or typedef to use for type
+    {
+        var name = member.Name;
+        var type = member.Type!.Value;
+
+        var modifiers = type.Modifiers.ToArray();
+
+        var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
+        var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
+
+        var fcn = modifiers.Any(s => s is SymbolTypeModifier.FCN);
+
+        if (fcn) // always have PTR
+        {
+            Assert.AreEqual(1, modifiers.Count(s => s is SymbolTypeModifier.FCN), member.ToString());
+            Assert.AreEqual(0, modifiers.Count(s => s is SymbolTypeModifier.ARY), member.ToString());
+        }
+
+        var tag = member.Tag;
+
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            var where1 = Factory.DistinctTypeDefinition.Where(s => s.Type!.Value == type);
+            var symbols1 = where1.Where(s => s.Header.Position < member.Header.Position).OrderBy(s => s.Header.Position);
+            var symbol1 = symbols1.FirstOrDefault();
+
+            if (symbol1 == null)
+            {
+                var where2 = Factory.DistinctTypeDefinition.Where(s => s.Type!.Value.Kind == type.Kind);
+                var symbols2 = where2.Where(s => s.Header.Position < member.Header.Position).OrderBy(s => s.Header.Position);
+                var symbol2 = symbols2.FirstOrDefault();
+
+                if (symbol2 == null)
+                {
+                    return $"{GetTypeName(member)}{pointers} {name}; /* case 5 */";
+                }
+                else
+                {
+                    if (fcn)
+                    {
+                        return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 4 */";
+                    }
+                    else
+                    {
+                        return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}; /* case 3 */";
+                    }
+                }
+            }
+            else // basic
+            {
+                return $"{GetTypeName(symbol1)} {name}; /* case 2 */";
+            }
+        }
+        else // TODO ARY, FCN
+        {
+            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
+            {
+                return $"{tag} {pointers}{name}; /* case 1 */";
+            }
+            else // if type isn't in symbols, add 'struct' so it still compiles
+            {
+                // TODO ordering is done many times, cache
+                // TODO by-position shall be based on type position, not member position
+                var a = Factory.DistinctTypeName.OrderBy(s => s.Key[0].Header.Position);
+                var b = a.Where(s => s.Key[0].Header.Position < member.Header.Position);
+                var c = b.Where(s => s.Key[0].Name == tag);
+                var d = c.LastOrDefault().Value;
+
+                if (d == null)
+                {
+                    return $"{ToString(type.Kind)} {tag} {pointers}{name}; /* case 0 */";
+                }
+                else
+                {
+                    return $"{d} {pointers}{name}; /* case 9 */";
+                }
+            }
+        }
+    }
+
+    [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+    private static string GetTypeName(Symbol symbol, bool typedef = false)
+    {
+        if (typedef)
+        {
+            return symbol.Name!;
+        }
+
+        return ToString(symbol.Type!.Value.Kind);
     }
 
     private void GenerateTypes(SortedDictionary<long, string> declarations)
     {
-        foreach (var type in Factory.DistinctType)
+        foreach (var type in Factory.DistinctType.OrderBy(s => s[0].Header.Position)) // TODO delete
         {
-            var symbol = type[0];
+            var value = GenerateType(type);
 
-            switch (symbol.Class)
+            if (value != null)
             {
-                case SymbolStorageClass.STRTAG:
-                    break;
-                case SymbolStorageClass.UNTAG:
-                    break;
-                default:
-                    throw new NotImplementedException(symbol.Class.ToString());
+                declarations.Add(type[0].Header.Position, value);
             }
-
-            var s = GenerateType(type);
-
-            declarations.Add(symbol.Header.Position, s);
         }
     }
 

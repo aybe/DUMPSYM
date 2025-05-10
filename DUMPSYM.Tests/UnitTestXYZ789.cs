@@ -2,8 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 
-// ReSharper disable CommentTypo
-
 namespace DUMPSYM.Tests;
 
 [TestClass]
@@ -25,7 +23,13 @@ public sealed class UnitTestXYZ789 : UnitTestBase
     {
         var generator = new SymbolGenerator(Factory);
 
-        WriteLine(generator);
+        var s = generator.ToString();
+
+        WriteLine(s);
+
+        const string path = @"C:\Files\GitHub\! PSX\DUMPSYM\MAIN.SYM.H"; // TODO get from file
+
+        File.WriteAllText(path, s);
     }
 
     [TestMethod]
