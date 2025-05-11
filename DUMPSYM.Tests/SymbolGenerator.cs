@@ -112,6 +112,8 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
         var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
 
+        var field = member.Class!.Value is SymbolStorageClass.FIELD ? $" : {member.Size!.Value}" : null;
+
         var fcn = modifiers.Any(s => s is SymbolTypeModifier.FCN);
 
         if (fcn) // always have PTR
@@ -128,7 +130,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol1 != null) // exact
             {
-                return $"{GetTypeName(symbol1)}{pointers} {name}; /* case 2 */";
+                return $"{GetTypeName(symbol1)}{pointers} {name}{field}; /* case 2 */";
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
