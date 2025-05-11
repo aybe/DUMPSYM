@@ -130,6 +130,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol1 != null) // exact
             {
+                if (!string.IsNullOrEmpty(dimensions))
+                {
+                    throw new NotImplementedException(member.ToString());
+                }
+
                 return $"{GetTypeName(symbol1)}{pointers} {name}{field}; /* case 2 */";
             }
 
@@ -137,6 +142,16 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol2 == null) // partial
             {
+                if (!string.IsNullOrEmpty(dimensions))
+                {
+                    throw new NotImplementedException(member.ToString());
+                }
+
+                if (!string.IsNullOrEmpty(field))
+                {
+                    throw new NotImplementedException(member.ToString());
+                }
+
                 return $"{GetTypeName(member)}{pointers} {name}; /* case 5 */";
             }
 
@@ -146,11 +161,26 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             }
             else
             {
+                if (!string.IsNullOrEmpty(field))
+                {
+                    throw new NotImplementedException(member.ToString());
+                }
+
                 return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}; /* case 3 */";
             }
         }
         else // TODO ARY, FCN
         {
+            if (!string.IsNullOrEmpty(dimensions))
+            {
+                throw new NotImplementedException(member.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(field))
+            {
+                throw new NotImplementedException(member.ToString());
+            }
+
             if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
             {
                 return $"{tag} {pointers}{name}; /* case 1 */";
