@@ -132,10 +132,12 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             {
                 if (fcn)
                 {
-                    throw new NotImplementedException(member.ToString());
+                    return $"{GetTypeName(symbol1)} ({pointers}{name})(); /* case 4 */";
                 }
-
-                return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}{field}; /* case 2 */";
+                else
+                {
+                    return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}{field}; /* case 2 */";
+                }
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
@@ -144,10 +146,12 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             {
                 if (fcn)
                 {
-                    throw new NotImplementedException(member.ToString());
+                    return $"{GetTypeName(member)} ({pointers}{name})(); /* case 4 */";
                 }
-
-                return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
+                else
+                {
+                    return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
+                }
             }
 
             if (fcn)
@@ -161,14 +165,16 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
         else
         {
-            if (fcn)
-            {
-                throw new NotImplementedException(member.ToString());
-            }
-
             if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
             {
-                return $"{tag} {pointers}{name}{dimensions}{field}; /* case 1 */";
+                if (fcn)
+                {
+                    return $"{tag} ({pointers}{name})(); /* case 6 */";
+                }
+                else
+                {
+                    return $"{tag} {pointers}{name}{dimensions}{field}; /* case 1 */";
+                }
             }
             else // if type isn't in symbols, add 'struct' so it still compiles
             {
@@ -181,11 +187,25 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
                 if (d == null)
                 {
-                    return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
+                    if (fcn)
+                    {
+                        return $"{ToString(type.Kind)} {tag} ({pointers}{name})(); /* case 0 */";
+                    }
+                    else
+                    {
+                        return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
+                    }
                 }
-                else // TODO FCN
+                else
                 {
-                    return $"{d} {pointers}{name}{dimensions}{field} ; /* case 9 */";
+                    if (fcn)
+                    {
+                        return $"{d} ({pointers}{name})(); /* case 8 */";
+                    }
+                    else
+                    {
+                        return $"{d} {pointers}{name}{dimensions}{field} ; /* case 9 */";
+                    }
                 }
             }
         }
