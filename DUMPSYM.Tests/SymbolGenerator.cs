@@ -128,7 +128,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol1 != null) // exact
             {
-                return $"{GetTypeName(symbol1)} {name}; /* case 2 */";
+                return $"{GetTypeName(symbol1)}{pointers} {name}; /* case 2 */";
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
