@@ -168,7 +168,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
         var typeName = GetTypeName(member, parent);
 
-        if (member.Class!.Value is SymbolStorageClass.EXT)
+        if (member.Class!.Value is SymbolStorageClass.EXT or SymbolStorageClass.STAT)
         {
             return $"{typeName} {name}();";
         }
