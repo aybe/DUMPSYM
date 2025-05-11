@@ -22,8 +22,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
 
 // TODO consider merging LoadFiles/LoadFilesPtr alike in same typedef struct
+// BUG extern long (initialiseWEAPON_MINI_GUN)();
 {
     private SymbolFactory Factory { get; } = factory;
+
+    private bool GenerateExternalEnabled { get; } = true;
 
     private bool GenerateStaticEnabled { get; } = true;
 
@@ -34,6 +37,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
     public override string? ToString()
     {
         var dictionary = new SortedDictionary<long, string>();
+
+        if (GenerateExternalEnabled)
+        {
+            GenerateExternals(dictionary);
+        }
 
         if (GenerateStaticEnabled)
         {
@@ -60,6 +68,27 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         Console.WriteLine(dictionary.Count);
 
         return writer.InnerWriter.ToString();
+    }
+
+    private void GenerateExternals(SortedDictionary<long, string> dictionary) // TODO DRY
+    {
+        // TODO this shouldn't be fetched from line of
+        // TODO this is per-file
+
+        var statics = Factory.LineOf.Keys.Where(s => s.Class is SymbolStorageClass.EXT).ToArray();
+
+        foreach (var symbol in statics)
+        {
+            using var writer = new IndentedTextWriter(new StringWriter());
+
+            var s = GetMemberString(symbol, symbol); // is its own parent!
+
+            writer.Write2($"{ToString(SymbolStorageClass.EXT)} {s}", $"// {symbol}");
+
+            var t = writer.InnerWriter.ToString()!;
+
+            dictionary.Add(symbol.Header.Position, t);
+        }
     }
 
     private void GenerateStatics(SortedDictionary<long, string> dictionary)
@@ -333,7 +362,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         var s = value switch
         {
             SymbolStorageClass.AUTO    => null,
-            SymbolStorageClass.EXT     => null,
+            SymbolStorageClass.EXT     => "extern",
             SymbolStorageClass.STAT    => "static",
             SymbolStorageClass.REG     => null,
             SymbolStorageClass.LABEL   => null,
