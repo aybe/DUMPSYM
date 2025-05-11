@@ -27,7 +27,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
     private bool GenerateTypeEnabled { get; } = true;
 
-    private bool GenerateTypeDefinitionEnabled { get; } = false;
+    private bool GenerateTypeDefinitionEnabled { get; } = true;
 
     public override string ToString()
     {
@@ -234,6 +234,8 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
     [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "InvertIf")]
     private string GetTypeName(Symbol member, Symbol parent) // TODO comment
     {
         var tag = member.Tag;
@@ -246,19 +248,23 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol1 != null)
             {
-                return GetTypeName(symbol1); // identical
+                Assert.AreNotEqual(symbol1.Tag, symbol1.Name);
+
+                return GetTypeName(symbol1, false); // identical
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
             if (symbol2 != null)
             {
-                return GetTypeName(symbol2); // partial
+                Assert.AreNotEqual(symbol2.Tag, symbol2.Name);
+
+                return GetTypeName(symbol2, false); // partial
             }
-            else
-            {
-                return GetTypeName(member); // manual
-            }
+
+            Assert.AreNotEqual(member.Tag, member.Name);
+
+            return GetTypeName(member, false); // manual
         }
         else
         {
