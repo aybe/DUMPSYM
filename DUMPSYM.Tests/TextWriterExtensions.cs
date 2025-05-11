@@ -12,7 +12,7 @@ public static class TextWriterExtensions
 
     private static ConditionalWeakTable<IndentedTextWriter, string> Table { get; } = new();
 
-    public static void WriteLine2(this IndentedTextWriter writer, object? x, object? y, int padding = 50)
+    public static void Write2(this IndentedTextWriter writer, object? x, object? y, int padding = 50)
     {
         ArgumentNullException.ThrowIfNull(writer);
 
@@ -24,6 +24,13 @@ public static class TextWriterExtensions
 
         var value = $"{(x?.ToString() ?? string.Empty).PadRight(width)}{y}";
 
-        writer.WriteLine(value);
+        writer.Write(value);
+    }
+
+    public static void WriteLine2(this IndentedTextWriter writer, object? x, object? y, int padding = 50)
+    {
+        writer.Write2(x, y, padding);
+
+        writer.WriteLine();
     }
 }

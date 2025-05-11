@@ -193,30 +193,34 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
         var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
 
+        using var writer = new IndentedTextWriter(new StringWriter());
+
         if (tag == null)
         {
             var kind = ToString(type.Kind);
 
             if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
             {
-                return $"{klass} {kind} ({pointers}{symbol.Name})(void);";
+                writer.Write2($"{klass} {kind} ({pointers}{symbol.Name})(void);", $"// {symbol}");
             }
             else
             {
-                return $"{klass} {kind}{pointers} {symbol.Name};";
+                writer.Write2($"{klass} {kind}{pointers} {symbol.Name};", $"// {symbol}");
             }
         }
         else
         {
             if (modifiers.Length != 0)
             {
-                return $"{klass} {tag}{pointers} {symbol.Name};";
+                writer.Write2($"{klass} {tag}{pointers} {symbol.Name};", $"// {symbol}");
             }
             else
             {
-                return null; // typedef struct X { ... } Y;
+                // typedef struct X { ... } Y;
             }
         }
+
+        return writer.InnerWriter.ToString();
     }
 
     private void GenerateTypeDefinitions(SortedDictionary<long, string> dictionary)
