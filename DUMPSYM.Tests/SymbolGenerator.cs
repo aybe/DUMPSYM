@@ -22,6 +22,8 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
 
 // TODO consider merging LoadFiles/LoadFilesPtr alike in same typedef struct
+
+// BUG extern SpriteList panel_burn_out(); // 243efc: $80086688 96 Def2 class EXT type ARY STRUCT size 204 dims 1 17 tag SpriteList name panel_burn_out
 {
     private SymbolFactory Factory { get; } = factory;
 
