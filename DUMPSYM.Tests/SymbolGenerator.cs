@@ -159,12 +159,19 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
     [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-    private string? GetMemberString(Symbol member, Symbol parent)
+    private string GetMemberString(Symbol member, Symbol parent)
         // TODO figure out which of C primitive or typedef to use for type
         // TODO this should be able to work for EXT, TPDEF too
     {
         var name = member.Name;
         var type = member.Type!.Value;
+
+        var typeName = GetTypeName(member, parent);
+
+        if (member.Class!.Value is SymbolStorageClass.EXT)
+        {
+            return $"{typeName} {name}();";
+        }
 
         var modifiers = type.Modifiers.ToArray();
 
@@ -174,31 +181,15 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
         var field = member.Class!.Value is SymbolStorageClass.FIELD ? $" : {member.Size!.Value}" : null;
 
-        var ext = member.Class!.Value is SymbolStorageClass.EXT;
-
-        var fcn = modifiers.Any(s => s is SymbolTypeModifier.FCN);
-
-        if (fcn) // always have PTR
+        if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
         {
             Assert.AreEqual(1, modifiers.Count(s => s is SymbolTypeModifier.FCN), member.ToString());
             Assert.AreEqual(0, modifiers.Count(s => s is SymbolTypeModifier.ARY), member.ToString());
-        }
 
-        var typeName = GetTypeName(member, parent);
-
-        if (ext)
-        {
-            return $"{typeName} {name}();";
-        }
-
-        if (fcn)
-        {
             return $"{typeName} ({pointers}{name})();";
         }
-        else
-        {
-            return $"{typeName}{pointers} {name}{dimensions}{field};";
-        }
+
+        return $"{typeName}{pointers} {name}{dimensions}{field};";
     }
 
     private Symbol? GetTypeDefinition(Symbol member, Func<Symbol, bool> predicate)
