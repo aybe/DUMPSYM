@@ -130,29 +130,19 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol1 != null) // exact
             {
-                if (!string.IsNullOrEmpty(dimensions))
-                {
-                    throw new NotImplementedException(member.ToString());
-                }
-
-                return $"{GetTypeName(symbol1)}{pointers} {name}{field}; /* case 2 */";
+                return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}; /* case 2 */";
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
             if (symbol2 == null) // partial
             {
-                if (!string.IsNullOrEmpty(dimensions))
-                {
-                    throw new NotImplementedException(member.ToString());
-                }
-
                 if (!string.IsNullOrEmpty(field))
                 {
                     throw new NotImplementedException(member.ToString());
                 }
 
-                return $"{GetTypeName(member)}{pointers} {name}; /* case 5 */";
+                return $"{GetTypeName(member)}{pointers} {name}{dimensions}; /* case 5 */";
             }
 
             if (fcn)
@@ -171,11 +161,6 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
         else // TODO ARY, FCN
         {
-            if (!string.IsNullOrEmpty(dimensions))
-            {
-                throw new NotImplementedException(member.ToString());
-            }
-
             if (!string.IsNullOrEmpty(field))
             {
                 throw new NotImplementedException(member.ToString());
@@ -183,7 +168,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
             {
-                return $"{tag} {pointers}{name}; /* case 1 */";
+                return $"{tag} {pointers}{name}{dimensions}; /* case 1 */";
             }
             else // if type isn't in symbols, add 'struct' so it still compiles
             {
@@ -196,11 +181,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
                 if (d == null)
                 {
-                    return $"{ToString(type.Kind)} {tag} {pointers}{name}; /* case 0 */";
+                    return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}; /* case 0 */";
                 }
                 else
                 {
-                    return $"{d} {pointers}{name}; /* case 9 */";
+                    return $"{d} {pointers}{name}{dimensions}; /* case 9 */";
                 }
             }
         }
