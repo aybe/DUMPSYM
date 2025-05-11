@@ -186,18 +186,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                 var c = b.Where(s => s.Key[0].Name == tag);
                 var d = c.LastOrDefault().Value;
 
-                if (d == null)
-                {
-                    if (fcn)
-                    {
-                        return $"{ToString(type.Kind)} {tag} ({pointers}{name})(); /* case 0 */";
-                    }
-                    else
-                    {
-                        return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
-                    }
-                }
-                else
+                if (d != null)
                 {
                     if (fcn)
                     {
@@ -206,6 +195,17 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                     else
                     {
                         return $"{d} {pointers}{name}{dimensions}{field} ; /* case 9 */";
+                    }
+                }
+                else
+                {
+                    if (fcn)
+                    {
+                        return $"{ToString(type.Kind)} {tag} ({pointers}{name})(); /* case 0 */";
+                    }
+                    else
+                    {
+                        return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
                     }
                 }
             }
