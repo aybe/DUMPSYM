@@ -126,29 +126,27 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         {
             var symbol1 = GetTypeDefinition(member, s => s.Type!.Value == type);
 
-            if (symbol1 == null)
+            if (symbol1 != null) // exact
             {
-                var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
+                return $"{GetTypeName(symbol1)} {name}; /* case 2 */";
+            }
 
-                if (symbol2 == null)
+            var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
+
+            if (symbol2 == null)
+            {
+                return $"{GetTypeName(member)}{pointers} {name}; /* case 5 */";
+            }
+            else
+            {
+                if (fcn)
                 {
-                    return $"{GetTypeName(member)}{pointers} {name}; /* case 5 */";
+                    return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 4 */";
                 }
                 else
                 {
-                    if (fcn)
-                    {
-                        return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 4 */";
-                    }
-                    else
-                    {
-                        return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}; /* case 3 */";
-                    }
+                    return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}; /* case 3 */";
                 }
-            }
-            else // basic
-            {
-                return $"{GetTypeName(symbol1)} {name}; /* case 2 */";
             }
         }
         else // TODO ARY, FCN
