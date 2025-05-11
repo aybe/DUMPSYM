@@ -161,7 +161,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             {
                 // TODO ordering is done many times, cache
                 // TODO by-position shall be based on type position, not member position
-                var a = Factory.DistinctTypeName.OrderBy(s => s.Key[0].Header.Position);
+                var a = Factory.DistinctTypeName;
                 var b = a.Where(s => s.Key[0].Header.Position < member.Header.Position);
                 var c = b.Where(s => s.Key[0].Name == tag);
                 var d = c.LastOrDefault().Value;

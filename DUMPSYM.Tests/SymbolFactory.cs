@@ -26,7 +26,9 @@ public sealed class SymbolFactory
 
         DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, s => GetTypeDefinition(s, symbols, indices));
 
-        DistinctTypeName = DistinctType.ToFrozenDictionary(s => s, GetTypeName);
+        var comparer2 = Comparer<Symbol[]>.Create((x, y) => x[0].Header.Position.CompareTo(y[0].Header.Position));
+
+        DistinctTypeName = DistinctType.ToImmutableSortedDictionary(s => s, GetTypeName, comparer2);
 
         GeneratedType = DistinctTypeDefinitionMap.Where(s => s.Key[0].HasFakeName && s.Value == null).Select(s => s.Key).ToFrozenSet();
 
@@ -63,7 +65,7 @@ public sealed class SymbolFactory
     /// <remarks>
     ///     See <see cref="DistinctType" />.
     /// </remarks>
-    public FrozenDictionary<Symbol[], string> DistinctTypeName { get; }
+    public ImmutableSortedDictionary<Symbol[], string> DistinctTypeName { get; }
 
     /// <summary>
     ///     Set containing headers of compiler-generated types.
