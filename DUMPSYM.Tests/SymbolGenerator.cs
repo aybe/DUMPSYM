@@ -70,12 +70,12 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         return writer.InnerWriter.ToString();
     }
 
-    private void GenerateExternals(SortedDictionary<long, string> dictionary) // TODO DRY
+    private void GenerateDeclarations(SortedDictionary<long, string> dictionary, SymbolStorageClass klass)
     {
         // TODO this shouldn't be fetched from line of
         // TODO this is per-file
 
-        var statics = Factory.LineOf.Keys.Where(s => s.Class is SymbolStorageClass.EXT).ToArray();
+        var statics = Factory.LineOf.Keys.Where(s => s.Class == klass).ToArray();
 
         foreach (var symbol in statics)
         {
@@ -83,7 +83,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             var s = GetMemberString(symbol, symbol); // is its own parent!
 
-            writer.Write2($"{ToString(SymbolStorageClass.EXT)} {s}", $"// {symbol}");
+            writer.Write2($"{ToString(klass)} {s}", $"// {symbol}");
 
             var t = writer.InnerWriter.ToString()!;
 
@@ -91,25 +91,14 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
     }
 
+    private void GenerateExternals(SortedDictionary<long, string> dictionary)
+    {
+        GenerateDeclarations(dictionary, SymbolStorageClass.EXT);
+    }
+
     private void GenerateStatics(SortedDictionary<long, string> dictionary)
     {
-        // TODO this shouldn't be fetched from line of
-        // TODO this is per-file
-
-        var statics = Factory.LineOf.Keys.Where(s => s.Class is SymbolStorageClass.STAT).ToArray();
-
-        foreach (var symbol in statics)
-        {
-            using var writer = new IndentedTextWriter(new StringWriter());
-
-            var s = GetMemberString(symbol, symbol); // is its own parent!
-
-            writer.Write2($"{ToString(SymbolStorageClass.STAT)} {s}", $"// {symbol}");
-
-            var t = writer.InnerWriter.ToString()!;
-
-            dictionary.Add(symbol.Header.Position, t);
-        }
+        GenerateDeclarations(dictionary, SymbolStorageClass.STAT);
     }
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
