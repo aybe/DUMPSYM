@@ -124,15 +124,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
         if (string.IsNullOrWhiteSpace(tag))
         {
-            var where1 = Factory.DistinctTypeDefinition.Where(s => s.Type!.Value == type);
-            var symbols1 = where1.Where(s => s.Header.Position < member.Header.Position);
-            var symbol1 = symbols1.FirstOrDefault();
+            var symbol1 = GetTypeDefinition(member, s => s.Type!.Value == type);
 
             if (symbol1 == null)
             {
-                var where2 = Factory.DistinctTypeDefinition.Where(s => s.Type!.Value.Kind == type.Kind);
-                var symbols2 = where2.Where(s => s.Header.Position < member.Header.Position);
-                var symbol2 = symbols2.FirstOrDefault();
+                var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
                 if (symbol2 == null)
                 {
@@ -180,6 +176,17 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                 }
             }
         }
+    }
+
+    private Symbol? GetTypeDefinition(Symbol member, Func<Symbol, bool> predicate)
+    {
+        var where1 = Factory.DistinctTypeDefinition.Where(predicate);
+
+        var where2 = where1.Where(s => s.Header.Position < member.Header.Position);
+
+        var symbol = where2.FirstOrDefault();
+
+        return symbol;
     }
 
     [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
