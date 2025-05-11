@@ -80,7 +80,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             foreach (var member in members)
             {
-                writer.WriteLine2($"{GetMemberString(member)}", $"// {member}");
+                writer.WriteLine2($"{GetMemberString(member, header)}", $"// {member}");
             }
         }
 
@@ -100,7 +100,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
     [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-    private string? GetMemberString(Symbol member)
+    private string? GetMemberString(Symbol member, Symbol parent)
         // TODO figure out which of C primitive or typedef to use for type
         // TODO this should be able to work for EXT, TPDEF too
     {
@@ -182,7 +182,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                 // TODO ordering is done many times, cache
                 // TODO by-position shall be based on type position, not member position
                 var a = Factory.DistinctTypeName;
-                var b = a.Where(s => s.Key[0].Header.Position < member.Header.Position);
+                var b = a.Where(s => s.Key[0].Header.Position < parent.Header.Position);
                 var c = b.Where(s => s.Key[0].Name == tag);
                 var d = c.LastOrDefault().Value;
 
@@ -205,6 +205,10 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                     }
                     else
                     {
+// BUG missing typedef struct NAME -> 804: struct _GsCOORDINATE *super; /* case 12 */    // 00429d: $00000020 96 Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name super
+// BUG missing typedef struct NAME -> 805: struct _GsCOORDINATE *sub; /* case 12 */      // 0042c0: $00000024 96 Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name sub
+// BUG missing typedef struct NAME -> 819: struct _GsCOORDINATE2 *super; /* case 12 */   // 00445a: $00000048 96 Def2 class MOS type PTR STRUCT size 80 dims 0 tag _GsCOORDINATE2 name super
+// BUG missing typedef struct NAME -> 820: struct _GsCOORDINATE2 *sub; /* case 12 */     // 00447e: $0000004c 96 Def2 class MOS type PTR STRUCT size 80 dims 0 tag _GsCOORDINATE2 name sub
                         return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 12 */";
                     }
                 }
