@@ -22,7 +22,9 @@ public sealed class SymbolFactory
 
         DistinctType = splitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
 
-        DistinctTypeDefinition = splitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToImmutableSortedSet(SymbolPositionComparer.Instance);
+        var comparer1 = Comparer<Symbol>.Create((x, y) => x.Header.Position.CompareTo(y.Header.Position));
+
+        DistinctTypeDefinition = splitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToImmutableSortedSet(comparer1);
 
         DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, s => GetTypeDefinition(s, symbols, indices));
 
