@@ -20,6 +20,8 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
 // BUG Camera ChaseCamera; /* case 1 */ // 00bdd9: $0000003c 96 Def2 class MOS type STRUCT size 60 dims 0 tag Camera name ChaseCamera
 // BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
+
+// TODO consider merging LoadFiles/LoadFilesPtr alike in same typedef struct
 {
     private SymbolFactory Factory { get; } = factory;
 
