@@ -25,6 +25,8 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 {
     private SymbolFactory Factory { get; } = factory;
 
+    private bool GenerateFileEnabled { get; } = true;
+
     private bool GenerateExternalEnabled { get; } = true;
 
     private bool GenerateStaticEnabled { get; } = true;
@@ -36,6 +38,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
     public override string? ToString()
     {
         var dictionary = new SortedDictionary<long, string>();
+
+        if (GenerateFileEnabled)
+        {
+            GenerateFiles(dictionary);
+        }
 
         if (GenerateExternalEnabled)
         {
@@ -67,6 +74,22 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         Console.WriteLine(dictionary.Count);
 
         return writer.InnerWriter.ToString();
+    }
+
+    private void GenerateFiles(SortedDictionary<long, string> dictionary)
+    {
+        // TODO this sucks a bit but baking header in record is way worse
+
+        foreach (var symbol in Factory.LineOf.Keys.Where(s => s.IsFile))
+        {
+            using var writer = new IndentedTextWriter(new StringWriter());
+
+            writer.Write2($"// FILE: {((ISymbolFileStart)symbol.Record).File}", $"// {symbol}");
+
+            var s = writer.InnerWriter.ToString()!;
+
+            dictionary.Add(symbol.Header.Position, s);
+        }
     }
 
     private void GenerateDeclarations(SortedDictionary<long, string> dictionary, SymbolStorageClass klass)
