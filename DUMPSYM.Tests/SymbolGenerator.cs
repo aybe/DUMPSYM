@@ -22,7 +22,6 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
 
 // TODO consider merging LoadFiles/LoadFilesPtr alike in same typedef struct
-// BUG extern long (initialiseWEAPON_MINI_GUN)();
 {
     private SymbolFactory Factory { get; } = factory;
 
@@ -175,6 +174,8 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
         var field = member.Class!.Value is SymbolStorageClass.FIELD ? $" : {member.Size!.Value}" : null;
 
+        var ext = member.Class!.Value is SymbolStorageClass.EXT;
+
         var fcn = modifiers.Any(s => s is SymbolTypeModifier.FCN);
 
         if (fcn) // always have PTR
@@ -184,6 +185,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
 
         var typeName = GetTypeName(member, parent);
+
+        if (ext)
+        {
+            return $"{typeName} {name}();";
+        }
 
         if (fcn)
         {
