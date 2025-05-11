@@ -27,7 +27,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
     private bool GenerateTypeDefinitionEnabled { get; } = true;
 
-    public override string ToString()
+    public override string? ToString()
     {
         var dictionary = new SortedDictionary<long, string>();
 
@@ -41,11 +41,16 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             GenerateTypeDefinitions(dictionary);
         }
 
-        var s = string.Join(Environment.NewLine, dictionary.Values);
+        using var writer = new IndentedTextWriter(new StringWriter());
+
+        foreach (var s in dictionary.Values.Where(s => !string.IsNullOrWhiteSpace(s)))
+        {
+            writer.WriteLine(s);
+        }
 
         Console.WriteLine(dictionary.Count);
 
-        return s;
+        return writer.InnerWriter.ToString();
     }
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
