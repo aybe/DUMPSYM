@@ -6,13 +6,15 @@ namespace DUMPSYM.Tests;
 
 public static class TextWriterExtensions
 {
+    private const int DefaultPadding = 80;
+
     private static FieldInfo TabString { get; } =
         typeof(IndentedTextWriter)
             .GetField("_tabString", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
     private static ConditionalWeakTable<IndentedTextWriter, string> Table { get; } = new();
 
-    public static void Write2(this IndentedTextWriter writer, object? x, object? y, int padding = 50)
+    public static void Write2(this IndentedTextWriter writer, object? x, object? y, int padding = DefaultPadding)
     {
         ArgumentNullException.ThrowIfNull(writer);
 
@@ -27,7 +29,7 @@ public static class TextWriterExtensions
         writer.Write(value);
     }
 
-    public static void WriteLine2(this IndentedTextWriter writer, object? x, object? y, int padding = 50)
+    public static void WriteLine2(this IndentedTextWriter writer, object? x, object? y, int padding = DefaultPadding)
     {
         writer.Write2(x, y, padding);
 
