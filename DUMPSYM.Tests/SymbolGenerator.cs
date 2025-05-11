@@ -71,7 +71,16 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
         else
         {
-            writer.WriteLine2($"{ToString(SymbolStorageClass.TPDEF)} {klass} {{", $"// {header}");
+            if (def.HasFakeTag)
+            {
+                writer.WriteLine2($"{ToString(SymbolStorageClass.TPDEF)} {klass} {{", $"// {def}");
+            }
+            else
+            {
+                writer.WriteLine2($"{ToString(SymbolStorageClass.TPDEF)} {klass} {def.Tag} {{", $"// {def}");
+            }
+
+            writer.WriteLine2(null, $"// {header}");
         }
 
         using (writer.GetIndentScope())
@@ -205,10 +214,6 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                     }
                     else
                     {
-// BUG missing typedef struct NAME -> 804: struct _GsCOORDINATE *super; /* case 12 */    // 00429d: $00000020 96 Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name super
-// BUG missing typedef struct NAME -> 805: struct _GsCOORDINATE *sub; /* case 12 */      // 0042c0: $00000024 96 Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name sub
-// BUG missing typedef struct NAME -> 819: struct _GsCOORDINATE2 *super; /* case 12 */   // 00445a: $00000048 96 Def2 class MOS type PTR STRUCT size 80 dims 0 tag _GsCOORDINATE2 name super
-// BUG missing typedef struct NAME -> 820: struct _GsCOORDINATE2 *sub; /* case 12 */     // 00447e: $0000004c 96 Def2 class MOS type PTR STRUCT size 80 dims 0 tag _GsCOORDINATE2 name sub
                         return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 12 */";
                     }
                 }

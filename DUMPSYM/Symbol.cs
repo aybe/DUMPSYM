@@ -106,6 +106,8 @@ public sealed partial class Symbol
 
     public bool HasFakeName => Name is not null && RegexFakeName.IsMatch(Name);
 
+    public bool HasFakeTag => Tag is not null && RegexFakeName.IsMatch(Tag);
+
     public bool IsFunction => Record is ISymbolFunction;
 
     public bool IsTypeDefinition => Class is SymbolStorageClass.TPDEF;

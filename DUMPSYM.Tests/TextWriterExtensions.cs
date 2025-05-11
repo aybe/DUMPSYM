@@ -22,7 +22,7 @@ public static class TextWriterExtensions
 
         var width = Math.Max(0, padding - writer.Indent * chars.Length);
 
-        var value = $"{x?.ToString()?.PadRight(width)}{y}";
+        var value = $"{(x?.ToString() ?? string.Empty).PadRight(width)}{y}";
 
         writer.WriteLine(value);
     }
