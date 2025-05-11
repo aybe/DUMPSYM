@@ -143,25 +143,25 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
-            if (symbol2 == null) // partial
+            if (symbol2 != null) // partial
             {
                 if (fcn)
                 {
-                    return $"{GetTypeName(member)} ({pointers}{name})(); /* case 4 */";
+                    return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 4 */";
                 }
                 else
                 {
-                    return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
+                    return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}{field}; /* case 3 */";
                 }
             }
 
             if (fcn)
             {
-                return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 4 */";
+                return $"{GetTypeName(member)} ({pointers}{name})(); /* case 4 */";
             }
             else
             {
-                return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}{field}; /* case 3 */";
+                return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
             }
         }
         else
