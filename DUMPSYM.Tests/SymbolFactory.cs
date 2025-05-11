@@ -1,4 +1,5 @@
 ﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
 
 // ReSharper disable CommentTypo
 
@@ -21,7 +22,7 @@ public sealed class SymbolFactory
 
         DistinctType = splitDistinct.Where(s => s[0].IsTypeHeader).ToFrozenSet();
 
-        DistinctTypeDefinition = splitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToFrozenSet();
+        DistinctTypeDefinition = splitDistinct.Select(s => s.First()).Where(s => s.IsTypeDefinition).ToImmutableSortedSet(SymbolPositionComparer.Instance);
 
         DistinctTypeDefinitionMap = DistinctType.ToFrozenDictionary(s => s, s => GetTypeDefinition(s, symbols, indices));
 
@@ -44,9 +45,9 @@ public sealed class SymbolFactory
     ///     Set containing distinct type definitions in .SYM file.
     /// </summary>
     /// <remarks>
-    ///     Type definitions may refer to fake types that share names.
+    ///     Type definitions are sorted by position; they may refer to fake types that share names.
     /// </remarks>
-    public FrozenSet<Symbol> DistinctTypeDefinition { get; }
+    public ImmutableSortedSet<Symbol> DistinctTypeDefinition { get; }
 
     /// <summary>
     ///     Dictionary to map a distinct type to its definition, if any.

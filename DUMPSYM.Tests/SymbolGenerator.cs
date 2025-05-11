@@ -125,13 +125,13 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         if (string.IsNullOrWhiteSpace(tag))
         {
             var where1 = Factory.DistinctTypeDefinition.Where(s => s.Type!.Value == type);
-            var symbols1 = where1.Where(s => s.Header.Position < member.Header.Position).OrderBy(s => s.Header.Position);
+            var symbols1 = where1.Where(s => s.Header.Position < member.Header.Position);
             var symbol1 = symbols1.FirstOrDefault();
 
             if (symbol1 == null)
             {
                 var where2 = Factory.DistinctTypeDefinition.Where(s => s.Type!.Value.Kind == type.Kind);
-                var symbols2 = where2.Where(s => s.Header.Position < member.Header.Position).OrderBy(s => s.Header.Position);
+                var symbols2 = where2.Where(s => s.Header.Position < member.Header.Position);
                 var symbol2 = symbols2.FirstOrDefault();
 
                 if (symbol2 == null)
