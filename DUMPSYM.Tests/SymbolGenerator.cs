@@ -71,11 +71,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
         else
         {
-            if (def.HasFakeTag)
+            if (def.HasFakeTag || def.Tag == def.Name) // stay anonymous
             {
                 writer.WriteLine2($"{ToString(SymbolStorageClass.TPDEF)} {klass} {{", $"// {def}");
             }
-            else
+            else // self-referential, e.g. GsCOORDINATE
             {
                 writer.WriteLine2($"{ToString(SymbolStorageClass.TPDEF)} {klass} {def.Tag} {{", $"// {def}");
             }
