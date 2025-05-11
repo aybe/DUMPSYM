@@ -21,6 +21,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG Camera ChaseCamera; /* case 1 */ // 00bdd9: $0000003c 96 Def2 class MOS type STRUCT size 60 dims 0 tag Camera name ChaseCamera
 // BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
 
+// TODO missing typedefs: physadr
 {
     private SymbolFactory Factory { get; } = factory;
 
@@ -127,14 +128,14 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         {
             var symbol1 = GetTypeDefinition(member, s => s.Type!.Value == type);
 
-            if (symbol1 != null) // exact
+            if (symbol1 != null) // exact // TODO FCN
             {
                 return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}{field}; /* case 2 */";
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
-            if (symbol2 == null) // partial
+            if (symbol2 == null) // partial // TODO FCN
             {
                 return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
             }
@@ -150,7 +151,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
         else
         {
-            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
+            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO FCN // TODO reverse map
             {
                 return $"{tag} {pointers}{name}{dimensions}{field}; /* case 1 */";
             }
@@ -163,11 +164,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                 var c = b.Where(s => s.Key[0].Name == tag);
                 var d = c.LastOrDefault().Value;
 
-                if (d == null)
+                if (d == null) // TODO FCN
                 {
                     return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
                 }
-                else
+                else // TODO FCN
                 {
                     return $"{d} {pointers}{name}{dimensions}{field} ; /* case 9 */";
                 }
