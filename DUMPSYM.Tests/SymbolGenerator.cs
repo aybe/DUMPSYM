@@ -128,15 +128,25 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         {
             var symbol1 = GetTypeDefinition(member, s => s.Type!.Value == type);
 
-            if (symbol1 != null) // exact // TODO FCN
+            if (symbol1 != null) // exact
             {
+                if (fcn)
+                {
+                    throw new NotImplementedException(member.ToString());
+                }
+
                 return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}{field}; /* case 2 */";
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
-            if (symbol2 == null) // partial // TODO FCN
+            if (symbol2 == null) // partial
             {
+                if (fcn)
+                {
+                    throw new NotImplementedException(member.ToString());
+                }
+
                 return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
             }
 
@@ -151,7 +161,12 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
         else
         {
-            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO FCN // TODO reverse map
+            if (fcn)
+            {
+                throw new NotImplementedException(member.ToString());
+            }
+
+            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
             {
                 return $"{tag} {pointers}{name}{dimensions}{field}; /* case 1 */";
             }
@@ -164,7 +179,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                 var c = b.Where(s => s.Key[0].Name == tag);
                 var d = c.LastOrDefault().Value;
 
-                if (d == null) // TODO FCN
+                if (d == null)
                 {
                     return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
                 }
