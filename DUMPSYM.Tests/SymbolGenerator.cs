@@ -21,7 +21,6 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG Camera ChaseCamera; /* case 1 */ // 00bdd9: $0000003c 96 Def2 class MOS type STRUCT size 60 dims 0 tag Camera name ChaseCamera
 // BUG void Function; /* case 2 */ // 00f706: $00000010 94 Def class MOS type PTR FCN VOID size 0 name Function
 
-// TODO FIELD
 {
     private SymbolFactory Factory { get; } = factory;
 
@@ -130,19 +129,14 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
             if (symbol1 != null) // exact
             {
-                return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}; /* case 2 */";
+                return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}{field}; /* case 2 */";
             }
 
             var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
 
             if (symbol2 == null) // partial
             {
-                if (!string.IsNullOrEmpty(field))
-                {
-                    throw new NotImplementedException(member.ToString());
-                }
-
-                return $"{GetTypeName(member)}{pointers} {name}{dimensions}; /* case 5 */";
+                return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
             }
 
             if (fcn)
@@ -151,24 +145,14 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             }
             else
             {
-                if (!string.IsNullOrEmpty(field))
-                {
-                    throw new NotImplementedException(member.ToString());
-                }
-
-                return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}; /* case 3 */";
+                return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}{field}; /* case 3 */";
             }
         }
-        else // TODO ARY, FCN
+        else
         {
-            if (!string.IsNullOrEmpty(field))
-            {
-                throw new NotImplementedException(member.ToString());
-            }
-
             if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
             {
-                return $"{tag} {pointers}{name}{dimensions}; /* case 1 */";
+                return $"{tag} {pointers}{name}{dimensions}{field}; /* case 1 */";
             }
             else // if type isn't in symbols, add 'struct' so it still compiles
             {
@@ -181,11 +165,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
 
                 if (d == null)
                 {
-                    return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}; /* case 0 */";
+                    return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
                 }
                 else
                 {
-                    return $"{d} {pointers}{name}{dimensions}; /* case 9 */";
+                    return $"{d} {pointers}{name}{dimensions}{field} ; /* case 9 */";
                 }
             }
         }
