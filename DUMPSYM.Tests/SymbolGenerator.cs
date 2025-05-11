@@ -132,92 +132,15 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             Assert.AreEqual(0, modifiers.Count(s => s is SymbolTypeModifier.ARY), member.ToString());
         }
 
-        var tag = member.Tag;
+        var typeName = GetTypeName(member, parent);
 
-        if (string.IsNullOrWhiteSpace(tag))
+        if (fcn)
         {
-            var symbol1 = GetTypeDefinition(member, s => s.Type!.Value == type);
-
-            if (symbol1 != null) // exact
-            {
-                if (fcn)
-                {
-                    return $"{GetTypeName(symbol1)} ({pointers}{name})(); /* case 1 */";
-                }
-                else
-                {
-                    return $"{GetTypeName(symbol1)}{pointers} {name}{dimensions}{field}; /* case 2 */";
-                }
-            }
-
-            var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
-
-            if (symbol2 != null) // partial
-            {
-                if (fcn)
-                {
-                    return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 3 */";
-                }
-                else
-                {
-                    return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}{field}; /* case 4 */";
-                }
-            }
-
-            if (fcn)
-            {
-                return $"{GetTypeName(member)} ({pointers}{name})(); /* case 5 */";
-            }
-            else
-            {
-                return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 6 */";
-            }
+            return $"{typeName} ({pointers}{name})();";
         }
         else
         {
-            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
-            {
-                if (fcn)
-                {
-                    return $"{tag} ({pointers}{name})(); /* case 7 */";
-                }
-                else
-                {
-                    return $"{tag} {pointers}{name}{dimensions}{field}; /* case 8 */";
-                }
-            }
-            else // if type isn't in symbols, add 'struct' so it still compiles
-            {
-                // TODO ordering is done many times, cache
-                // TODO by-position shall be based on type position, not member position
-                var a = Factory.DistinctTypeName;
-                var b = a.Where(s => s.Key[0].Header.Position < parent.Header.Position);
-                var c = b.Where(s => s.Key[0].Name == tag);
-                var d = c.LastOrDefault().Value;
-
-                if (d != null)
-                {
-                    if (fcn)
-                    {
-                        return $"{d} ({pointers}{name})(); /* case 9 */";
-                    }
-                    else
-                    {
-                        return $"{d} {pointers}{name}{dimensions}{field} ; /* case 10 */";
-                    }
-                }
-                else
-                {
-                    if (fcn)
-                    {
-                        return $"{ToString(type.Kind)} {tag} ({pointers}{name})(); /* case 11 */";
-                    }
-                    else
-                    {
-                        return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 12 */";
-                    }
-                }
-            }
+            return $"{typeName}{pointers} {name}{dimensions}{field};";
         }
     }
 
@@ -305,6 +228,59 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             if (value != null)
             {
                 dictionary.Add(symbol.Header.Position, value);
+            }
+        }
+    }
+
+    [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
+    [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
+    private string GetTypeName(Symbol member, Symbol parent) // TODO comment
+    {
+        var tag = member.Tag;
+
+        var type = member.Type!.Value;
+
+        if (string.IsNullOrWhiteSpace(tag))
+        {
+            var symbol1 = GetTypeDefinition(member, s => s.Type!.Value == type);
+
+            if (symbol1 != null)
+            {
+                return GetTypeName(symbol1); // identical
+            }
+
+            var symbol2 = GetTypeDefinition(member, s => s.Type!.Value.Kind == type.Kind);
+
+            if (symbol2 != null)
+            {
+                return GetTypeName(symbol2); // partial
+            }
+            else
+            {
+                return GetTypeName(member); // manual
+            }
+        }
+        else
+        {
+            if (Factory.DistinctTypeName.Values.Any(s => s == tag)) // TODO reverse map
+            {
+                return tag;
+            }
+            else
+            {
+                var a = Factory.DistinctTypeName;
+                var b = a.Where(s => s.Key[0].Header.Position < parent.Header.Position);
+                var c = b.Where(s => s.Key[0].Name == tag);
+                var d = c.LastOrDefault().Value;
+
+                if (d != null)
+                {
+                    return d;
+                }
+                else
+                {
+                    return $"{ToString(type.Kind)} {tag}";
+                }
             }
         }
     }
