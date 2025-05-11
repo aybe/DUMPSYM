@@ -102,6 +102,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
     [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
     private string? GetMemberString(Symbol member)
         // TODO figure out which of C primitive or typedef to use for type
+        // TODO this should be able to work for EXT, TPDEF too
     {
         var name = member.Name;
         var type = member.Type!.Value;
