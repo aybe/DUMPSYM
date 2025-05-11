@@ -133,7 +133,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             {
                 if (fcn)
                 {
-                    return $"{GetTypeName(symbol1)} ({pointers}{name})(); /* case 4 */";
+                    return $"{GetTypeName(symbol1)} ({pointers}{name})(); /* case 1 */";
                 }
                 else
                 {
@@ -147,21 +147,21 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             {
                 if (fcn)
                 {
-                    return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 4 */";
+                    return $"{GetTypeName(symbol2)} ({pointers}{name})(); /* case 3 */";
                 }
                 else
                 {
-                    return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}{field}; /* case 3 */";
+                    return $"{GetTypeName(symbol2)}{pointers} {name}{dimensions}{field}; /* case 4 */";
                 }
             }
 
             if (fcn)
             {
-                return $"{GetTypeName(member)} ({pointers}{name})(); /* case 4 */";
+                return $"{GetTypeName(member)} ({pointers}{name})(); /* case 5 */";
             }
             else
             {
-                return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 5 */";
+                return $"{GetTypeName(member)}{pointers} {name}{dimensions}{field}; /* case 6 */";
             }
         }
         else
@@ -170,11 +170,11 @@ public sealed class SymbolGenerator(SymbolFactory factory)
             {
                 if (fcn)
                 {
-                    return $"{tag} ({pointers}{name})(); /* case 6 */";
+                    return $"{tag} ({pointers}{name})(); /* case 7 */";
                 }
                 else
                 {
-                    return $"{tag} {pointers}{name}{dimensions}{field}; /* case 1 */";
+                    return $"{tag} {pointers}{name}{dimensions}{field}; /* case 8 */";
                 }
             }
             else // if type isn't in symbols, add 'struct' so it still compiles
@@ -190,22 +190,22 @@ public sealed class SymbolGenerator(SymbolFactory factory)
                 {
                     if (fcn)
                     {
-                        return $"{d} ({pointers}{name})(); /* case 8 */";
+                        return $"{d} ({pointers}{name})(); /* case 9 */";
                     }
                     else
                     {
-                        return $"{d} {pointers}{name}{dimensions}{field} ; /* case 9 */";
+                        return $"{d} {pointers}{name}{dimensions}{field} ; /* case 10 */";
                     }
                 }
                 else
                 {
                     if (fcn)
                     {
-                        return $"{ToString(type.Kind)} {tag} ({pointers}{name})(); /* case 0 */";
+                        return $"{ToString(type.Kind)} {tag} ({pointers}{name})(); /* case 11 */";
                     }
                     else
                     {
-                        return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 0 */";
+                        return $"{ToString(type.Kind)} {tag} {pointers}{name}{dimensions}{field}; /* case 12 */";
                     }
                 }
             }
