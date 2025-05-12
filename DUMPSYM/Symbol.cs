@@ -104,6 +104,8 @@ public sealed partial class Symbol
 
     #region Extras
 
+    public string? File => Record is ISymbolFileStart f ? f.File : null;
+
     public bool HasFakeName => Name is not null && RegexFakeName.IsMatch(Name);
 
     public bool HasFakeTag => Tag is not null && RegexFakeName.IsMatch(Tag);

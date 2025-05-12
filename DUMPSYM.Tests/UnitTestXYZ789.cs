@@ -33,6 +33,40 @@ public sealed class UnitTestXYZ789 : UnitTestBase
     }
 
     [TestMethod]
+    public void TestGroupTypeByFile()
+    {
+        var files = new SymbolFactoryFiles(Sample.Default);
+
+        var set = Factory.DistinctType;
+
+        WriteLineVar(set.Count);
+
+        var lookup = set.ToLookup(s => files.Reverse[s.First()]);
+
+        foreach (var grouping in lookup)
+        {
+            WriteLine($"File: {grouping.Key.File}, Count: {grouping.Count()}");
+        }
+    }
+
+    [TestMethod]
+    public void TestGroupTypeDefinitionByFile()
+    {
+        var files = new SymbolFactoryFiles(Sample.Default);
+
+        var set = Factory.DistinctTypeDefinition;
+
+        WriteLineVar(set.Count);
+
+        var lookup = set.ToLookup(s => files.Reverse[s]);
+
+        foreach (var grouping in lookup)
+        {
+            WriteLine($"File: {grouping.Key.File}, Count: {grouping.Count()}");
+        }
+    }
+
+    [TestMethod]
     public void TestSplitByFiles()
     {
         var printTypes = false;
