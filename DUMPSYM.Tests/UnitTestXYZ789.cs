@@ -136,4 +136,76 @@ public sealed class UnitTestXYZ789 : UnitTestBase
 
         File.WriteAllText(output, md);
     }
+
+    [TestMethod]
+    public void TestSymbolStorageClassOccurrences()
+    {
+        var symbols = Sample.Default.Symbols;
+
+        var symbolsCount = symbols.Count;
+
+        WriteLineVar(symbolsCount);
+
+        var found = 0;
+
+        foreach (var klass in Enum.GetValues<SymbolStorageClass>())
+        {
+            var count = symbols.Count(s => s.Class == klass);
+
+            WriteLine($"{klass}: {count}");
+
+            found += count;
+        }
+
+        WriteLine($"{nameof(found)}: {found} ({(float)found / symbolsCount:P})");
+
+        var missing = symbols.Count(s => s.Class == null);
+
+        WriteLine($"{nameof(missing)}: {missing} ({(float)missing / symbolsCount:P})");
+
+#pragma warning disable CS0162 // Unreachable code detected
+        // ReSharper disable HeuristicUnreachableCode
+        switch (new SymbolStorageClass())
+        {
+            case SymbolStorageClass.AUTO: // appear in functions
+                break;
+            case SymbolStorageClass.EXT: // externals
+                break;
+            case SymbolStorageClass.STAT: // statics
+                break;
+            case SymbolStorageClass.REG: // appear in functions
+                break;
+            case SymbolStorageClass.LABEL: // appear in functions
+                break;
+            case SymbolStorageClass.MOS: // struct member
+                break;
+            case SymbolStorageClass.ARG: // appear in functions
+                break;
+            case SymbolStorageClass.STRTAG: // struct
+                break;
+            case SymbolStorageClass.MOU: // union member
+                break;
+            case SymbolStorageClass.UNTAG: // union
+                break;
+            case SymbolStorageClass.TPDEF: // typedef
+                break;
+            case SymbolStorageClass.ENTAG: // enum
+                break;
+            case SymbolStorageClass.MOE: // enum member
+                break;
+            case SymbolStorageClass.REGPARM: // appear in functions
+                break;
+            case SymbolStorageClass.FIELD: // bit field
+                break;
+            case SymbolStorageClass.EOS: // end of struct/union/enum
+                break;
+            case SymbolStorageClass.FILE: // files
+                break;
+            // ReSharper disable once RedundantEmptySwitchSection
+            default:
+                break;
+        }
+        // ReSharper restore HeuristicUnreachableCode
+#pragma warning restore CS0162 // Unreachable code detected
+    }
 }
