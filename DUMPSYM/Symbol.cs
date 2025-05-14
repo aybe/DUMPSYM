@@ -82,6 +82,9 @@ public sealed partial class Symbol
 {
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    public static IComparer<Symbol> PositionComparer { get; } =
+        Comparer<Symbol>.Create((x, y) => x.Header.Position.CompareTo(y.Header.Position));
+
     #region ISymbolDefinition
 
     public SymbolStorageClass? Class => Record is ISymbolDefinition d ? d.Class : null;

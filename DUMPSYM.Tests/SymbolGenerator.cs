@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using DUMPSYM.Extensions;
 
@@ -76,6 +77,29 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         Console.WriteLine(dictionary.Count);
 
         return writer.InnerWriter.ToString();
+    }
+
+    private void GenerateFiles()
+    {
+        var directory = Directory.CreateDirectory(Path.Combine(Solution.Directory, "Project1", "src")).FullName;
+
+        var files = Factory.LineOf
+            .Where(s => s.Key.IsFile)
+            .Select(s => s.Key)
+            .ToImmutableSortedDictionary(s => s, s => Path.GetFileName(s.File!), Symbol.PositionComparer);
+
+        if (files.Values.ToHashSet().Count != files.Count)
+        {
+            throw new InvalidOperationException("Can't flatten paths, some have identical names.");
+        }
+
+        foreach (var pair in files)
+        {
+            var combine = Path.Combine(directory, pair.Value);
+
+            using var c = File.Create(Path.ChangeExtension(combine, "C"));
+            using var h = File.Create(Path.ChangeExtension(combine, "H"));
+        }
     }
 
     private void GenerateFiles(SortedDictionary<long, string> dictionary)
