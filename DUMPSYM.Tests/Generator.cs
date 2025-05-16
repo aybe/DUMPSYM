@@ -32,7 +32,7 @@ public sealed class Generator : IDisposable
 
     private Dictionary<string, IndentedTextWriter> Writers { get; } = new();
 
-    private static Regex RegexFirstLine { get; } = new(@"^.*?(?=\r?\n|$)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static Regex RegexNewLine { get; } = new(@"\r?\n", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     public void Dispose()
     {
@@ -99,7 +99,11 @@ public sealed class Generator : IDisposable
     {
         var writer = GetWriter(header);
 
-        writer.WriteLine($"// TODO: {RegexFirstLine.Match(header.ToString()).Value}");
+        var split = RegexNewLine.Split(header.ToString());
+
+        var join = string.Join(", ", split.Select(s => s.Trim()));
+
+        writer.WriteLine($"// TODO: {join}");
     }
 
     private void GenerateFile(Symbol header)
