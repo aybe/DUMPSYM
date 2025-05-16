@@ -183,7 +183,10 @@ public sealed class Generator : IDisposable
 
         if (symbol.IsTypeHeader)
         {
-            if (!TryGetHeader(symbol, out path!))
+            if (SdkMatch.TypesMap.TryGetValue(symbol.Name!, out path!))
+            {
+            }
+            else
             {
                 path = SymbolsFiles[symbol].File!;
             }
@@ -257,23 +260,6 @@ public sealed class Generator : IDisposable
         }
 
         return result != null;
-    }
-
-    private bool TryGetHeader(Symbol type, [MaybeNullWhen(false)] out string result) // TODO improve
-    {
-        result = null;
-
-        if (!TryGetDefinition(type, out var def))
-        {
-            return false;
-        }
-
-        if (!SdkMatch.DefinitionsMap.TryGetValue(def.Name!, out result))
-        {
-            return false;
-        }
-
-        return true;
     }
 
     public void Write()
