@@ -113,15 +113,23 @@ public sealed partial class Symbol
 
     public bool HasFakeTag => Tag is not null && RegexFakeName.IsMatch(Tag);
 
+    public bool IsExternal => Class is SymbolStorageClass.EXT;
+
     public bool IsFile => Record is ISymbolFileStart;
 
+    public bool IsFileEnd => Record is ISymbolFileEnd;
+
     public bool IsFunction => Record is ISymbolFunction;
+
+    public bool IsStatic => Class is SymbolStorageClass.STAT;
 
     public bool IsTypeDefinition => Class is SymbolStorageClass.TPDEF;
 
     public bool IsTypeHeader => Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG;
 
     public bool IsTypeFooter => Class is SymbolStorageClass.EOS;
+
+    public bool IsVariable => Record is ISymbolVariable;
 
     #endregion
 }

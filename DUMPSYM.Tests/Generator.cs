@@ -2,6 +2,7 @@
 using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using DUMPSYM.Tests.WorkInProgress;
 
 namespace DUMPSYM.Tests;
@@ -30,6 +31,8 @@ public sealed class Generator : IDisposable
     private GeneratorSets Sets { get; } = new();
 
     private Dictionary<string, IndentedTextWriter> Writers { get; } = new();
+
+    private static Regex RegexFirstLine { get; } = new(@"^.*?(?=\r?\n|$)", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     public void Dispose()
     {
@@ -65,12 +68,38 @@ public sealed class Generator : IDisposable
             {
                 GenerateTypedef(header);
             }
+            else if (header.IsExternal)
+            {
+                GenerateDefault(header);
+            }
+            else if (header.IsFileEnd)
+            {
+                GenerateDefault(header);
+            }
+            else if (header.IsFunction)
+            {
+                GenerateDefault(header);
+            }
+            else if (header.IsStatic)
+            {
+                GenerateDefault(header);
+            }
+            else if (header.IsVariable)
+            {
+                // GenerateDefault(header); // BUG/TODO these appear in last file, that's wrong
+            }
             else
             {
-                continue;
                 throw new NotImplementedException(header.ToString());
             }
         }
+    }
+
+    private void GenerateDefault(Symbol header)
+    {
+        var writer = GetWriter(header);
+
+        writer.WriteLine($"// TODO: {RegexFirstLine.Match(header.ToString()).Value}");
     }
 
     private void GenerateFile(Symbol header)
