@@ -17,6 +17,23 @@ public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
     /// </summary>
     public static SymbolArrayEqualityComparer Members { get; } = new(new Range(1, ^1));
 
+    /// <summary>
+    ///     Compare members and type name.
+    /// </summary>
+    /// <remarks>
+    ///     How this comparer works:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             duplicated types across TUs are not distinct (tag is always the same)
+    ///         </item>
+    ///         <item>
+    ///             compiler-generated types are distinct (tag is never the same)
+    ///         </item>
+    ///     </list>
+    /// </remarks>
+    public static EqualityComparer<Symbol[]> MembersTypeName { get; } =
+        Create(Members.Equals, obj => HashCode.Combine(Members.GetHashCode(obj), obj[0].Name));
+
     private Range Range { get; }
 
     public override bool Equals(Symbol[]? x, Symbol[]? y)

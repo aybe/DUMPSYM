@@ -392,7 +392,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         }
     }
 
-    private static string ToString(SymbolStorageClass value)
+    public static string ToString(SymbolStorageClass value)
     {
         var s = value switch
         {
@@ -419,7 +419,7 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         return s ?? throw new NotImplementedException(value.ToString());
     }
 
-    private static string ToString(SymbolTypeKind value)
+    public static string ToString(SymbolTypeKind value)
     {
         var s = value switch
         {

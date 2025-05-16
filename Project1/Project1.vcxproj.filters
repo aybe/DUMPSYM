@@ -14,4 +14,162 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\AFFECT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ANGLE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BUILDING.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CAMERA.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CONTROL.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DISTANCE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DRAW.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EFFECT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ENGINE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FLOATLIB.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FORLIB.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GAME.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GENMAP.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LEVEL.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LIBCD.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LIBGPU.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LIBGS.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LIBGTE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LIBSPU.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MAIN.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MAP.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MAPWHO.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MEMCARD.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MOVE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MUSIC.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OBJECT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OBJECTS.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OPTMENU.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PACKET.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PERSON.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\POWERUP.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PSXHOST.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PSXIO.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SCANNER.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SCREENS.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SEARCH.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SHOT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SOUND.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SSPRITE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\STATS.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\STDDEF.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SUPER.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SWITCH.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TEXT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\THING.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TRACK.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TYPES.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VEHCOLID.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VEHICLE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WEAPON.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WEATHER.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c" />
+  </ItemGroup>
 </Project>

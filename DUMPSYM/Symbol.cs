@@ -1,5 +1,5 @@
-using DUMPSYM.Extensions;
 using System.Text.RegularExpressions;
+using DUMPSYM.Extensions;
 
 namespace DUMPSYM;
 
@@ -124,4 +124,32 @@ public sealed partial class Symbol
     public bool IsTypeFooter => Class is SymbolStorageClass.EOS;
 
     #endregion
+}
+
+public sealed partial class Symbol
+{
+    public static IEqualityComparer<Symbol> RecordEqualityComparer { get; } = new RecordEqualityComparerImpl();
+
+    private sealed class RecordEqualityComparerImpl : EqualityComparer<Symbol>
+    {
+        public override bool Equals(Symbol? x, Symbol? y)
+        {
+            if (ReferenceEquals(x, y))
+            {
+                return true;
+            }
+
+            if (x is null || y is null)
+            {
+                return false;
+            }
+
+            return x.Record.Equals(y.Record);
+        }
+
+        public override int GetHashCode(Symbol obj)
+        {
+            return obj.Record.GetHashCode();
+        }
+    }
 }
