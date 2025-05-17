@@ -197,7 +197,56 @@ public sealed class Generator : IDisposable
 
         if (Sets.Typedefs.Add(header))
         {
-            writer.WriteLine($"typedef int {name}; // {header}");
+            var type = header.Type!.Value;
+
+            var kind = SymbolGenerator.ToString(type.Kind);
+
+            var modifiers = type.Modifiers.ToArray();
+
+            var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
+            var fcn = modifiers.Any(s => s is SymbolTypeModifier.FCN);
+
+            var ptr = modifiers.Any(s => s is SymbolTypeModifier.PTR);
+
+            var tag = header.Tag;
+
+            if (tag == null)
+            {
+                if (fcn)
+                {
+                    writer.WriteLine($"typedef {kind} ({pointers}{name})(); // {header}");
+                }
+                else
+                {
+                    writer.WriteLine($"typedef {kind} {pointers}{name}; // {header}");
+                }
+            }
+            else
+            {
+                if (fcn)
+                {
+                    throw new NotImplementedException(header.ToString()); // none thus far
+                }
+
+                if (type.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
+                {
+                    if (ptr)
+                    {
+                        writer.WriteLine($"typedef {kind} {tag} {pointers}{name}; // {header}");
+                    }
+                    else
+                    {
+                        writer.WriteLine($"// IGNORED: typedef struct // {header}");
+                        counter.Added--;
+                        counter.Ignored++;
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException(header.ToString()); // none thus far
+                }
+            }
 
             counter.Added++;
         }
