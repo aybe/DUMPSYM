@@ -186,7 +186,7 @@ public sealed class Generator : IDisposable
 
         var name = header.Name!;
 
-        if (name is "clock_t" or "size_t" or "wchar_t")
+        if (name is "clock_t" or "size_t" or "wchar_t" or "ushort")
         {
             writer.WriteLine(GetIgnored(header));
 
