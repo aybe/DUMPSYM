@@ -3,6 +3,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using DUMPSYM.Extensions;
 using DUMPSYM.Tests.WorkInProgress;
 
 namespace DUMPSYM.Tests;
@@ -161,7 +162,37 @@ public sealed class Generator : IDisposable
 
         if (Sets.Types.Add(symbols))
         {
-            writer.WriteLine($"{SymbolGenerator.ToString(type.Class!.Value)} {SymbolsNames[type]}; // {type}");
+            var klass = SymbolGenerator.ToString(type.Class!.Value);
+
+            if (TryGetDefinition(type, out var def))
+            {
+                var typedef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
+
+                if (type.HasFakeName || def.Tag == def.Name)
+                {
+                    writer.WriteLine($"{typedef} {klass} {{ // {type}");
+                }
+                else
+                {
+                    writer.WriteLine($"{typedef} {klass} {name} {{ // {type}");
+                }
+
+                using (writer.GetIndentScope())
+                {
+                    var members = symbols[1..^1];
+
+                    foreach (var member in members) // TODO
+                    {
+                        writer.WriteLine($"int {member.Name}; // {member}");
+                    }
+                }
+
+                writer.WriteLine($"}} {new string('*', def.Type!.Value.Modifiers.Count(s => s is SymbolTypeModifier.PTR))}{def.Name}; // {def}");
+            }
+            else
+            {
+                writer.WriteLine($"{klass} {SymbolsNames[type]}; // {type}");
+            }
 
             counter.Added++;
         }
@@ -233,7 +264,18 @@ public sealed class Generator : IDisposable
                 {
                     if (ptr)
                     {
-                        writer.WriteLine($"typedef {kind} {tag} {pointers}{name}; // {header}");
+                        var previous = Symbols[SymbolsIndices[header] - 1];
+
+                        if (previous.Class is SymbolStorageClass.EOS && previous.Tag == tag)
+                        {
+                            writer.WriteLine($"// IGNORED: typedef struct // {header}");
+                            counter.Added--;
+                            counter.Ignored++;
+                        }
+                        else
+                        {
+                            writer.WriteLine($"typedef {kind} {tag} {pointers}{name}; // {header}");
+                        }
                     }
                     else
                     {
@@ -370,6 +412,7 @@ public sealed class Generator : IDisposable
             // ReSharper disable CppInconsistentNaming
             // ReSharper disable CppClangTidyBugproneReservedIdentifier
             // ReSharper disable CppClangTidyClangDiagnosticReservedIdentifier
+            // ReSharper disable GrammarMistakeInComment
             // ReSharper disable IdentifierTypo
             """;
 
