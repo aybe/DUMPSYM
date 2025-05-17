@@ -24,6 +24,8 @@ public sealed class Generator : IDisposable
 
     private FrozenDictionary<Symbol, int> SymbolsIndices { get; set; } = null!;
 
+    private FrozenDictionary<Symbol, string> SymbolsNames { get; set; } = null!;
+
     private GeneratorCounters Counters { get; } = new();
 
     private GeneratorOptions Options { get; }
@@ -31,6 +33,8 @@ public sealed class Generator : IDisposable
     private GeneratorSets Sets { get; } = new();
 
     private Dictionary<string, IndentedTextWriter> Writers { get; } = new();
+
+    private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private static Regex RegexNewLine { get; } = new(@"\r?\n", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -49,6 +53,19 @@ public sealed class Generator : IDisposable
         Initialize();
 
         SymbolsIndices = source.Index().ToFrozenDictionary(s => s.Item, s => s.Index);
+
+        var dictionary = new Dictionary<Symbol, string>();
+
+        foreach (var symbol in Symbols.Where(s => s.IsTypeDefinition || s.IsTypeHeader))
+        {
+            var s = symbol.Name!;
+
+            var t = RegexFakeName.IsMatch(s) ? $"_{s[1..]}{symbol.Header.Position:x6}" : s;
+
+            dictionary.Add(symbol, t);
+        }
+
+        SymbolsNames = dictionary.ToFrozenDictionary();
 
         var split = Symbol.Split(source);
 
@@ -144,7 +161,7 @@ public sealed class Generator : IDisposable
 
         if (Sets.Types.Add(symbols))
         {
-            writer.WriteLine($"{SymbolGenerator.ToString(type.Class!.Value)} {type.Name}; // {type}");
+            writer.WriteLine($"{SymbolGenerator.ToString(type.Class!.Value)} {SymbolsNames[type]}; // {type}");
 
             counter.Added++;
         }
