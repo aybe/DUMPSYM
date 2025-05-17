@@ -319,6 +319,8 @@ public sealed class Generator : IDisposable
             #pragma once
             // ReSharper disable CommentTypo
             // ReSharper disable CppInconsistentNaming
+            // ReSharper disable CppClangTidyBugproneReservedIdentifier
+            // ReSharper disable CppClangTidyClangDiagnosticReservedIdentifier
             // ReSharper disable IdentifierTypo
             """;
 
