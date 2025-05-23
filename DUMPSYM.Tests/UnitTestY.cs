@@ -24,25 +24,6 @@ public sealed class UnitTestY : UnitTestBase
     {
         var symbols = Sample.Default.Symbols;
 
-        NewMethod(symbols);
-        return;
-#pragma warning disable CS0162 // Unreachable code detected
-        // ReSharper disable HeuristicUnreachableCode
-        using var generator = new Generator(symbols);
-
-        var generate = generator.Generate(symbols.ToArray());
-
-        WriteLine(generator.GetStatistics());
-
-        const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
-
-        File.WriteAllText(path, generate);
-        // ReSharper restore HeuristicUnreachableCode
-#pragma warning restore CS0162 // Unreachable code detected
-    }
-
-    private void NewMethod(List<Symbol> symbols)
-    {
         symbols = symbols.ToList();
 
         // symbols = Generator.CleanupSymbols(symbols); // TODO very slow
