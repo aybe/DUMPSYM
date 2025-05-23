@@ -112,7 +112,7 @@ public sealed class UnitTestY : UnitTestBase
             {
                 if (!Typedefs.Contains(header))
                 {
-                    GenerateTypedef(filtered, header, array, originals);
+                    GenerateTypedef(filtered, header, originals);
                 }
             }
             else if (header.IsTypeHeader)
@@ -214,7 +214,7 @@ public sealed class UnitTestY : UnitTestBase
         Writer.WriteLine2("};", $"// {type[^1]}");
     }
 
-    private void GenerateTypedef(Symbol[][] filtered, Symbol header, Symbol[] array, Symbol[] originals)
+    private void GenerateTypedef(Symbol[][] filtered, Symbol header, Symbol[] originals)
     {
         if (header.Tag == null)
         {
