@@ -186,7 +186,6 @@ public sealed class UnitTestY : UnitTestBase
             if (definition.Tag != definition.Name && !definition.HasFakeTag)
             {
                 name = definition.Tag!;
-                Console.WriteLine(definition);
             }
             else
             {
