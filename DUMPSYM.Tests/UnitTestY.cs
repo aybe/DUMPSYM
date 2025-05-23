@@ -11,7 +11,7 @@ namespace DUMPSYM.Tests;
 
 [TestClass]
 public sealed class UnitTestY : UnitTestBase
-// BUG type name missing     00e68a: $00000005 96 Def2 class MOS type UNION size 1 dims 0 tag .97fake name srm
+// TODO 'typedef struct _GsCOORDINATE { ... } GsCOORDINATE' stays as _GsCOORDINATE or IDA generates fake type -> best done on IDA output
 {
     private const bool JumpLines = false;
 
@@ -70,18 +70,19 @@ public sealed class UnitTestY : UnitTestBase
 
         var filtered = map.Values.ToArray();
 
-        var original = symbols;
+        // symbols shall not contain functions else they get visited and yield wrong types/typedefs:
+        //
+        // member being generated:
+        // 15acc4: $00000000 96 Def2 class MOU type STRUCT size 2 dims 0 tag .109fake name WR
+        //
+        // symbol found in function above it:
+        // 14b41b: $00000000 96 Def2 class TPDEF type STRUCT size 3 dims 0 tag .109fake name Palette
+        //
+        // since lookup is by tag, output becomes wrong; ignoring functions is the right solution
 
-        original =
-            // BUG
-            // because
-            // 15acc4: $00000000 96 Def2 class MOU type STRUCT size 2 dims 0 tag .109fake name WR
-            // picks
-            // 14b41b: $00000000 96 Def2 class TPDEF type STRUCT size 3 dims 0 tag .109fake name Palette
-            // from function, which is wrong
-            filtered.SelectMany(s => s).ToList();
+        var original = filtered.SelectMany(s => s).ToList();
 
-        Generate(filtered, original);
+        Generate(filtered, original); // TODO same thing passed twice
 
         const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
 
@@ -259,8 +260,6 @@ public sealed class UnitTestY : UnitTestBase
 
     private void GenerateTypedefComplex(Symbol[] def, Symbol[][] symbols, Symbol[] everything)
     {
-        // TODO must be a type without typedef else IDA uses fake types
-
         // TODO if it has modifiers, generate an extra typedef for it
 
         var index = Array.IndexOf(symbols, def);
@@ -303,11 +302,6 @@ public sealed class UnitTestY : UnitTestBase
 
     private string GetMemberString(Symbol member, Symbol[] symbols)
     {
-        // BUG SpritePtr* Sprites; // 000b97: $00000000 96 Def2 class MOS type PTR STRUCT size 8 dims 0 tag Sprite name Sprites
-        // TODO modifiers etc, should return full string // TODO struct prefix
-
-        // BUG should have no _ -> struct _GsCOORDINATE* super;   // 00429d: $00000020 96 Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name super
-
         if (member.ToString() == "00e68a: $00000005 96 Def2 class MOS type UNION size 1 dims 0 tag .97fake name srm")
         {
             var s = 0;
@@ -374,8 +368,6 @@ public sealed class UnitTestY : UnitTestBase
             {
                 output = member.Tag;
             }
-
-            // BUG     SpuIRQCallbackProc** Start;    // 00036f: $0000001c 94 Def class MOS type PTR PTR VOID size 0 name Start
         }
 
         if (memberType.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
