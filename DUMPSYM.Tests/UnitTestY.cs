@@ -108,11 +108,6 @@ public sealed class UnitTestY : UnitTestBase
         {
             var header = array[0];
 
-            if (header.ToString() == "000619: $00000000 94 Def class STRTAG type STRUCT size 52 name .0fake")
-            {
-                var z = 0;
-            }
-
             if (header.IsTypeDefinition)
             {
                 if (!Typedefs.Contains(header))
@@ -168,10 +163,6 @@ public sealed class UnitTestY : UnitTestBase
     private void GenerateType(Symbol? definition, Symbol[] type, Symbol[] everything)
     {
         var header = type[0];
-
-        if (header.ToString() == "0041f2: $00000000 94 Def class STRTAG type STRUCT size 40 name _GsCOORDINATE")
-        {
-        }
 
         string typeName;
 
@@ -301,11 +292,6 @@ public sealed class UnitTestY : UnitTestBase
 
     private string GetMemberString(Symbol member, Symbol[] symbols)
     {
-        if (member.ToString() == "00e68a: $00000005 96 Def2 class MOS type UNION size 1 dims 0 tag .97fake name srm")
-        {
-            var s = 0;
-        }
-
         var memberType = member.Type!.Value;
 
         var find = Array.Find(symbols, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
