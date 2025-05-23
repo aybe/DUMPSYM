@@ -183,6 +183,72 @@ public sealed class UnitTestY : UnitTestBase
         }
     }
 
+    private void GenerateType(Symbol? definition, Symbol[] type, Symbol[] everything)
+    {
+        var header = type[0];
+
+        if (header.ToString() == "0041f2: $00000000 94 Def class STRTAG type STRUCT size 40 name _GsCOORDINATE")
+        {
+        }
+
+        string typeName;
+
+        if (definition == null) // TODO should be triggered by compiler-generated struct
+        {
+            typeName = $"{SymbolGenerator.ToString(header.Type!.Value.Kind)} {GetSafeName(header)}";
+        }
+        else
+        {
+            string name;
+
+            if (definition.Tag != definition.Name && !definition.HasFakeTag)
+            {
+                name = definition.Tag!;
+                Console.WriteLine(definition);
+            }
+            else
+            {
+                name = definition.Name!;
+            }
+
+            typeName = $"{SymbolGenerator.ToString(definition.Type!.Value.Kind)} {name}";
+        }
+
+        Writer.WriteLine2($"{typeName} ", $"// {header}");
+
+        Writer.WriteLine2("{", $"// {definition}");
+
+        Writer.Indent++;
+
+        var members = type[1..^1];
+
+        foreach (var member in members)
+        {
+            var memberType = member.Type!.Value;
+
+            var modifiers = memberType.Modifiers.ToArray();
+
+            if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
+            {
+                Writer.WriteLine($"// TODO: {member}");
+            }
+            else
+            {
+                var kind = GetMemberString(member, everything);
+
+                var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
+                var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
+
+                Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
+            }
+        }
+
+        Writer.Indent--;
+
+        Writer.WriteLine2("};", $"// {type[^1]}");
+    }
+
     [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
     private void GenerateTypedefBasic(Symbol[] def)
     {
@@ -252,72 +318,6 @@ public sealed class UnitTestY : UnitTestBase
                 }
             }
         }
-    }
-
-    private void GenerateType(Symbol? definition, Symbol[] type, Symbol[] everything)
-    {
-        var header = type[0];
-
-        if (header.ToString() == "0041f2: $00000000 94 Def class STRTAG type STRUCT size 40 name _GsCOORDINATE")
-        {
-        }
-
-        string typeName;
-
-        if (definition == null) // TODO should be triggered by compiler-generated struct
-        {
-            typeName = $"{SymbolGenerator.ToString(header.Type!.Value.Kind)} {GetSafeName(header)}";
-        }
-        else
-        {
-            string name;
-
-            if (definition.Tag != definition.Name && !definition.HasFakeTag)
-            {
-                name = definition.Tag!;
-                Console.WriteLine(definition);
-            }
-            else
-            {
-                name = definition.Name!;
-            }
-
-            typeName = $"{SymbolGenerator.ToString(definition.Type!.Value.Kind)} {name}";
-        }
-
-        Writer.WriteLine2($"{typeName} ", $"// {header}");
-
-        Writer.WriteLine2("{", $"// {definition}");
-
-        Writer.Indent++;
-
-        var members = type[1..^1];
-
-        foreach (var member in members)
-        {
-            var memberType = member.Type!.Value;
-
-            var modifiers = memberType.Modifiers.ToArray();
-
-            if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
-            {
-                Writer.WriteLine($"// TODO: {member}");
-            }
-            else
-            {
-                var kind = GetMemberString(member, everything);
-
-                var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
-
-                var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
-
-                Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
-            }
-        }
-
-        Writer.Indent--;
-
-        Writer.WriteLine2("};", $"// {type[^1]}");
     }
 
     private string GetMemberString(Symbol member, Symbol[] symbols)
