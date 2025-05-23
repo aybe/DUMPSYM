@@ -332,21 +332,6 @@ public sealed class UnitTestY : UnitTestBase
                     }
                 }
 
-                if (name == null)
-                {
-                    // TODO delete
-                    for (var i = index - 1; i >= 0; i--)
-                    {
-                        var symbol = symbols[i];
-
-                        if (symbol.IsTypeDefinition && symbol.Tag == member.Tag && !symbol.Type!.Value.Modifiers.Any())
-                        {
-                            name = GetSafeName(symbol);
-                            break;
-                        }
-                    }
-                }
-
                 output = name ?? throw new InvalidOperationException(member.ToString());
             }
             else
