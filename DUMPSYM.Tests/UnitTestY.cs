@@ -92,7 +92,7 @@ public sealed class UnitTestY : UnitTestBase
 
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
 
-        Assert.AreEqual("d90980de93a42c259678998453850ffa0a2e162c81b96d9e22bbae7269066386", hash, true);
+        Assert.AreEqual("be62c014392513954d4e4468227e237e74f0bf276bfbab1adf56705c38b78cfe", hash, true);
     }
 
     private int Remove(List<Symbol[]> split, Func<Symbol, bool> predicate)
@@ -196,20 +196,20 @@ public sealed class UnitTestY : UnitTestBase
 
         foreach (var member in members)
         {
+            var kind = GetMemberString(member, everything);
+
             var memberType = member.Type!.Value;
 
             var modifiers = memberType.Modifiers.ToArray();
 
+            var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
             if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
             {
-                Writer.WriteLine($"// TODO: {member}");
+                Writer.WriteLine2($"{kind} ({pointers}{member.Name})();", $"// {member}");
             }
             else
             {
-                var kind = GetMemberString(member, everything);
-
-                var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
-
                 var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
 
                 Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
