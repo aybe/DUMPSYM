@@ -283,7 +283,7 @@ public sealed class UnitTestY : UnitTestBase
 
                 if (header.IsTypeHeader && header.Name == definition.Tag)
                 {
-                    GenerateType(definition, symbol, everything); // TODO generate fake type using typedef name
+                    GenerateType(definition, symbol, everything);
                     break;
                 }
             }
