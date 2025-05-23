@@ -1,5 +1,7 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
+using System.Text;
 
 // ReSharper disable CommentTypo
 // ReSharper disable InvertIf
@@ -102,7 +104,13 @@ public sealed class UnitTestY : UnitTestBase
 
         const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
 
-        File.WriteAllText(path, Writer.InnerWriter.ToString());
+        var contents = Writer.InnerWriter.ToString()!;
+
+        File.WriteAllText(path, contents);
+
+        var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
+
+        Assert.AreEqual("d90980de93a42c259678998453850ffa0a2e162c81b96d9e22bbae7269066386", hash, true);
     }
 
     private int Remove(List<Symbol[]> split, Func<Symbol, bool> predicate)
