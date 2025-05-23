@@ -112,14 +112,7 @@ public sealed class UnitTestY : UnitTestBase
             {
                 if (!Typedefs.Contains(header))
                 {
-                    if (header.Tag == null)
-                    {
-                        GenerateTypedefBasic(array);
-                    }
-                    else
-                    {
-                        GenerateTypedefComplex(array, filtered, originals);
-                    }
+                    GenerateTypedef(filtered, header, array, originals);
                 }
             }
             else if (header.IsTypeHeader)
@@ -219,6 +212,18 @@ public sealed class UnitTestY : UnitTestBase
         Writer.Indent--;
 
         Writer.WriteLine2("};", $"// {type[^1]}");
+    }
+
+    private void GenerateTypedef(Symbol[][] filtered, Symbol header, Symbol[] array, Symbol[] originals)
+    {
+        if (header.Tag == null)
+        {
+            GenerateTypedefBasic(array);
+        }
+        else
+        {
+            GenerateTypedefComplex(array, filtered, originals);
+        }
     }
 
     [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
