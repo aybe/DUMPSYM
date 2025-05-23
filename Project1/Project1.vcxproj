@@ -19,60 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\AFFECT.H" />
-    <ClInclude Include="src\ANGLE.H" />
-    <ClInclude Include="src\BUILDING.H" />
-    <ClInclude Include="src\CAMERA.H" />
-    <ClInclude Include="src\CONTROL.H" />
-    <ClInclude Include="src\DISTANCE.H" />
-    <ClInclude Include="src\DRAW.H" />
-    <ClInclude Include="src\EFFECT.H" />
-    <ClInclude Include="src\ENGINE.H" />
-    <ClInclude Include="src\FLOATLIB.H" />
-    <ClInclude Include="src\FORLIB.H" />
-    <ClInclude Include="src\GAME.H" />
-    <ClInclude Include="src\GENMAP.H" />
-    <ClInclude Include="src\LEVEL.H" />
-    <ClInclude Include="src\LIBCD.H" />
-    <ClInclude Include="src\LIBGPU.H" />
-    <ClInclude Include="src\LIBGS.H" />
-    <ClInclude Include="src\LIBGTE.H" />
-    <ClInclude Include="src\LIBSPU.H" />
-    <ClInclude Include="src\MAIN.H" />
-    <ClInclude Include="src\MAP.H" />
-    <ClInclude Include="src\MAPWHO.H" />
-    <ClInclude Include="src\MEMCARD.H" />
-    <ClInclude Include="src\MOVE.H" />
-    <ClInclude Include="src\MUSIC.H" />
-    <ClInclude Include="src\OBJECT.H" />
-    <ClInclude Include="src\OBJECTS.H" />
-    <ClInclude Include="src\OPTMENU.H" />
-    <ClInclude Include="src\PACKET.H" />
-    <ClInclude Include="src\PERSON.H" />
-    <ClInclude Include="src\POWERUP.H" />
-    <ClInclude Include="src\PSXHOST.H" />
-    <ClInclude Include="src\PSXIO.H" />
-    <ClInclude Include="src\SCANNER.H" />
-    <ClInclude Include="src\SCREENS.H" />
-    <ClInclude Include="src\SEARCH.H" />
-    <ClInclude Include="src\SHOT.H" />
-    <ClInclude Include="src\SOUND.H" />
-    <ClInclude Include="src\SSPRITE.H" />
-    <ClInclude Include="src\STATS.H" />
-    <ClInclude Include="src\STDDEF.H" />
-    <ClInclude Include="src\SUPER.H" />
-    <ClInclude Include="src\SWITCH.H" />
-    <ClInclude Include="src\TEXT.H" />
-    <ClInclude Include="src\THING.H" />
-    <ClInclude Include="src\TRACK.H" />
-    <ClInclude Include="src\TYPES.H" />
-    <ClInclude Include="src\VEHCOLID.H" />
-    <ClInclude Include="src\VEHICLE.H" />
-    <ClInclude Include="src\WEAPON.H" />
-    <ClInclude Include="src\WEATHER.H" />
+    <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c" />
+    <ClInclude Include="..\MAIN.SYM.H" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

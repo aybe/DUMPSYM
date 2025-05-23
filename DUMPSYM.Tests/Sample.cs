@@ -4,7 +4,7 @@ public static class Sample
 {
     static Sample()
     {
-        var path = Path.Combine(Solution.Directory, "MAIN.SYM");
+        const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM";
 
         using var stream = File.OpenRead(path);
 

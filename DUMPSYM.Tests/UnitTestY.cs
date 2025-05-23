@@ -1,23 +1,411 @@
-﻿namespace DUMPSYM.Tests;
+﻿using System.CodeDom.Compiler;
+using System.Diagnostics.CodeAnalysis;
+
+// ReSharper disable CommentTypo
+// ReSharper disable InvertIf
+// ReSharper disable StringLiteralTypo
+
+namespace DUMPSYM.Tests;
 
 [TestClass]
 public sealed class UnitTestY : UnitTestBase
+// BUG type name missing     00e68a: $00000005 96 Def2 class MOS type UNION size 1 dims 0 tag .97fake name srm
 {
+    private const bool JumpLines = false;
+
+    private HashSet<Symbol> Typedefs { get; } = [];
+
+    private IndentedTextWriter Writer { get; } = new(new StringWriter());
+
     [TestMethod]
     public void TestMethodY()
     {
-        var directory = Path.Combine(Solution.Directory, "Project1", "src");
+        var symbols = Sample.Default.Symbols;
 
-        Directory.CreateDirectory(directory);
+        NewMethod(symbols);
+        return;
+#pragma warning disable CS0162 // Unreachable code detected
+        // ReSharper disable HeuristicUnreachableCode
+        using var generator = new Generator(symbols);
 
-        using var generator = new Generator(directory);
-
-        generator.Generate(Sample.Default.Symbols.ToArray());
-
-        generator.Write();
+        var generate = generator.Generate(symbols.ToArray());
 
         WriteLine(generator.GetStatistics());
 
+        const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
 
+        File.WriteAllText(path, generate);
+        // ReSharper restore HeuristicUnreachableCode
+#pragma warning restore CS0162 // Unreachable code detected
+    }
+
+    private void NewMethod(List<Symbol> symbols)
+    {
+        symbols = symbols.ToList();
+
+        // symbols = Generator.CleanupSymbols(symbols); // TODO very slow
+
+        var split = Symbol.Split(symbols.ToArray()).ToList();
+
+        WriteLineVar(split.Count);
+
+        WriteLineVar(Remove(split, s => s.IsExternal));
+
+        WriteLineVar(split.Count);
+
+        WriteLineVar(Remove(split, s => s.IsFile));
+
+        WriteLineVar(split.Count);
+
+        WriteLineVar(Remove(split, s => s.IsFileEnd));
+
+        WriteLineVar(split.Count);
+
+        WriteLineVar(Remove(split, s => s.IsStatic));
+
+        WriteLineVar(split.Count);
+
+        WriteLineVar(Remove(split, s => s.IsFunction));
+
+        WriteLineVar(split.Count);
+
+        WriteLineVar(Remove(split, s => s.IsVariable));
+
+        var map = new SortedDictionary<int, Symbol[]>();
+
+        var set = new HashSet<Symbol[]>(SymbolArrayEqualityComparer.MembersTypeName);
+
+        foreach (var item in split)
+        {
+            if (set.Add(item))
+            {
+                map.Add(map.Count, item);
+            }
+        }
+
+        WriteLineVar(set.Count);
+
+        var filtered = map.Values.ToArray();
+
+        var original = symbols;
+
+        original =
+            // BUG
+            // because
+            // 15acc4: $00000000 96 Def2 class MOU type STRUCT size 2 dims 0 tag .109fake name WR
+            // picks
+            // 14b41b: $00000000 96 Def2 class TPDEF type STRUCT size 3 dims 0 tag .109fake name Palette
+            // from function, which is wrong
+            filtered.SelectMany(s => s).ToList();
+
+        Generate(filtered, original);
+
+        const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
+
+        File.WriteAllText(path, Writer.InnerWriter.ToString());
+    }
+
+    private int Remove(List<Symbol[]> split, Func<Symbol, bool> predicate)
+    {
+        return split.RemoveAll(s => predicate(s[0]));
+    }
+
+    private void Generate(Symbol[][] filtered, List<Symbol> original)
+    {
+        var originals = original.ToArray();
+
+        foreach (var (index, array) in filtered.Index())
+        {
+            var header = array[0];
+
+            if (header.ToString() == "000619: $00000000 94 Def class STRTAG type STRUCT size 52 name .0fake")
+            {
+                var z = 0;
+            }
+
+            if (header.IsTypeDefinition)
+            {
+                if (!Typedefs.Contains(header))
+                {
+                    if (header.Tag == null)
+                    {
+                        GenerateTypedefBasic(array);
+                    }
+                    else
+                    {
+                        GenerateTypedefComplex(array, filtered, originals);
+                    }
+                }
+            }
+            else if (header.IsTypeHeader)
+            {
+                var nextOffset = index + 1;
+
+                if (nextOffset >= 0 && nextOffset < filtered.Length)
+                {
+                    var nextSymbol = filtered[nextOffset]; // TODO sucks, need better mechanism
+
+                    var nextHeader = nextSymbol[0];
+
+                    if (nextHeader.IsTypeDefinition && nextHeader.Tag == header.Name && !nextHeader.Type!.Value.Modifiers.Any())
+                    {
+                        Typedefs.Add(nextHeader);
+
+                        GenerateType(nextHeader, array, originals);
+                    }
+                    else // LoadFiles
+                    {
+                        GenerateType(null, array, originals); // TODO should be triggered by compiler generated struct
+                    }
+                }
+                else
+                {
+                    GenerateType(null, array, originals); // TODO should be triggered by compiler generated struct
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(header.ToString());
+            }
+
+            if (JumpLines)
+            {
+                Writer.WriteLine();
+            }
+        }
+    }
+
+    [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
+    private void GenerateTypedefBasic(Symbol[] def)
+    {
+        var header = def[0];
+
+        var type = header.Type!.Value;
+
+        var modifiers = type.Modifiers.ToArray();
+
+        var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
+        var dimensions = string.Concat((header.Dimensions ?? []).Select(s => $"[{s}]"));
+
+        var typedef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
+
+        var kind = SymbolGenerator.ToString(type.Kind);
+
+        if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
+        {
+            Writer.WriteLine2($"{typedef} {kind} ({pointers}{header.Name})();", $"// {header}");
+        }
+        else
+        {
+            Writer.WriteLine2($"{typedef} {kind}{pointers} {header.Name}{dimensions};", $"// {header}");
+        }
+    }
+
+    private void GenerateTypedefComplex(Symbol[] def, Symbol[][] symbols, Symbol[] everything)
+    {
+        // TODO must be a type without typedef else IDA uses fake types
+
+        // TODO if it has modifiers, generate an extra typedef for it
+
+        var index = Array.IndexOf(symbols, def);
+
+        if (index is -1)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var definition = def[0];
+
+        var type = definition.Type!.Value;
+
+        var modifiers = type.Modifiers.ToArray();
+
+        if (modifiers.Any()) // TODO generate this after typedef if any?
+        {
+            var s1 = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
+            var s2 = SymbolGenerator.ToString(type.Kind);
+            var s3 = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
+            Writer.WriteLine2($"{s1} {s2} {definition.Tag}{s3} {definition.Name};", $"// {definition}");
+        }
+        else
+        {
+            for (var i = index - 1; i >= 0; i--)
+            {
+                var symbol = symbols[i];
+
+                var header = symbol[0];
+
+                if (header.IsTypeHeader && header.Name == definition.Tag)
+                {
+                    GenerateType(definition, symbol, everything); // TODO generate fake type using typedef name
+                    break;
+                }
+            }
+        }
+    }
+
+    private void GenerateType(Symbol? definition, Symbol[] type, Symbol[] everything)
+    {
+        var header = type[0];
+
+        if (header.ToString() == "0041f2: $00000000 94 Def class STRTAG type STRUCT size 40 name _GsCOORDINATE")
+        {
+        }
+
+        string typeName;
+
+        if (definition == null) // TODO should be triggered by compiler-generated struct
+        {
+            typeName = $"{SymbolGenerator.ToString(header.Type!.Value.Kind)} {GetSafeName(header)}";
+        }
+        else
+        {
+            string name;
+
+            if (definition.Tag != definition.Name && !definition.HasFakeTag)
+            {
+                name = definition.Tag!;
+                Console.WriteLine(definition);
+            }
+            else
+            {
+                name = definition.Name!;
+            }
+
+            typeName = $"{SymbolGenerator.ToString(definition.Type!.Value.Kind)} {name}";
+        }
+
+        Writer.WriteLine2($"{typeName} ", $"// {header}");
+
+        Writer.WriteLine2("{", $"// {definition}");
+
+        Writer.Indent++;
+
+        var members = type[1..^1];
+
+        foreach (var member in members)
+        {
+            var memberType = member.Type!.Value;
+
+            var modifiers = memberType.Modifiers.ToArray();
+
+            if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
+            {
+                Writer.WriteLine($"// TODO: {member}");
+            }
+            else
+            {
+                var kind = GetMemberString(member, everything);
+
+                var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+
+                var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
+
+                Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
+            }
+        }
+
+        Writer.Indent--;
+
+        Writer.WriteLine2("};", $"// {type[^1]}");
+    }
+
+    private string GetMemberString(Symbol member, Symbol[] symbols)
+    {
+        // BUG SpritePtr* Sprites; // 000b97: $00000000 96 Def2 class MOS type PTR STRUCT size 8 dims 0 tag Sprite name Sprites
+        // TODO modifiers etc, should return full string // TODO struct prefix
+
+        // BUG should have no _ -> struct _GsCOORDINATE* super;   // 00429d: $00000020 96 Def2 class MOS type PTR STRUCT size 40 dims 0 tag _GsCOORDINATE name super
+
+        if (member.ToString() == "00e68a: $00000005 96 Def2 class MOS type UNION size 1 dims 0 tag .97fake name srm")
+        {
+            var s = 0;
+        }
+
+        var memberType = member.Type!.Value;
+
+        var find = Array.Find(symbols, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
+
+        var kind = SymbolGenerator.ToString(memberType.Kind);
+
+        string output;
+
+        if (string.IsNullOrWhiteSpace(member.Tag)) //member.Tag != null)
+        {
+            output = find?.Name ?? kind;
+        }
+        else
+        {
+            if (member.HasFakeTag)
+            {
+                var index = Array.IndexOf(symbols, member);
+
+                var name = default(string);
+
+                for (var i = index - 1; i >= 0; i--)
+                {
+                    var symbol = symbols[i];
+
+                    if (symbol.IsTypeHeader && symbol.Name == member.Tag) // TODO modifiers?
+                    {
+                        name ??= GetSafeName(symbol);
+                        break;
+                    }
+
+                    if (symbol.IsTypeDefinition && symbol.Tag == member.Tag)
+                    {
+                        var aggregate = (member.Dimensions ?? [1u]).Aggregate(1u, (s, t) => s * t);
+                        var memberSize = member.Size!.Value / aggregate;
+                        Assert.AreEqual(memberSize, symbol.Size);
+                        name = symbol.Name;
+                        break;
+                    }
+                }
+
+                if (name == null)
+                {
+                    // TODO delete
+                    for (var i = index - 1; i >= 0; i--)
+                    {
+                        var symbol = symbols[i];
+
+                        if (symbol.IsTypeDefinition && symbol.Tag == member.Tag && !symbol.Type!.Value.Modifiers.Any())
+                        {
+                            name = GetSafeName(symbol);
+                            break;
+                        }
+                    }
+                }
+
+                output = name ?? throw new InvalidOperationException(member.ToString());
+            }
+            else
+            {
+                output = member.Tag;
+            }
+
+            // BUG     SpuIRQCallbackProc** Start;    // 00036f: $0000001c 94 Def class MOS type PTR PTR VOID size 0 name Start
+        }
+
+        if (memberType.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
+        {
+            output = $"{kind} {output}";
+        }
+
+        return output;
+    }
+
+    private static string GetSafeName(Symbol symbol)
+    {
+        var name = symbol.Name ?? throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
+
+        if (symbol.HasFakeName)
+        {
+            name = $"_{name[1..]}_{symbol.Header.Position:x6}";
+        }
+
+        return name;
     }
 }

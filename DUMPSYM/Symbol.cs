@@ -41,7 +41,7 @@ public sealed partial class Symbol
             new(s => s.IsFileHeader(), s => s.IsFileFooter()),
             new(s => s.IsFunctionHeader(), s => s.IsFunctionFooter()),
             new(s => s.IsStructHeader(), s => s.IsTypeFooter()),
-            new(s => s.IsUnionHeader(), s => s.IsTypeFooter()),
+            new(s => s.IsUnionHeader(), s => s.IsTypeFooter())
         };
 
         for (var i = 0; i < records.Length; i++)
@@ -109,9 +109,9 @@ public sealed partial class Symbol
 
     public string? File => Record is ISymbolFileStart f ? f.File : null;
 
-    public bool HasFakeName => Name is not null && RegexFakeName.IsMatch(Name);
+    public bool HasFakeName => !string.IsNullOrEmpty(Name) && RegexFakeName.IsMatch(Name);
 
-    public bool HasFakeTag => Tag is not null && RegexFakeName.IsMatch(Tag);
+    public bool HasFakeTag => !string.IsNullOrEmpty(Tag) && RegexFakeName.IsMatch(Tag);
 
     public bool IsExternal => Class is SymbolStorageClass.EXT;
 
