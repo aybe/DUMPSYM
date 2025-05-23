@@ -316,7 +316,7 @@ public sealed class UnitTestY : UnitTestBase
                 {
                     var symbol = symbols[i];
 
-                    if (symbol.IsTypeHeader && symbol.Name == member.Tag) // TODO modifiers?
+                    if (symbol.IsTypeHeader && symbol.Name == member.Tag)
                     {
                         name ??= GetSafeName(symbol);
                         break;
