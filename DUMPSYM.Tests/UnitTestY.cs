@@ -15,37 +15,29 @@ public sealed class UnitTestY : UnitTestBase
     {
         var generator = new HeaderGenerator();
 
-        var symbols = Sample.Default.Symbols;
-
-        symbols = symbols.ToList();
+        var symbols = Sample.Default.Symbols.ToList();
 
         // symbols = Generator.CleanupSymbols(symbols); // TODO very slow
 
         var split = Symbol.Split(symbols.ToArray()).ToList();
 
-        WriteLineVar(split.Count);
+        Console.WriteLine($"{split.Count} symbols found");
+        
+        var remove1 = split.RemoveAll(s => s[0].IsExternal);
+        var remove2 = split.RemoveAll(s => s[0].IsFile);
+        var remove3 = split.RemoveAll(s => s[0].IsFileEnd);
+        var remove4 = split.RemoveAll(s => s[0].IsFunction);
+        var remove5 = split.RemoveAll(s => s[0].IsStatic);
+        var remove6 = split.RemoveAll(s => s[0].IsVariable);
 
-        WriteLineVar(generator.Remove(split, s => s.IsExternal));
+        Console.WriteLine($"Removed {remove1} externals");
+        Console.WriteLine($"Removed {remove2} files");
+        Console.WriteLine($"Removed {remove3} file endings");
+        Console.WriteLine($"Removed {remove4} functions");
+        Console.WriteLine($"Removed {remove5} statics");
+        Console.WriteLine($"Removed {remove6} variables");
 
-        WriteLineVar(split.Count);
-
-        WriteLineVar(generator.Remove(split, s => s.IsFile));
-
-        WriteLineVar(split.Count);
-
-        WriteLineVar(generator.Remove(split, s => s.IsFileEnd));
-
-        WriteLineVar(split.Count);
-
-        WriteLineVar(generator.Remove(split, s => s.IsStatic));
-
-        WriteLineVar(split.Count);
-
-        WriteLineVar(generator.Remove(split, s => s.IsFunction));
-
-        WriteLineVar(split.Count);
-
-        WriteLineVar(generator.Remove(split, s => s.IsVariable));
+        Console.WriteLine($"{split.Count} symbols remaining");
 
         var map = new SortedDictionary<int, Symbol[]>();
 
@@ -59,7 +51,7 @@ public sealed class UnitTestY : UnitTestBase
             }
         }
 
-        WriteLineVar(set.Count);
+        Console.WriteLine($"{set.Count} unique typedefs/types found");
 
         var filtered = map.Values.ToArray();
 

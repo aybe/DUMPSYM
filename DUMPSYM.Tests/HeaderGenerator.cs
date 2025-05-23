@@ -12,11 +12,6 @@ public sealed class HeaderGenerator
 
     public IndentedTextWriter Writer { get; } = new(new StringWriter());
 
-    public int Remove(List<Symbol[]> split, Func<Symbol, bool> predicate)
-    {
-        return split.RemoveAll(s => predicate(s[0]));
-    }
-
     public void Generate(Symbol[][] filtered, List<Symbol> original)
     {
         var originals = original.ToArray();
