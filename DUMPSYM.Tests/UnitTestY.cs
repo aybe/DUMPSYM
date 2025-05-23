@@ -218,7 +218,7 @@ public sealed class UnitTestY : UnitTestBase
     {
         if (header.Tag == null)
         {
-            GenerateTypedefBasic(array);
+            GenerateTypedefBasic(header);
         }
         else
         {
@@ -227,17 +227,15 @@ public sealed class UnitTestY : UnitTestBase
     }
 
     [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
-    private void GenerateTypedefBasic(Symbol[] def)
+    private void GenerateTypedefBasic(Symbol def)
     {
-        var header = def[0];
-
-        var type = header.Type!.Value;
+        var type = def.Type!.Value;
 
         var modifiers = type.Modifiers.ToArray();
 
         var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
 
-        var dimensions = string.Concat((header.Dimensions ?? []).Select(s => $"[{s}]"));
+        var dimensions = string.Concat((def.Dimensions ?? []).Select(s => $"[{s}]"));
 
         var typedef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
 
@@ -245,7 +243,7 @@ public sealed class UnitTestY : UnitTestBase
 
         if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
         {
-            Writer.WriteLine2($"{typedef} {kind} ({pointers}{header.Name})();", $"// {header}");
+            Writer.WriteLine2($"{typedef} {kind} ({pointers}{def.Name})();", $"// {def}");
         }
         else
         {
