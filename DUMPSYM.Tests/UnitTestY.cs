@@ -92,7 +92,7 @@ public sealed class UnitTestY : UnitTestBase
 
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
 
-        Assert.AreEqual("be62c014392513954d4e4468227e237e74f0bf276bfbab1adf56705c38b78cfe", hash, true);
+        Assert.AreEqual("7c728371592fc8f1d0f50471123556ced99732d39b4c2ed59ee2a49e59bea9c0", hash, true);
     }
 
     private int Remove(List<Symbol[]> split, Func<Symbol, bool> predicate)
@@ -186,9 +186,9 @@ public sealed class UnitTestY : UnitTestBase
             typeName = $"{SymbolGenerator.ToString(definition.Type!.Value.Kind)} {name}";
         }
 
-        Writer.WriteLine2($"{typeName} ", $"// {header}");
+        Writer.WriteLine2($"{typeName} ", $"// {definition}".TrimEnd());
 
-        Writer.WriteLine2("{", $"// {definition}");
+        Writer.WriteLine2("{", $"// {header}");
 
         Writer.Indent++;
 
