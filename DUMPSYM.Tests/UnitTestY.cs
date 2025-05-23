@@ -222,7 +222,7 @@ public sealed class UnitTestY : UnitTestBase
         }
         else
         {
-            GenerateTypedefComplex(array, filtered, originals);
+            GenerateTypedefComplex(header, filtered, originals);
         }
     }
 
@@ -247,22 +247,20 @@ public sealed class UnitTestY : UnitTestBase
         }
         else
         {
-            Writer.WriteLine2($"{typedef} {kind}{pointers} {header.Name}{dimensions};", $"// {header}");
+            Writer.WriteLine2($"{typedef} {kind}{pointers} {def.Name}{dimensions};", $"// {def}");
         }
     }
 
-    private void GenerateTypedefComplex(Symbol[] def, Symbol[][] symbols, Symbol[] everything)
+    private void GenerateTypedefComplex(Symbol def, Symbol[][] symbols, Symbol[] everything)
     {
-        var index = Array.IndexOf(symbols, def);
+        var index = Array.FindIndex(symbols, s => s[0] == def);
 
         if (index is -1)
         {
             throw new InvalidOperationException();
         }
 
-        var definition = def[0];
-
-        var type = definition.Type!.Value;
+        var type = def.Type!.Value;
 
         var modifiers = type.Modifiers.ToArray();
 
@@ -272,7 +270,7 @@ public sealed class UnitTestY : UnitTestBase
             var s2 = SymbolGenerator.ToString(type.Kind);
             var s3 = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
 
-            Writer.WriteLine2($"{s1} {s2} {definition.Tag}{s3} {definition.Name};", $"// {definition}");
+            Writer.WriteLine2($"{s1} {s2} {def.Tag}{s3} {def.Name};", $"// {def}");
         }
         else
         {
@@ -282,9 +280,9 @@ public sealed class UnitTestY : UnitTestBase
 
                 var header = symbol[0];
 
-                if (header.IsTypeHeader && header.Name == definition.Tag)
+                if (header.IsTypeHeader && header.Name == def.Tag)
                 {
-                    GenerateType(definition, symbol, everything);
+                    GenerateType(def, symbol, everything);
                     break;
                 }
             }
