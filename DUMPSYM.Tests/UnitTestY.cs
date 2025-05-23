@@ -250,8 +250,6 @@ public sealed class UnitTestY : UnitTestBase
 
     private void GenerateTypedefComplex(Symbol[] def, Symbol[][] symbols, Symbol[] everything)
     {
-        // TODO if it has modifiers, generate an extra typedef for it
-
         var index = Array.IndexOf(symbols, def);
 
         if (index is -1)
@@ -265,7 +263,7 @@ public sealed class UnitTestY : UnitTestBase
 
         var modifiers = type.Modifiers.ToArray();
 
-        if (modifiers.Any()) // TODO generate this after typedef if any?
+        if (modifiers.Any())
         {
             var s1 = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
             var s2 = SymbolGenerator.ToString(type.Kind);
