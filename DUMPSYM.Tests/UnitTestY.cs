@@ -13,10 +13,8 @@ public sealed class UnitTestY : UnitTestBase
     {
         var options = new HeaderGeneratorOptions
         {
-            RemoveTypedefs = // TODO keep bool
+            RemoveTypedefs =
             [
-                "BBOOL",
-                "BOOL",
                 "PSBYTE",
                 "PSLONG",
                 "PSWORD",
@@ -47,6 +45,6 @@ public sealed class UnitTestY : UnitTestBase
 
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
 
-        Assert.AreEqual("ac665e0400301f15abf1b597e3e0c38ce8d5b698580ab4d940fd396e39ee85b1", hash, true);
+        Assert.AreEqual("e05bcdec420d1ca54a1a41f35b9a98ac8f96273e7b3860ae3029946ee28e42a4", hash, true);
     }
 }
