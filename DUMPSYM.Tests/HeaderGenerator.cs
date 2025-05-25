@@ -23,7 +23,11 @@ public sealed class HeaderGenerator : IDisposable
     {
         var symbols = file.Symbols.ToList();
 
+        Console.WriteLine($"{symbols.Count} symbols found");
+
         symbols = Cleanup(symbols, options);
+
+        Console.WriteLine("Splitting symbols...");
 
         var split = Symbol.Split(symbols.ToArray()).ToList();
 
@@ -87,6 +91,8 @@ public sealed class HeaderGenerator : IDisposable
 
     private static List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
+        Console.WriteLine("Cleaning symbols...");
+
         var typedefs = symbols.Where(s => s.IsTypeDefinition && options.RemoveTypedefs.Contains(s.Name!)).ToImmutableArray();
 
         var remove1 = symbols.RemoveAll(typedefs.Contains);
