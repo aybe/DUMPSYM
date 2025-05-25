@@ -19,6 +19,6 @@ public sealed class UnitTestY : UnitTestBase
 
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
 
-        Assert.AreEqual("7c728371592fc8f1d0f50471123556ced99732d39b4c2ed59ee2a49e59bea9c0", hash, true);
+        Assert.AreEqual("8569d457bbac35e6240da3ac3b444a42f10d19a8adfd0a8d4fcdc754890beca7", hash, true);
     }
 }

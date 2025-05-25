@@ -22,7 +22,7 @@ public sealed class HeaderGenerator : IDisposable
     {
         var symbols = file.Symbols.ToList();
 
-        // symbols = Generator.CleanupSymbols(symbols); // TODO very slow
+        symbols = Cleanup(symbols); // TODO very slow
 
         var split = Symbol.Split(symbols.ToArray()).ToList();
 
@@ -74,6 +74,61 @@ public sealed class HeaderGenerator : IDisposable
     public void Dispose()
     {
         Writer.Dispose();
+    }
+
+    private static List<Symbol> Cleanup(List<Symbol> symbols) // TODO pass list of typedefs to remove, add options
+    {
+        var types1 = Enum.GetValues<SymbolTypeKind>().Where(IsPrimitive).Select(s => new SymbolType(s)).ToArray();
+
+        var types2 = types1.Select(s => new SymbolType(s.Kind, SymbolTypeModifier.PTR)).ToArray();
+
+        Remove(symbols, types1);
+
+        Remove(symbols, types2);
+
+        var types3 = new[]
+            {
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long")
+            }
+            .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
+
+        var index = symbols.FindIndex(s => s.IsFileEnd);
+
+        symbols.InsertRange(index + 1, types3);
+
+        return symbols;
+
+        bool IsPrimitive(SymbolTypeKind kind)
+        {
+            return kind switch
+            {
+                SymbolTypeKind.NULL   => false,
+                SymbolTypeKind.VOID   => false,
+                SymbolTypeKind.CHAR   => true,
+                SymbolTypeKind.SHORT  => true,
+                SymbolTypeKind.INT    => true,
+                SymbolTypeKind.LONG   => true,
+                SymbolTypeKind.FLOAT  => true,
+                SymbolTypeKind.DOUBLE => true,
+                SymbolTypeKind.STRUCT => false,
+                SymbolTypeKind.UNION  => false,
+                SymbolTypeKind.ENUM   => false,
+                SymbolTypeKind.MOE    => false,
+                SymbolTypeKind.UCHAR  => true,
+                SymbolTypeKind.USHORT => true,
+                SymbolTypeKind.UINT   => true,
+                SymbolTypeKind.ULONG  => true,
+                _                     => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+            };
+        }
+
+        static int Remove(List<Symbol> symbols, SymbolType[] types)
+        {
+            return symbols.RemoveAll(s => s.IsTypeDefinition && types.Contains(s.Type!.Value));
+        }
     }
 
     public string Generate()
