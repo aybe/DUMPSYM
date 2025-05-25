@@ -341,11 +341,11 @@ public sealed class HeaderGenerator : IDisposable
             {
                 output = member.Tag;
             }
-        }
 
-        if (memberType.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
-        {
-            output = $"{kind} {output}";
+            if (memberType.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
+            {
+                output = $"{kind} {output}";
+            }
         }
 
         return output;
