@@ -79,6 +79,8 @@ public sealed class HeaderGenerator : IDisposable
 
     private static List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
+        // BUG dev_t is gone but if kept is used for short
+
         var types1 = Enum.GetValues<SymbolTypeKind>().Where(IsPrimitive).Select(s => new SymbolType(s)).ToArray();
 
         var types2 = types1.Select(s => new SymbolType(s.Kind, SymbolTypeModifier.PTR)).ToArray();
