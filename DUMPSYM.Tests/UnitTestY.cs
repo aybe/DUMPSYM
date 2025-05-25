@@ -1,6 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
+// ReSharper disable StringLiteralTypo
+
 namespace DUMPSYM.Tests;
 
 [TestClass]
@@ -9,7 +11,28 @@ public sealed class UnitTestY : UnitTestBase
     [TestMethod]
     public void TestMethodY()
     {
-        using var generator = new HeaderGenerator(Sample.Default);
+        var options = new HeaderGeneratorOptions
+        {
+            RemoveTypedefs = // TODO keep bool
+            [
+                "BBOOL",
+                "BOOL",
+                "PSBYTE",
+                "PSLONG",
+                "PSWORD",
+                "PUBYTE",
+                "PULONG",
+                "PUWORD",
+                "SBYTE",
+                "SLONG",
+                "SWORD",
+                "UBYTE",
+                "ULONG",
+                "UWORD"
+            ]
+        };
+
+        using var generator = new HeaderGenerator(Sample.Default, options);
 
         var contents = generator.Generate();
 

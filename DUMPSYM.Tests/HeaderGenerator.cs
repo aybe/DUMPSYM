@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 // ReSharper disable CommentTypo
@@ -18,11 +19,11 @@ public sealed class HeaderGenerator : IDisposable
 {
     private const bool JumpLines = false;
 
-    public HeaderGenerator(SymbolFile file)
+    public HeaderGenerator(SymbolFile file, HeaderGeneratorOptions options)
     {
         var symbols = file.Symbols.ToList();
 
-        symbols = Cleanup(symbols);
+        symbols = Cleanup(symbols, options);
 
         var split = Symbol.Split(symbols.ToArray()).ToList();
 
@@ -76,11 +77,17 @@ public sealed class HeaderGenerator : IDisposable
         Writer.Dispose();
     }
 
-    private static List<Symbol> Cleanup(List<Symbol> symbols) // TODO pass list of typedefs to remove, add options
+    private static List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
         var types1 = Enum.GetValues<SymbolTypeKind>().Where(IsPrimitive).Select(s => new SymbolType(s)).ToArray();
 
         var types2 = types1.Select(s => new SymbolType(s.Kind, SymbolTypeModifier.PTR)).ToArray();
+
+        var typedefs = symbols.Where(s => s.IsTypeDefinition && options.RemoveTypedefs.Contains(s.Name!)).ToImmutableArray();
+
+        var remove1 = symbols.RemoveAll(typedefs.Contains);
+
+        Console.WriteLine($"Removed {remove1} typedefs");
 
         Remove(symbols, types1);
 
