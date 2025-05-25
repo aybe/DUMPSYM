@@ -86,7 +86,7 @@ public sealed class HeaderGenerator : IDisposable
             {
                 if (!Typedefs.Contains(header))
                 {
-                    GenerateTypedef(SymbolsGroups, header, Symbols);
+                    GenerateTypedef(header);
                 }
             }
             else if (header.IsTypeHeader)
@@ -103,16 +103,16 @@ public sealed class HeaderGenerator : IDisposable
                     {
                         Typedefs.Add(nextHeader);
 
-                        GenerateType(nextHeader, array, Symbols);
+                        GenerateType(nextHeader, array);
                     }
                     else // LoadFiles
                     {
-                        GenerateType(null, array, Symbols); // TODO should be triggered by compiler generated struct
+                        GenerateType(null, array); // TODO should be triggered by compiler generated struct
                     }
                 }
                 else
                 {
-                    GenerateType(null, array, Symbols); // TODO should be triggered by compiler generated struct
+                    GenerateType(null, array); // TODO should be triggered by compiler generated struct
                 }
             }
             else
@@ -129,7 +129,7 @@ public sealed class HeaderGenerator : IDisposable
         return Writer.InnerWriter.ToString()!;
     }
 
-    private void GenerateType(Symbol? definition, Symbol[] type, Symbol[] everything)
+    private void GenerateType(Symbol? definition, Symbol[] type)
     {
         var header = type[0];
 
@@ -165,7 +165,7 @@ public sealed class HeaderGenerator : IDisposable
 
         foreach (var member in members)
         {
-            var kind = GetMemberString(member, everything);
+            var kind = GetMemberString(member);
 
             var memberType = member.Type!.Value;
 
@@ -190,7 +190,7 @@ public sealed class HeaderGenerator : IDisposable
         Writer.WriteLine2("};", $"// {type[^1]}");
     }
 
-    private void GenerateTypedef(Symbol[][] filtered, Symbol header, Symbol[] originals)
+    private void GenerateTypedef(Symbol header)
     {
         if (header.Tag == null)
         {
@@ -198,7 +198,7 @@ public sealed class HeaderGenerator : IDisposable
         }
         else
         {
-            GenerateTypedefComplex(header, filtered, originals);
+            GenerateTypedefComplex(header);
         }
     }
 
@@ -227,9 +227,9 @@ public sealed class HeaderGenerator : IDisposable
         }
     }
 
-    private void GenerateTypedefComplex(Symbol def, Symbol[][] symbols, Symbol[] everything)
+    private void GenerateTypedefComplex(Symbol def)
     {
-        var index = Array.FindIndex(symbols, s => s[0] == def);
+        var index = Array.FindIndex(SymbolsGroups, s => s[0] == def);
 
         if (index is -1)
         {
@@ -252,24 +252,24 @@ public sealed class HeaderGenerator : IDisposable
         {
             for (var i = index - 1; i >= 0; i--)
             {
-                var symbol = symbols[i];
+                var symbol = SymbolsGroups[i];
 
                 var header = symbol[0];
 
                 if (header.IsTypeHeader && header.Name == def.Tag)
                 {
-                    GenerateType(def, symbol, everything);
+                    GenerateType(def, symbol);
                     break;
                 }
             }
         }
     }
 
-    private string GetMemberString(Symbol member, Symbol[] symbols)
+    private string GetMemberString(Symbol member)
     {
         var memberType = member.Type!.Value;
 
-        var find = Array.Find(symbols, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
+        var find = Array.Find(Symbols, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
 
         var kind = SymbolGenerator.ToString(memberType.Kind);
 
@@ -283,13 +283,13 @@ public sealed class HeaderGenerator : IDisposable
         {
             if (member.HasFakeTag)
             {
-                var index = Array.IndexOf(symbols, member);
+                var index = Array.IndexOf(Symbols, member);
 
                 var name = default(string);
 
                 for (var i = index - 1; i >= 0; i--)
                 {
-                    var symbol = symbols[i];
+                    var symbol = Symbols[i];
 
                     if (symbol.IsTypeHeader && symbol.Name == member.Tag)
                     {
