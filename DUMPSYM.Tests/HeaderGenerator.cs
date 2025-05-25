@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 // ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
-// TODO FIELD, size_t, wchar_t, ushort, uint, ulong
+// TODO FIELD
 public sealed class HeaderGenerator : IDisposable
 // general notes:
 //
