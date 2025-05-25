@@ -11,11 +11,9 @@ public sealed class UnitTestY : UnitTestBase
     {
         var generator = new HeaderGenerator(Sample.Default);
 
-        generator.Generate();
+        var contents = generator.Generate();
 
         const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
-
-        var contents = generator.Writer.InnerWriter.ToString()!;
 
         File.WriteAllText(path, contents);
 

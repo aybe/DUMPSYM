@@ -69,9 +69,9 @@ public sealed class HeaderGenerator
 
     private HashSet<Symbol> Typedefs { get; } = [];
 
-    public IndentedTextWriter Writer { get; } = new(new StringWriter());
+    private IndentedTextWriter Writer { get; } = new(new StringWriter());
 
-    public void Generate()
+    public string Generate()
     {
         foreach (var (index, array) in SymbolsGroups.Index())
         {
@@ -120,6 +120,8 @@ public sealed class HeaderGenerator
                 Writer.WriteLine();
             }
         }
+
+        return Writer.InnerWriter.ToString()!;
     }
 
     private void GenerateType(Symbol? definition, Symbol[] type, Symbol[] everything)
