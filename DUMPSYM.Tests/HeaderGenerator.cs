@@ -22,7 +22,7 @@ public sealed class HeaderGenerator : IDisposable
     {
         var symbols = file.Symbols.ToList();
 
-        symbols = Cleanup(symbols); // TODO very slow
+        symbols = Cleanup(symbols);
 
         var split = Symbol.Split(symbols.ToArray()).ToList();
 
