@@ -79,8 +79,6 @@ public sealed class HeaderGenerator : IDisposable
 
     private static List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
-        // BUG dev_t is gone but if kept is used for short
-
         var types1 = Enum.GetValues<SymbolTypeKind>().Where(IsPrimitive).Select(s => new SymbolType(s)).ToArray();
 
         var types2 = types1.Select(s => new SymbolType(s.Kind, SymbolTypeModifier.PTR)).ToArray();
@@ -91,9 +89,9 @@ public sealed class HeaderGenerator : IDisposable
 
         Console.WriteLine($"Removed {remove1} typedefs");
 
-        Remove(symbols, types1);
+        //Remove(symbols, types1);
 
-        Remove(symbols, types2);
+        //Remove(symbols, types2);
 
         if (options.UseSdkUnsignedTypedefs)
         {
@@ -336,7 +334,7 @@ public sealed class HeaderGenerator : IDisposable
     {
         var memberType = member.Type!.Value;
 
-        var find = Array.Find(Symbols, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
+        var index = Array.IndexOf(Symbols, member);
 
         var kind = SymbolGenerator.ToString(memberType.Kind);
 
@@ -344,14 +342,14 @@ public sealed class HeaderGenerator : IDisposable
 
         if (string.IsNullOrWhiteSpace(member.Tag)) //member.Tag != null)
         {
-            output = find?.Name ?? kind;
+            var def = Array.FindIndex(Symbols, 0, index, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
+
+            output = def == -1 ? kind : Symbols[def].Name!;
         }
         else
         {
             if (member.HasFakeTag)
             {
-                var index = Array.IndexOf(Symbols, member);
-
                 var name = default(string);
 
                 for (var i = index - 1; i >= 0; i--)
