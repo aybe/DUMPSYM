@@ -9,7 +9,7 @@ public sealed class UnitTestY : UnitTestBase
     [TestMethod]
     public void TestMethodY()
     {
-        var generator = new HeaderGenerator(Sample.Default);
+        using var generator = new HeaderGenerator(Sample.Default);
 
         var contents = generator.Generate();
 

@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace DUMPSYM.Tests;
 
-public sealed class HeaderGenerator
+public sealed class HeaderGenerator : IDisposable
 // general notes:
 //
 // the list of symbols to be processed should never contain functions,
@@ -70,6 +70,11 @@ public sealed class HeaderGenerator
     private HashSet<Symbol> Typedefs { get; } = [];
 
     private IndentedTextWriter Writer { get; } = new(new StringWriter());
+
+    public void Dispose()
+    {
+        Writer.Dispose();
+    }
 
     public string Generate()
     {
