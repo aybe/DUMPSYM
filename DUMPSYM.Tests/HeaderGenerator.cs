@@ -1,6 +1,8 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 
+// ReSharper disable CommentTypo
+
 namespace DUMPSYM.Tests;
 
 public sealed class HeaderGenerator
@@ -8,15 +10,62 @@ public sealed class HeaderGenerator
 {
     private const bool JumpLines = false;
 
+    public HeaderGenerator(SymbolFile file)
+    {
+        var symbols = file.Symbols.ToList();
+
+        // symbols = Generator.CleanupSymbols(symbols); // TODO very slow
+
+        var split = Symbol.Split(symbols.ToArray()).ToList();
+
+        Console.WriteLine($"{split.Count} symbols found");
+
+        var remove1 = split.RemoveAll(s => s[0].IsExternal);
+        var remove2 = split.RemoveAll(s => s[0].IsFile);
+        var remove3 = split.RemoveAll(s => s[0].IsFileEnd);
+        var remove4 = split.RemoveAll(s => s[0].IsFunction);
+        var remove5 = split.RemoveAll(s => s[0].IsStatic);
+        var remove6 = split.RemoveAll(s => s[0].IsVariable);
+
+        Console.WriteLine($"Removed {remove1} externals");
+        Console.WriteLine($"Removed {remove2} files");
+        Console.WriteLine($"Removed {remove3} file endings");
+        Console.WriteLine($"Removed {remove4} functions");
+        Console.WriteLine($"Removed {remove5} statics");
+        Console.WriteLine($"Removed {remove6} variables");
+
+        Console.WriteLine($"{split.Count} symbols remaining");
+
+        var map = new SortedDictionary<int, Symbol[]>();
+
+        var set = new HashSet<Symbol[]>(SymbolArrayEqualityComparer.MembersTypeName);
+
+        foreach (var item in split)
+        {
+            if (set.Add(item))
+            {
+                map.Add(map.Count, item);
+            }
+        }
+
+        Console.WriteLine($"{set.Count} unique typedefs/types found");
+
+        Symbols = [..map.Values.SelectMany(s => s)];
+
+        SymbolsGroups = [..map.Values];
+    }
+
+    private Symbol[] Symbols { get; }
+
+    private Symbol[][] SymbolsGroups { get; }
+
     private HashSet<Symbol> Typedefs { get; } = [];
 
     public IndentedTextWriter Writer { get; } = new(new StringWriter());
 
-    public void Generate(Symbol[][] filtered, List<Symbol> original)
+    public void Generate()
     {
-        var originals = original.ToArray();
-
-        foreach (var (index, array) in filtered.Index())
+        foreach (var (index, array) in SymbolsGroups.Index())
         {
             var header = array[0];
 
@@ -24,16 +73,16 @@ public sealed class HeaderGenerator
             {
                 if (!Typedefs.Contains(header))
                 {
-                    GenerateTypedef(filtered, header, originals);
+                    GenerateTypedef(SymbolsGroups, header, Symbols);
                 }
             }
             else if (header.IsTypeHeader)
             {
                 var nextOffset = index + 1;
 
-                if (nextOffset >= 0 && nextOffset < filtered.Length)
+                if (nextOffset >= 0 && nextOffset < SymbolsGroups.Length)
                 {
-                    var nextSymbol = filtered[nextOffset]; // TODO sucks, need better mechanism
+                    var nextSymbol = SymbolsGroups[nextOffset]; // TODO sucks, need better mechanism
 
                     var nextHeader = nextSymbol[0];
 
@@ -41,16 +90,16 @@ public sealed class HeaderGenerator
                     {
                         Typedefs.Add(nextHeader);
 
-                        GenerateType(nextHeader, array, originals);
+                        GenerateType(nextHeader, array, Symbols);
                     }
                     else // LoadFiles
                     {
-                        GenerateType(null, array, originals); // TODO should be triggered by compiler generated struct
+                        GenerateType(null, array, Symbols); // TODO should be triggered by compiler generated struct
                     }
                 }
                 else
                 {
-                    GenerateType(null, array, originals); // TODO should be triggered by compiler generated struct
+                    GenerateType(null, array, Symbols); // TODO should be triggered by compiler generated struct
                 }
             }
             else
