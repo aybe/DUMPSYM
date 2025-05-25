@@ -6,7 +6,15 @@ using System.Diagnostics.CodeAnalysis;
 namespace DUMPSYM.Tests;
 
 public sealed class HeaderGenerator
-// TODO 'typedef struct _GsCOORDINATE { ... } GsCOORDINATE' stays as _GsCOORDINATE or IDA generates fake type -> best done on IDA output
+// general notes:
+//
+// the list of symbols to be processed should never contain functions,
+// since resolution is done by tag and fake names are being reused,
+// visiting parameters of functions would yield wrong symbols
+//
+// generator produces IDA-friendly code with a simpler C syntax,
+// i.e. typedef struct symbols are stripped out of the typedef 
+// else IDA produces fake types which isn't friendly at all
 {
     private const bool JumpLines = false;
 
