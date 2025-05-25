@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 // ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
-// TODO FIELD
+
 public sealed class HeaderGenerator : IDisposable
 // general notes:
 //
@@ -214,7 +214,14 @@ public sealed class HeaderGenerator : IDisposable
             {
                 var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
 
-                Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
+                if (member.Class is SymbolStorageClass.FIELD)
+                {
+                    Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions} : {member.Size};", $"// {member}");
+                }
+                else
+                {
+                    Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
+                }
             }
         }
 
