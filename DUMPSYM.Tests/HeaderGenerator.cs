@@ -70,6 +70,14 @@ public sealed class HeaderGenerator : IDisposable
 
     private HashSet<Symbol> Typedefs { get; } = [];
 
+    private Dictionary<SymbolTypeKind, string> TypedefsUnsigned { get; } = new()
+    {
+        { SymbolTypeKind.UCHAR, "u_char" },
+        { SymbolTypeKind.USHORT, "u_short" },
+        { SymbolTypeKind.UINT, "u_int" },
+        { SymbolTypeKind.ULONG, "u_long" }
+    };
+
     private IndentedTextWriter Writer { get; } = new(new StringWriter());
 
     public void Dispose()
@@ -79,66 +87,26 @@ public sealed class HeaderGenerator : IDisposable
 
     private static List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
-        var types1 = Enum.GetValues<SymbolTypeKind>().Where(IsPrimitive).Select(s => new SymbolType(s)).ToArray();
-
-        var types2 = types1.Select(s => new SymbolType(s.Kind, SymbolTypeModifier.PTR)).ToArray();
-
         var typedefs = symbols.Where(s => s.IsTypeDefinition && options.RemoveTypedefs.Contains(s.Name!)).ToImmutableArray();
 
         var remove1 = symbols.RemoveAll(typedefs.Contains);
 
         Console.WriteLine($"Removed {remove1} typedefs");
 
-        //Remove(symbols, types1);
+        var types3 = new[]
+            {
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long")
+            }
+            .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
 
-        //Remove(symbols, types2);
+        var index = symbols.FindIndex(s => s.IsFileEnd);
 
-        if (options.UseSdkUnsignedTypedefs)
-        {
-            var types3 = new[]
-                {
-                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
-                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
-                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
-                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long")
-                }
-                .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
-
-            var index = symbols.FindIndex(s => s.IsFileEnd);
-
-            symbols.InsertRange(index + 1, types3);
-        }
+        symbols.InsertRange(index + 1, types3);
 
         return symbols;
-
-        bool IsPrimitive(SymbolTypeKind kind)
-        {
-            return kind switch
-            {
-                SymbolTypeKind.NULL   => false,
-                SymbolTypeKind.VOID   => false,
-                SymbolTypeKind.CHAR   => true,
-                SymbolTypeKind.SHORT  => true,
-                SymbolTypeKind.INT    => true,
-                SymbolTypeKind.LONG   => true,
-                SymbolTypeKind.FLOAT  => true,
-                SymbolTypeKind.DOUBLE => true,
-                SymbolTypeKind.STRUCT => false,
-                SymbolTypeKind.UNION  => false,
-                SymbolTypeKind.ENUM   => false,
-                SymbolTypeKind.MOE    => false,
-                SymbolTypeKind.UCHAR  => true,
-                SymbolTypeKind.USHORT => true,
-                SymbolTypeKind.UINT   => true,
-                SymbolTypeKind.ULONG  => true,
-                _                     => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
-            };
-        }
-
-        static int Remove(List<Symbol> symbols, SymbolType[] types)
-        {
-            return symbols.RemoveAll(s => s.IsTypeDefinition && types.Contains(s.Type!.Value));
-        }
     }
 
     public string Generate()
@@ -340,11 +308,9 @@ public sealed class HeaderGenerator : IDisposable
 
         string output;
 
-        if (string.IsNullOrWhiteSpace(member.Tag)) //member.Tag != null)
+        if (string.IsNullOrWhiteSpace(member.Tag))
         {
-            var def = Array.FindIndex(Symbols, 0, index, s => s.IsTypeDefinition && s.Type!.Value.Kind == memberType.Kind && !s.Type!.Value.Modifiers.Any());
-
-            output = def == -1 ? kind : Symbols[def].Name!;
+            output = TypedefsUnsigned.TryGetValue(memberType.Kind, out var name) ? name : kind;
         }
         else
         {

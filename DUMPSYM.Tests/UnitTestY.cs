@@ -29,8 +29,7 @@ public sealed class UnitTestY : UnitTestBase
                 "UBYTE",
                 "ULONG",
                 "UWORD"
-            ],
-            UseSdkUnsignedTypedefs = true
+            ]
         };
 
         using var generator = new HeaderGenerator(Sample.Default, options);
@@ -43,6 +42,6 @@ public sealed class UnitTestY : UnitTestBase
 
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
 
-        Assert.AreEqual("fce5510ea41c60461cda1e8be2d194afb613f551dc02ec691aa8e842adc02ae7", hash, true);
+        Assert.AreEqual("f1ed791cb1a2ad1a508427c05279c6a07efb47c6abdd6eae4575ae2660e85762", hash, true);
     }
 }
