@@ -74,7 +74,7 @@ public sealed class HeaderGenerator : IDisposable
 
     private HashSet<Symbol> Typedefs { get; } = [];
 
-    private Dictionary<SymbolTypeKind, string> TypedefsUnsigned { get; } = new()
+    private Dictionary<SymbolTypeKind, string> TypedefsOverrides { get; } = new()
     {
         { SymbolTypeKind.UCHAR, "u_char" },
         { SymbolTypeKind.USHORT, "u_short" },
@@ -303,7 +303,11 @@ public sealed class HeaderGenerator : IDisposable
 
         if (string.IsNullOrWhiteSpace(member.Tag))
         {
-            output = TypedefsUnsigned.TryGetValue(memberType.Kind, out var name) ? name : kind;
+            // there are many typedefs for a type, e.g. unsigned short may be u_short or uid_t
+            // since this can't really be solved, we default to the most likely, i.e. u_short
+            // if not doing this, we'd end up with many members being uid_t, which is worse
+
+            output = TypedefsOverrides.TryGetValue(memberType.Kind, out var name) ? name : kind;
         }
         else
         {
