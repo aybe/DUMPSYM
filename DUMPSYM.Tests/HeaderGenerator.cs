@@ -93,18 +93,21 @@ public sealed class HeaderGenerator : IDisposable
 
         Remove(symbols, types2);
 
-        var types3 = new[]
-            {
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long")
-            }
-            .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
+        if (options.UseSdkUnsignedTypedefs)
+        {
+            var types3 = new[]
+                {
+                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
+                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
+                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
+                    new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long")
+                }
+                .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
 
-        var index = symbols.FindIndex(s => s.IsFileEnd);
+            var index = symbols.FindIndex(s => s.IsFileEnd);
 
-        symbols.InsertRange(index + 1, types3);
+            symbols.InsertRange(index + 1, types3);
+        }
 
         return symbols;
 

@@ -29,7 +29,8 @@ public sealed class UnitTestY : UnitTestBase
                 "UBYTE",
                 "ULONG",
                 "UWORD"
-            ]
+            ],
+            UseSdkUnsignedTypedefs = true
         };
 
         using var generator = new HeaderGenerator(Sample.Default, options);
