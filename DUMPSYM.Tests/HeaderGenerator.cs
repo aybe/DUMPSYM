@@ -16,8 +16,6 @@ public sealed class HeaderGenerator : IDisposable
 // i.e. typedef struct symbols are stripped out of the typedef 
 // else IDA produces fake types which isn't friendly at all
 {
-    private const bool JumpLines = false;
-
     public HeaderGenerator(SymbolFile file, HeaderGeneratorOptions options)
     {
         var symbols = file.Symbols.ToList();
@@ -147,10 +145,12 @@ public sealed class HeaderGenerator : IDisposable
 
             if (header.IsTypeDefinition)
             {
-                if (!Typedefs.Contains(header))
+                if (Typedefs.Contains(header))
                 {
-                    GenerateTypedef(header);
+                    continue;
                 }
+
+                GenerateTypedef(header);
             }
             else if (header.IsTypeHeader)
             {
@@ -183,10 +183,7 @@ public sealed class HeaderGenerator : IDisposable
                 throw new InvalidOperationException(header.ToString());
             }
 
-            if (JumpLines)
-            {
-                Writer.WriteLine();
-            }
+            Writer.WriteLine();
         }
 
         return Writer.InnerWriter.ToString()!;
