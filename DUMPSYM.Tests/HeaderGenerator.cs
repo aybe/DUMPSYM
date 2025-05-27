@@ -26,7 +26,11 @@ public sealed class HeaderGenerator : IDisposable
 
         Console.WriteLine($"{symbols.Count} symbols found");
 
-        Cleanup(symbols, options.RemoveTypedefs);
+        Console.WriteLine("Cleaning up symbols...");
+
+        CleanupTypedefs(symbols, options.RemoveTypedefs);
+
+        CleanupTypedefsUnsigned(symbols);
 
         Console.WriteLine("Splitting symbols...");
 
@@ -92,17 +96,6 @@ public sealed class HeaderGenerator : IDisposable
     public void Dispose()
     {
         Writer.Dispose();
-    }
-
-    private void Cleanup(List<Symbol> symbols, IEnumerable<string> typedefs)
-    {
-        // cleaning up symbols prior generation drastically improves the output
-
-        Console.WriteLine("Cleaning up symbols...");
-
-        CleanupTypedefs(symbols, typedefs);
-
-        CleanupTypedefsUnsigned(symbols);
     }
 
     private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> typedefs)
