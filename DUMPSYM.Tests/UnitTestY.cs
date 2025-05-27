@@ -27,8 +27,6 @@ public sealed class UnitTestY : UnitTestBase
                 "UBYTE",
                 "ULONG",
                 "UWORD",
-                "size_t",
-                "wchar_t",
             ],
         };
 
@@ -42,6 +40,6 @@ public sealed class UnitTestY : UnitTestBase
 
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
 
-        Assert.AreEqual("675b4f22ad6b3145395db80522bf1929d0b6ab8103865d4472c6047665d257f5", hash, true);
+        Assert.AreEqual("3c2c556373a661a123aae209e7518034d4deec9bc295a49a48e03b7cfaf0b541", hash, true);
     }
 }
