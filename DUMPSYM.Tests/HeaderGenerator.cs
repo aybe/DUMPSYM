@@ -107,6 +107,13 @@ public sealed class HeaderGenerator : IDisposable
 
         Console.WriteLine($"Removed {remove} typedefs");
 
+        CleanupUnsigned(symbols);
+
+        return symbols;
+    }
+
+    private void CleanupUnsigned(List<Symbol> symbols)
+    {
         Console.WriteLine("Adding SDK typedefs...");
 
         foreach (var typedef in TypedefsOverrides.Values)
@@ -121,8 +128,6 @@ public sealed class HeaderGenerator : IDisposable
             .ToArray();
 
         symbols.InsertRange(index + 1, typedefs2);
-
-        return symbols;
     }
 
     public string Generate()
