@@ -92,28 +92,31 @@ public sealed class HeaderGenerator : IDisposable
     {
         Console.WriteLine("Cleaning symbols...");
 
-        var removeTypedefs = options.RemoveTypedefs;
-
-        Console.WriteLine("Removing specified typedefs:");
-
-        foreach (var typedef in removeTypedefs)
-        {
-            Console.WriteLine($"\t{typedef}");
-        }
-
-        var typedefs1 = symbols.Where(s => s.IsTypeDefinition && removeTypedefs.Contains(s.Name!)).ToArray();
-
-        var remove = symbols.RemoveAll(typedefs1.Contains);
-
-        Console.WriteLine($"Removed {remove} typedefs");
+        CleanupTypedefs(symbols, options.RemoveTypedefs);
 
         CleanupUnsigned(symbols);
 
         return symbols;
     }
 
+    private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> names)
+    {
+        Console.WriteLine("Removing typedefs...");
+
+        foreach (var name in names)
+        {
+            var array = symbols.Where(s => s.IsTypeDefinition && s.Name == name).ToArray();
+
+            var count = symbols.RemoveAll(array.Contains);
+
+            Console.WriteLine($"Removed {count} instances of '{name}'");
+        }
+    }
+
     private void CleanupUnsigned(List<Symbol> symbols)
     {
+        CleanupTypedefs(symbols, ["ushort", "uint", "ulong"]);
+
         Console.WriteLine("Adding SDK typedefs...");
 
         foreach (var typedef in TypedefsOverrides.Values)

@@ -29,9 +29,6 @@ public sealed class UnitTestY : UnitTestBase
                 "UWORD",
                 "size_t",
                 "wchar_t",
-                "ushort",
-                "uint",
-                "ulong",
             ],
         };
 
