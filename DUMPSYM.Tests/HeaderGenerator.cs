@@ -125,48 +125,48 @@ public sealed class HeaderGenerator : IDisposable
 
     public string Generate()
     {
-        foreach (var (index, array) in SymbolsGroups.Index())
+        foreach (var (index, symbols) in SymbolsGroups.Index())
         {
-            var header = array[0];
+            var symbol = symbols[0];
 
-            if (header.IsTypeDefinition)
+            if (symbol.IsTypeDefinition)
             {
-                if (Typedefs.Contains(header))
+                if (Typedefs.Contains(symbol))
                 {
                     continue;
                 }
 
-                GenerateTypedef(header);
+                GenerateTypedef(symbol);
             }
-            else if (header.IsTypeHeader)
+            else if (symbol.IsTypeHeader)
             {
-                var nextOffset = index + 1;
+                var idx = index + 1;
 
-                if (nextOffset >= 0 && nextOffset < SymbolsGroups.Length)
+                if (idx >= 0 && idx < SymbolsGroups.Length)
                 {
-                    var nextSymbol = SymbolsGroups[nextOffset]; // TODO sucks, need better mechanism
+                    var nxt = SymbolsGroups[idx];
 
-                    var nextHeader = nextSymbol[0];
+                    var def = nxt[0];
 
-                    if (nextHeader.IsTypeDefinition && nextHeader.Tag == header.Name && !nextHeader.Type!.Value.Modifiers.Any())
+                    if (def.IsTypeDefinition && def.Tag == symbol.Name && !def.Type!.Value.Modifiers.Any())
                     {
-                        Typedefs.Add(nextHeader);
+                        Typedefs.Add(def);
 
-                        GenerateType(nextHeader, array);
+                        GenerateType(def, symbols);
                     }
-                    else // LoadFiles
+                    else
                     {
-                        GenerateType(null, array); // TODO should be triggered by compiler generated struct
+                        GenerateType(null, symbols);
                     }
                 }
                 else
                 {
-                    GenerateType(null, array); // TODO should be triggered by compiler generated struct
+                    GenerateType(null, symbols);
                 }
             }
             else
             {
-                throw new InvalidOperationException(header.ToString());
+                throw new InvalidOperationException(symbol.ToString());
             }
 
             Writer.WriteLine();
