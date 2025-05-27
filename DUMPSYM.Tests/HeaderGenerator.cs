@@ -246,27 +246,34 @@ public sealed class HeaderGenerator : IDisposable
 
     private void GenerateTypedefComplex(Symbol def)
     {
-        var index = Array.FindIndex(SymbolsGroups, s => s[0] == def);
-
-        if (index is -1)
-        {
-            throw new InvalidOperationException();
-        }
-
         var type = def.Type!.Value;
 
-        var modifiers = type.Modifiers.ToArray();
+        var mods = type.Modifiers.ToArray();
 
-        if (modifiers.Any())
+        if (mods.Any(s => s is SymbolTypeModifier.ARY or SymbolTypeModifier.FCN))
         {
-            var s1 = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
-            var s2 = SymbolGenerator.ToString(type.Kind);
-            var s3 = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+            throw new NotImplementedException(def.ToString());
+        }
 
-            Writer.WriteLine2($"{s1} {s2} {def.Tag}{s3} {def.Name};", $"// {def}");
+        if (mods.Any())
+        {
+            var tdef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
+
+            var kind = SymbolGenerator.ToString(type.Kind);
+
+            var ptrs = new string('*', mods.Count(s => s is SymbolTypeModifier.PTR));
+
+            Writer.WriteLine2($"{tdef} {kind} {def.Tag}{ptrs} {def.Name};", $"// {def}");
         }
         else
         {
+            var index = Array.FindIndex(SymbolsGroups, s => s[0] == def);
+
+            if (index is -1)
+            {
+                throw new InvalidOperationException();
+            }
+
             for (var i = index - 1; i >= 0; i--)
             {
                 var symbol = SymbolsGroups[i];
@@ -276,7 +283,7 @@ public sealed class HeaderGenerator : IDisposable
                 if (header.IsTypeHeader && header.Name == def.Tag)
                 {
                     GenerateType(symbol, def);
-                    break;
+                    return;
                 }
             }
         }
