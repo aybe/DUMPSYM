@@ -209,7 +209,7 @@ public sealed class HeaderGenerator : IDisposable
 
     private void GenerateTypedef(Symbol header)
     {
-        if (header.Tag == null)
+        if (header.Tag == null || header.Type!.Value.Modifiers.Any())
         {
             GenerateTypedefBasic(header);
         }
@@ -254,37 +254,28 @@ public sealed class HeaderGenerator : IDisposable
     {
         var type = def.Type!.Value;
 
-        var mods = type.Modifiers.ToArray();
-
-        if (mods.Any(s => s is SymbolTypeModifier.ARY or SymbolTypeModifier.FCN))
+        if (type.Modifiers.Any())
         {
-            throw new NotImplementedException(def.ToString());
+            throw new ArgumentOutOfRangeException(nameof(def), def, null);
         }
 
-        if (mods.Any())
+        var index = Array.FindIndex(SymbolsGroups, s => s[0] == def);
+
+        if (index is -1)
         {
-            GenerateTypedefBasic(def);
+            throw new InvalidOperationException();
         }
-        else
+
+        for (var i = index - 1; i >= 0; i--)
         {
-            var index = Array.FindIndex(SymbolsGroups, s => s[0] == def);
+            var symbol = SymbolsGroups[i];
 
-            if (index is -1)
+            var header = symbol[0];
+
+            if (header.IsTypeHeader && header.Name == def.Tag)
             {
-                throw new InvalidOperationException();
-            }
-
-            for (var i = index - 1; i >= 0; i--)
-            {
-                var symbol = SymbolsGroups[i];
-
-                var header = symbol[0];
-
-                if (header.IsTypeHeader && header.Name == def.Tag)
-                {
-                    GenerateType(symbol, def);
-                    return;
-                }
+                GenerateType(symbol, def);
+                return;
             }
         }
     }
