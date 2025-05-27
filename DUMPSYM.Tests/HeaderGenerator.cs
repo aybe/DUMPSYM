@@ -125,7 +125,7 @@ public sealed class HeaderGenerator : IDisposable
 
     public string Generate()
     {
-        foreach (var (index, symbols) in SymbolsGroups.Index())
+        foreach (var symbols in SymbolsGroups)
         {
             var symbol = symbols[0];
 
@@ -140,29 +140,12 @@ public sealed class HeaderGenerator : IDisposable
             }
             else if (symbol.IsTypeHeader)
             {
-                var idx = index + 1;
-
-                if (idx >= 0 && idx < SymbolsGroups.Length)
+                if (TryGetDefinition(symbol, out var def))
                 {
-                    var nxt = SymbolsGroups[idx];
-
-                    var def = nxt[0];
-
-                    if (def.IsTypeDefinition && def.Tag == symbol.Name && !def.Type!.Value.Modifiers.Any())
-                    {
-                        Typedefs.Add(def);
-
-                        GenerateType(def, symbols);
-                    }
-                    else
-                    {
-                        GenerateType(null, symbols);
-                    }
+                    Typedefs.Add(def);
                 }
-                else
-                {
-                    GenerateType(null, symbols);
-                }
+
+                GenerateType(def, symbols);
             }
             else
             {
@@ -393,5 +376,38 @@ public sealed class HeaderGenerator : IDisposable
         }
 
         return name;
+    }
+
+    private bool TryGetDefinition(Symbol type, [MaybeNullWhen(false)] out Symbol result)
+    {
+        result = null;
+
+        if (!type.IsTypeHeader)
+        {
+            throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+
+        var index = Array.FindIndex(SymbolsGroups, s => s[0] == type);
+
+        if (index == -1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+
+        index++;
+
+        if (index >= SymbolsGroups.Length)
+        {
+            return false;
+        }
+
+        var symbol = SymbolsGroups[index][0];
+
+        if (symbol.IsTypeDefinition && symbol.Tag == type.Name && !symbol.Type!.Value.Modifiers.Any())
+        {
+            result = symbol;
+        }
+
+        return result != null;
     }
 }
