@@ -1,6 +1,8 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 
+// ReSharper disable IdentifierTypo
+
 // ReSharper disable CommentTypo
 
 namespace DUMPSYM.Tests;
@@ -145,7 +147,7 @@ public sealed class HeaderGenerator : IDisposable
                     Typedefs.Add(def);
                 }
 
-                GenerateType(def, symbols);
+                GenerateType(symbols, def);
             }
             else
             {
@@ -158,15 +160,15 @@ public sealed class HeaderGenerator : IDisposable
         return Writer.InnerWriter.ToString()!;
     }
 
-    private void GenerateType(Symbol? definition, Symbol[] type)
+    private void GenerateType(Symbol[] type, Symbol? def)
     {
         var header = type[0];
 
-        var name = definition == null ? GetSafeName(header) : definition.Tag == definition.Name || definition.HasFakeTag ? definition.Name! : definition.Tag!;
+        var tag = def == null ? GetSafeName(header) : def.Tag == def.Name || def.HasFakeTag ? def.Name! : def.Tag!;
 
-        name = $"{SymbolGenerator.ToString((definition ?? header).Type!.Value.Kind)} {name}"; // IDA-friendly = no typedef = struct/union prefix
+        tag = $"{SymbolGenerator.ToString((def ?? header).Type!.Value.Kind)} {tag}";
 
-        Writer.WriteLine2($"{name} ", $"// {definition}".TrimEnd());
+        Writer.WriteLine2($"{tag} ", $"// {def}".TrimEnd());
 
         Writer.WriteLine2("{", $"// {header}");
 
@@ -178,28 +180,25 @@ public sealed class HeaderGenerator : IDisposable
         {
             var kind = GetMemberString(member);
 
-            var memberType = member.Type!.Value;
+            var mods = member.Type!.Value.Modifiers.ToArray();
 
-            var modifiers = memberType.Modifiers.ToArray();
+            var ptrs = new string('*', mods.Count(s => s is SymbolTypeModifier.PTR));
 
-            var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
+            var name = member.Name;
 
-            if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
+            if (mods.Any(s => s is SymbolTypeModifier.FCN))
             {
-                Writer.WriteLine2($"{kind} ({pointers}{member.Name})();", $"// {member}");
+                Writer.WriteLine2($"{kind} ({ptrs}{name})();", $"// {member}");
             }
             else
             {
-                var dimensions = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
+                var dims = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
 
-                if (member.Class is SymbolStorageClass.FIELD)
-                {
-                    Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions} : {member.Size};", $"// {member}");
-                }
-                else
-                {
-                    Writer.WriteLine2($"{kind}{pointers} {member.Name}{dimensions};", $"// {member}");
-                }
+                var text = member.Class is SymbolStorageClass.FIELD
+                    ? $"{kind}{ptrs} {name}{dims} : {member.Size};"
+                    : $"{kind}{ptrs} {name}{dims};";
+
+                Writer.WriteLine2(text, $"// {member}");
             }
         }
 
@@ -276,7 +275,7 @@ public sealed class HeaderGenerator : IDisposable
 
                 if (header.IsTypeHeader && header.Name == def.Tag)
                 {
-                    GenerateType(def, symbol);
+                    GenerateType(symbol, def);
                     break;
                 }
             }
