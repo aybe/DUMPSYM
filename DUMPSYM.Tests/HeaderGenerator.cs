@@ -234,13 +234,19 @@ public sealed class HeaderGenerator : IDisposable
 
         var dims = string.Concat((def.Dimensions ?? []).Select(s => $"[{s}]"));
 
+        var name = def.Name;
+
         if (mods.Any(s => s is SymbolTypeModifier.FCN))
         {
-            Writer.WriteLine2($"{tdef} {kind} ({ptrs}{def.Name})();", $"// {def}");
+            Writer.WriteLine2($"{tdef} {kind} ({ptrs}{name})();", $"// {def}");
+        }
+        else if (def.Tag == null)
+        {
+            Writer.WriteLine2($"{tdef} {kind}{ptrs} {name}{dims};", $"// {def}");
         }
         else
         {
-            Writer.WriteLine2($"{tdef} {kind}{ptrs} {def.Name}{dims};", $"// {def}");
+            Writer.WriteLine2($"{tdef} {kind} {def.Tag}{ptrs} {def.Name};", $"// {def}");
         }
     }
 
@@ -257,13 +263,7 @@ public sealed class HeaderGenerator : IDisposable
 
         if (mods.Any())
         {
-            var tdef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
-
-            var kind = SymbolGenerator.ToString(type.Kind);
-
-            var ptrs = new string('*', mods.Count(s => s is SymbolTypeModifier.PTR));
-
-            Writer.WriteLine2($"{tdef} {kind} {def.Tag}{ptrs} {def.Name};", $"// {def}");
+            GenerateTypedefBasic(def);
         }
         else
         {
