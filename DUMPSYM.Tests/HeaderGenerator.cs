@@ -162,9 +162,11 @@ public sealed class HeaderGenerator : IDisposable
     {
         var header = type[0];
 
-        var typeName = GetTypeName(header, definition);
+        var name = definition == null ? GetSafeName(header) : definition.Tag == definition.Name || definition.HasFakeTag ? definition.Name! : definition.Tag!;
 
-        Writer.WriteLine2($"{typeName} ", $"// {definition}".TrimEnd());
+        name = $"{SymbolGenerator.ToString((definition ?? header).Type!.Value.Kind)} {name}"; // IDA-friendly = no typedef = struct/union prefix
+
+        Writer.WriteLine2($"{name} ", $"// {definition}".TrimEnd());
 
         Writer.WriteLine2("{", $"// {header}");
 
@@ -348,31 +350,6 @@ public sealed class HeaderGenerator : IDisposable
         if (symbol.HasFakeName)
         {
             name = $"_{name[1..]}_{symbol.Header.Position:x6}";
-        }
-
-        return name;
-    }
-
-    private static string GetTypeName(Symbol type, Symbol? typedef)
-    {
-        // things to consider for generating an IDA-friendly header:
-        // 1. we don't use typedef else IDA creates fake names, so prefix with struct/union
-        // 2. compiler-generated types recycle fake names, ensure they're always unique
-        // 3. tag is used when not fake or different from name, because of #1 syntax
-
-        string name;
-
-        if (typedef == null)
-        {
-            var s = GetSafeName(type);
-
-            name = $"{SymbolGenerator.ToString(type.Type!.Value.Kind)} {s}";
-        }
-        else
-        {
-            var s = typedef.Tag == typedef.Name || typedef.HasFakeTag ? typedef.Name : typedef.Tag;
-
-            name = $"{SymbolGenerator.ToString(typedef.Type!.Value.Kind)} {s}";
         }
 
         return name;
