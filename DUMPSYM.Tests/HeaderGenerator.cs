@@ -79,7 +79,7 @@ public sealed class HeaderGenerator : IDisposable
         { SymbolTypeKind.UCHAR, "u_char" },
         { SymbolTypeKind.USHORT, "u_short" },
         { SymbolTypeKind.UINT, "u_int" },
-        { SymbolTypeKind.ULONG, "u_long" }
+        { SymbolTypeKind.ULONG, "u_long" },
     };
 
     private IndentedTextWriter Writer { get; } = new(new StringWriter());
@@ -104,7 +104,7 @@ public sealed class HeaderGenerator : IDisposable
                 new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
                 new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
                 new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long")
+                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long"),
             }
             .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
 
