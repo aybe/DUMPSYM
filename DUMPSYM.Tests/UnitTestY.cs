@@ -30,7 +30,8 @@ public sealed class UnitTestY : UnitTestBase
             ],
         };
 
-        using var generator = new HeaderGenerator(Sample.Default, options);
+        SymbolFile file = Sample.Default;
+        using var generator = new HeaderGenerator(file.Symbols.ToList(), options);
 
         var contents = generator.Generate();
 

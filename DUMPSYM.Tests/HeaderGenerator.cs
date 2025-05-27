@@ -6,23 +6,15 @@ using System.Diagnostics.CodeAnalysis;
 namespace DUMPSYM.Tests;
 
 public sealed class HeaderGenerator : IDisposable
-// general notes:
-//
-// the list of symbols to be processed should never contain functions,
-// since resolution is done by tag and fake names are being reused,
-// visiting parameters of functions would yield wrong symbols
-//
 // generator produces IDA-friendly code with a simpler C syntax,
 // i.e. typedef struct symbols are stripped out of the typedef 
 // else IDA produces fake types which isn't friendly at all
 {
-    public HeaderGenerator(SymbolFile file, HeaderGeneratorOptions options)
+    public HeaderGenerator(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
         // cleanup symbols first to produce cleanest possible output
         // functions are a trap as they contain types and typedefs
         // others are useless and will be done in an IDA script
-
-        var symbols = file.Symbols.ToList();
 
         Console.WriteLine($"{symbols.Count} symbols found");
 
@@ -62,12 +54,9 @@ public sealed class HeaderGenerator : IDisposable
 
         var set = new HashSet<Symbol[]>(SymbolArrayEqualityComparer.MembersTypeName);
 
-        foreach (var item in split)
+        foreach (var item in split.Where(set.Add))
         {
-            if (set.Add(item))
-            {
-                map.Add(map.Count, item);
-            }
+            map.Add(map.Count, item);
         }
 
         Console.WriteLine($"{set.Count} unique typedefs/types found");
@@ -102,8 +91,6 @@ public sealed class HeaderGenerator : IDisposable
     {
         // there tends to be as many duplicate symbols as there are files
 
-        Console.WriteLine("Removing typedefs...");
-
         foreach (var name in typedefs)
         {
             var array = symbols.Where(s => s.IsTypeDefinition && s.Name == name).ToArray();
@@ -119,8 +106,6 @@ public sealed class HeaderGenerator : IDisposable
         // UNIX typedefs may exist but as we use SDK unsigned typedefs they're useless
 
         CleanupTypedefs(symbols, ["ushort", "uint", "ulong"]);
-
-        Console.WriteLine("Adding typedefs...");
 
         foreach (var typedef in TypedefsOverrides.Values)
         {
