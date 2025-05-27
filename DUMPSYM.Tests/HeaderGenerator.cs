@@ -252,32 +252,14 @@ public sealed class HeaderGenerator : IDisposable
 
     private void GenerateTypedefComplex(Symbol def)
     {
-        var type = def.Type!.Value;
-
-        if (type.Modifiers.Any())
+        if (def.Type!.Value.Modifiers.Any())
         {
             throw new ArgumentOutOfRangeException(nameof(def), def, null);
         }
 
-        var index = Array.FindIndex(SymbolsGroups, s => s[0] == def);
+        var type = GetType(def);
 
-        if (index is -1)
-        {
-            throw new InvalidOperationException();
-        }
-
-        for (var i = index - 1; i >= 0; i--)
-        {
-            var symbol = SymbolsGroups[i];
-
-            var header = symbol[0];
-
-            if (header.IsTypeHeader && header.Name == def.Tag)
-            {
-                GenerateType(symbol, def);
-                return;
-            }
-        }
+        GenerateType(type, def);
     }
 
     private string GetMemberString(Symbol member)
@@ -350,6 +332,30 @@ public sealed class HeaderGenerator : IDisposable
         }
 
         return name;
+    }
+
+    private Symbol[] GetType(Symbol def)
+    {
+        if (!def.IsTypeDefinition)
+        {
+            throw new ArgumentOutOfRangeException(nameof(def), def, null);
+        }
+
+        var index1 = Array.FindIndex(SymbolsGroups, s => s[0] == def);
+
+        if (index1 == -1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(def), def, null);
+        }
+
+        var index2 = Array.FindLastIndex(SymbolsGroups, index1 - 1, s => s[0] is { IsTypeHeader: true } t && t.Name == def.Tag);
+
+        if (index2 == -1)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return SymbolsGroups[index2];
     }
 
     private bool TryGetDefinition(Symbol type, [MaybeNullWhen(false)] out Symbol result)
