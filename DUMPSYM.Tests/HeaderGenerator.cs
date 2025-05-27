@@ -24,7 +24,7 @@ public sealed class HeaderGenerator : IDisposable
 
         Console.WriteLine($"{symbols.Count} symbols found");
 
-        symbols = Cleanup(symbols, options);
+        Cleanup(symbols, options.RemoveTypedefs);
 
         Console.WriteLine("Splitting symbols...");
 
@@ -88,22 +88,24 @@ public sealed class HeaderGenerator : IDisposable
         Writer.Dispose();
     }
 
-    private List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
+    private void Cleanup(List<Symbol> symbols, IEnumerable<string> typedefs)
     {
-        Console.WriteLine("Cleaning symbols...");
+        // cleaning up symbols prior generation drastically improves the output
 
-        CleanupTypedefs(symbols, options.RemoveTypedefs);
+        Console.WriteLine("Cleaning up symbols...");
 
-        CleanupUnsigned(symbols);
+        CleanupTypedefs(symbols, typedefs);
 
-        return symbols;
+        CleanupTypedefsUnsigned(symbols);
     }
 
-    private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> names)
+    private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> typedefs)
     {
+        // there tends to be as many duplicate symbols as there are files
+
         Console.WriteLine("Removing typedefs...");
 
-        foreach (var name in names)
+        foreach (var name in typedefs)
         {
             var array = symbols.Where(s => s.IsTypeDefinition && s.Name == name).ToArray();
 
@@ -113,9 +115,9 @@ public sealed class HeaderGenerator : IDisposable
         }
     }
 
-    private void CleanupUnsigned(List<Symbol> symbols)
+    private void CleanupTypedefsUnsigned(List<Symbol> symbols)
     {
-        // UNIX typedefs may be there, or not; but as we use SDK unsigned typedefs they're useless
+        // UNIX typedefs may exist but as we use SDK unsigned typedefs they're useless
 
         CleanupTypedefs(symbols, ["ushort", "uint", "ulong"]);
 
