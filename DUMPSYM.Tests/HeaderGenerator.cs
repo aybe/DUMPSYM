@@ -1,5 +1,4 @@
 ﻿using System.CodeDom.Compiler;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 // ReSharper disable CommentTypo
@@ -89,28 +88,39 @@ public sealed class HeaderGenerator : IDisposable
         Writer.Dispose();
     }
 
-    private static List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
+    private List<Symbol> Cleanup(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
         Console.WriteLine("Cleaning symbols...");
 
-        var typedefs = symbols.Where(s => s.IsTypeDefinition && options.RemoveTypedefs.Contains(s.Name!)).ToImmutableArray();
+        var removeTypedefs = options.RemoveTypedefs;
 
-        var remove1 = symbols.RemoveAll(typedefs.Contains);
+        Console.WriteLine("Removing specified typedefs:");
 
-        Console.WriteLine($"Removed {remove1} typedefs");
+        foreach (var typedef in removeTypedefs)
+        {
+            Console.WriteLine($"\t{typedef}");
+        }
 
-        var types3 = new[]
-            {
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UCHAR), 0, "u_char"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.USHORT), 0, "u_short"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.UINT), 0, "u_int"),
-                new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(SymbolTypeKind.ULONG), 0, "u_long"),
-            }
-            .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, s)).ToArray();
+        var typedefs1 = symbols.Where(s => s.IsTypeDefinition && removeTypedefs.Contains(s.Name!)).ToArray();
+
+        var remove = symbols.RemoveAll(typedefs1.Contains);
+
+        Console.WriteLine($"Removed {remove} typedefs");
+
+        Console.WriteLine("Adding SDK typedefs...");
+
+        foreach (var typedef in TypedefsOverrides.Values)
+        {
+            Console.WriteLine($"\t{typedef}");
+        }
 
         var index = symbols.FindIndex(s => s.IsFileEnd);
 
-        symbols.InsertRange(index + 1, types3);
+        var typedefs2 = TypedefsOverrides
+            .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(s.Key), 0, s.Value)))
+            .ToArray();
+
+        symbols.InsertRange(index + 1, typedefs2);
 
         return symbols;
     }
