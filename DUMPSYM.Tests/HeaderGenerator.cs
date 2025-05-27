@@ -115,22 +115,26 @@ public sealed class HeaderGenerator : IDisposable
 
     private void CleanupUnsigned(List<Symbol> symbols)
     {
+        // UNIX typedefs may be there, or not; but as we use SDK unsigned typedefs they're useless
+
         CleanupTypedefs(symbols, ["ushort", "uint", "ulong"]);
 
-        Console.WriteLine("Adding SDK typedefs...");
+        Console.WriteLine("Adding typedefs...");
 
         foreach (var typedef in TypedefsOverrides.Values)
         {
-            Console.WriteLine($"\t{typedef}");
+            Console.WriteLine($"Added instance of '{typedef}'");
         }
+
+        // insert SDK unsigned typedefs after first file as splitting is done by file
 
         var index = symbols.FindIndex(s => s.IsFileEnd);
 
-        var typedefs2 = TypedefsOverrides
+        var array = TypedefsOverrides
             .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(s.Key), 0, s.Value)))
             .ToArray();
 
-        symbols.InsertRange(index + 1, typedefs2);
+        symbols.InsertRange(index + 1, array);
     }
 
     public string Generate()
