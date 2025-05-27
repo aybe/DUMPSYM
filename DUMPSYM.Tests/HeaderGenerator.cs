@@ -18,6 +18,10 @@ public sealed class HeaderGenerator : IDisposable
 {
     public HeaderGenerator(SymbolFile file, HeaderGeneratorOptions options)
     {
+        // cleanup symbols first to produce cleanest possible output
+        // functions are a trap as they contain types and typedefs
+        // others are useless and will be done in an IDA script
+
         var symbols = file.Symbols.ToList();
 
         Console.WriteLine($"{symbols.Count} symbols found");
@@ -45,6 +49,10 @@ public sealed class HeaderGenerator : IDisposable
         Console.WriteLine($"Removed {remove6} variables");
 
         Console.WriteLine($"{split.Count} symbols remaining");
+
+        // most of the types and typedefs are duplicates, except for fake types
+        // compiler generates them and reuse the same names making it tricky
+        // with a special comparer, we can differentiate these from others
 
         var map = new SortedDictionary<int, Symbol[]>();
 
