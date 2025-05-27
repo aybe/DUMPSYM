@@ -222,25 +222,25 @@ public sealed class HeaderGenerator : IDisposable
     [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
     private void GenerateTypedefBasic(Symbol def)
     {
+        var tdef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
+
         var type = def.Type!.Value;
-
-        var modifiers = type.Modifiers.ToArray();
-
-        var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
-
-        var dimensions = string.Concat((def.Dimensions ?? []).Select(s => $"[{s}]"));
-
-        var typedef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
 
         var kind = SymbolGenerator.ToString(type.Kind);
 
-        if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
+        var mods = type.Modifiers.ToArray();
+
+        var ptrs = new string('*', mods.Count(s => s is SymbolTypeModifier.PTR));
+
+        var dims = string.Concat((def.Dimensions ?? []).Select(s => $"[{s}]"));
+
+        if (mods.Any(s => s is SymbolTypeModifier.FCN))
         {
-            Writer.WriteLine2($"{typedef} {kind} ({pointers}{def.Name})();", $"// {def}");
+            Writer.WriteLine2($"{tdef} {kind} ({ptrs}{def.Name})();", $"// {def}");
         }
         else
         {
-            Writer.WriteLine2($"{typedef} {kind}{pointers} {def.Name}{dimensions};", $"// {def}");
+            Writer.WriteLine2($"{tdef} {kind}{ptrs} {def.Name}{dims};", $"// {def}");
         }
     }
 
