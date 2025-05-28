@@ -142,7 +142,9 @@ public sealed class HeaderGenerator : IDisposable
             }
             else if (symbol.IsTypeHeader)
             {
-                if (TryGetDefinition(symbol, out var def))
+                var def = GetTypeDefinition(symbol);
+
+                if (def != null)
                 {
                     Typedefs.Add(def);
                 }
@@ -358,10 +360,8 @@ public sealed class HeaderGenerator : IDisposable
         return SymbolsGroups[index2];
     }
 
-    private bool TryGetDefinition(Symbol type, [MaybeNullWhen(false)] out Symbol result)
+    private Symbol? GetTypeDefinition(Symbol type)
     {
-        result = null;
-
         if (!type.IsTypeHeader)
         {
             throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -378,16 +378,16 @@ public sealed class HeaderGenerator : IDisposable
 
         if (index >= SymbolsGroups.Length)
         {
-            return false;
+            return null;
         }
 
         var symbol = SymbolsGroups[index][0];
 
         if (symbol.IsTypeDefinition && symbol.Tag == type.Name && !symbol.Type!.Value.Modifiers.Any())
         {
-            result = symbol;
+            return symbol;
         }
 
-        return result != null;
+        return null;
     }
 }
