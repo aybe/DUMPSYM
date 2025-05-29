@@ -180,7 +180,7 @@ public sealed class HeaderGenerator : IDisposable
 
         foreach (var member in members)
         {
-            var kind = GetMemberString(member);
+            var kind = GetMemberType(member);
 
             var mods = member.Type!.Value.Modifiers.ToArray();
 
@@ -265,7 +265,7 @@ public sealed class HeaderGenerator : IDisposable
     }
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
-    private string GetMemberString(Symbol member)
+    private string GetMemberType(Symbol member)
     {
         var memberType = member.Type!.Value;
 
@@ -281,11 +281,11 @@ public sealed class HeaderGenerator : IDisposable
         }
         else
         {
-            return $"{kind} {GetMemberType(member)}";
+            return $"{kind} {GetMemberTypeName(member)}";
         }
     }
 
-    private string GetMemberType(Symbol member)
+    private string GetMemberTypeName(Symbol member)
     {
         if (!member.HasFakeTag)
         {
