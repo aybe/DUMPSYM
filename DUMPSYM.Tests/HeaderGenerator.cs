@@ -264,13 +264,12 @@ public sealed class HeaderGenerator : IDisposable
         GenerateType(type, def);
     }
 
+    [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
     private string GetMemberString(Symbol member)
     {
         var memberType = member.Type!.Value;
 
         var kind = SymbolGenerator.ToString(memberType.Kind);
-
-        string output;
 
         if (string.IsNullOrWhiteSpace(member.Tag))
         {
@@ -278,19 +277,12 @@ public sealed class HeaderGenerator : IDisposable
             // since this can't really be solved, we default to the most likely, i.e. u_short
             // if not doing this, we'd end up with many members being uid_t, which is worse
 
-            output = TypedefsOverrides.TryGetValue(memberType.Kind, out var name) ? name : kind;
+            return TypedefsOverrides.TryGetValue(memberType.Kind, out var name) ? name : kind;
         }
         else
         {
-            output = GetMemberType(member);
-
-            if (memberType.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
-            {
-                output = $"{kind} {output}";
-            }
+            return $"{kind} {GetMemberType(member)}";
         }
-
-        return output;
     }
 
     private string GetMemberType(Symbol member)
