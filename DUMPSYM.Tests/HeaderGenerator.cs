@@ -268,8 +268,6 @@ public sealed class HeaderGenerator : IDisposable
     {
         var memberType = member.Type!.Value;
 
-        var index = Array.IndexOf(Symbols, member);
-
         var kind = SymbolGenerator.ToString(memberType.Kind);
 
         string output;
@@ -284,36 +282,7 @@ public sealed class HeaderGenerator : IDisposable
         }
         else
         {
-            if (member.HasFakeTag)
-            {
-                var name = default(string);
-
-                for (var i = index - 1; i >= 0; i--)
-                {
-                    var symbol = Symbols[i];
-
-                    if (symbol.IsTypeHeader && symbol.Name == member.Tag)
-                    {
-                        name ??= GetSafeName(symbol);
-                        break;
-                    }
-
-                    if (symbol.IsTypeDefinition && symbol.Tag == member.Tag)
-                    {
-                        var aggregate = (member.Dimensions ?? [1u]).Aggregate(1u, (s, t) => s * t);
-                        var memberSize = member.Size!.Value / aggregate;
-                        Assert.AreEqual(memberSize, symbol.Size);
-                        name = symbol.Name;
-                        break;
-                    }
-                }
-
-                output = name ?? throw new InvalidOperationException(member.ToString());
-            }
-            else
-            {
-                output = member.Tag;
-            }
+            output = GetMemberType(member);
 
             if (memberType.Kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION)
             {
@@ -322,6 +291,33 @@ public sealed class HeaderGenerator : IDisposable
         }
 
         return output;
+    }
+
+    private string GetMemberType(Symbol member)
+    {
+        if (!member.HasFakeTag)
+        {
+            return member.Tag!;
+        }
+
+        var index = Array.IndexOf(Symbols, member);
+
+        for (var i = index - 1; i >= 0; i--)
+        {
+            var symbol = Symbols[i];
+
+            if (symbol.IsTypeHeader && symbol.Name == member.Tag)
+            {
+                return GetSafeName(symbol);
+            }
+
+            if (symbol.IsTypeDefinition && symbol.Tag == member.Tag)
+            {
+                return symbol.Name!;
+            }
+        }
+
+        throw new InvalidOperationException();
     }
 
     private static string GetSafeName(Symbol symbol)
