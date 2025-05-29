@@ -6,15 +6,14 @@ using System.Diagnostics.CodeAnalysis;
 namespace DUMPSYM.Tests;
 
 public sealed class HeaderGenerator : IDisposable
-// generator produces IDA-friendly code with a simpler C syntax,
-// i.e. typedef struct symbols are stripped out of the typedef 
-// else IDA produces fake types which isn't friendly at all
+// generating IDA-friendly code requires to not use typedef struct/union at all
+// else, IDA will rename every type with a fake name and add an extra typedef
 {
     public HeaderGenerator(List<Symbol> symbols, HeaderGeneratorOptions options)
     {
-        // cleanup symbols first to produce cleanest possible output
+        // symbols shall be cleaned first to produce correct output
         // functions are a trap as they contain types and typedefs
-        // others are useless and will be done in an IDA script
+        // and other symbols are useless for generating a header
 
         Console.WriteLine($"{symbols.Count} symbols found");
 
@@ -46,9 +45,9 @@ public sealed class HeaderGenerator : IDisposable
 
         Console.WriteLine($"{split.Count} symbols remaining");
 
-        // most of the types and typedefs are duplicates, except for fake types
-        // compiler generates them and reuse the same names making it tricky
-        // with a special comparer, we can differentiate these from others
+        // most types and typedefs are duplicates, except for fake types
+        // these are compiler-generated and often reuse the same names
+        // with a special comparer, we can accurately filter them out
 
         var map = new SortedDictionary<int, Symbol[]>();
 
@@ -89,7 +88,7 @@ public sealed class HeaderGenerator : IDisposable
 
     private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> typedefs)
     {
-        // there tends to be as many duplicate symbols as there are files
+        // symbols are duplicated as many times as there are files
 
         foreach (var name in typedefs)
         {
@@ -103,7 +102,7 @@ public sealed class HeaderGenerator : IDisposable
 
     private void CleanupTypedefsUnsigned(List<Symbol> symbols)
     {
-        // UNIX typedefs may exist but as we use SDK unsigned typedefs they're useless
+        // Sys III/V compat typedefs are useless as we use u_short/u_int/u_long
 
         CleanupTypedefs(symbols, ["ushort", "uint", "ulong"]);
 
@@ -112,7 +111,7 @@ public sealed class HeaderGenerator : IDisposable
             Console.WriteLine($"Added instance of '{typedef}'");
         }
 
-        // insert SDK unsigned typedefs after first file as splitting is done by file
+        // typedefs must be inserted after a file because of how symbols are split
 
         var index = symbols.FindIndex(s => s.IsFileEnd);
 
@@ -125,6 +124,8 @@ public sealed class HeaderGenerator : IDisposable
 
     public string Generate()
     {
+        // as a type may generate its own typedef, keep track of them
+
         foreach (var symbols in SymbolsGroups)
         {
             var symbol = symbols[0];
@@ -160,9 +161,9 @@ public sealed class HeaderGenerator : IDisposable
         return Writer.InnerWriter.ToString()!;
     }
 
-    private void GenerateType(Symbol[] type, Symbol? def)
+    private void GenerateType(Symbol[] symbols, Symbol? def)
     {
-        var header = type[0];
+        var header = symbols[0];
 
         var tag = def == null ? GetSafeName(header) : def.Tag == def.Name || def.HasFakeTag ? def.Name! : def.Tag!;
 
@@ -174,11 +175,11 @@ public sealed class HeaderGenerator : IDisposable
 
         Writer.Indent++;
 
-        var members = type[1..^1];
+        var members = symbols[1..^1];
 
         foreach (var member in members)
         {
-            var kind = GetMemberType(member);
+            var type = GetMemberType(member);
 
             var mods = member.Type!.Value.Modifiers.ToArray();
 
@@ -188,15 +189,15 @@ public sealed class HeaderGenerator : IDisposable
 
             if (mods.Any(s => s is SymbolTypeModifier.FCN))
             {
-                Writer.WriteLine2($"{kind} ({ptrs}{name})();", $"// {member}");
+                Writer.WriteLine2($"{type} ({ptrs}{name})();", $"// {member}");
             }
             else
             {
                 var dims = string.Concat((member.Dimensions ?? []).Select(s => $"[{s}]"));
 
                 var text = member.Class is SymbolStorageClass.FIELD
-                    ? $"{kind}{ptrs} {name}{dims} : {member.Size};"
-                    : $"{kind}{ptrs} {name}{dims};";
+                    ? $"{type}{ptrs} {name}{dims} : {member.Size};"
+                    : $"{type}{ptrs} {name}{dims};";
 
                 Writer.WriteLine2(text, $"// {member}");
             }
@@ -204,7 +205,7 @@ public sealed class HeaderGenerator : IDisposable
 
         Writer.Indent--;
 
-        Writer.WriteLine2("};", $"// {type[^1]}");
+        Writer.WriteLine2("};", $"// {symbols[^1]}");
     }
 
     private void GenerateTypedef(Symbol header)
@@ -278,12 +279,17 @@ public sealed class HeaderGenerator : IDisposable
         }
         else
         {
+            // this is slightly more complex, type name is found in a previous symbol
+
             return $"{kind} {GetMemberTypeName(member)}";
         }
     }
 
     private string GetMemberTypeName(Symbol member)
     {
+        // easy case: in the tag, when there's one and it isn't fake
+        // hard case: in a previous symbol whose name may be fake
+
         if (!member.HasFakeTag)
         {
             return member.Tag!;
@@ -311,6 +317,8 @@ public sealed class HeaderGenerator : IDisposable
 
     private static string GetSafeName(Symbol symbol)
     {
+        // most-effective way to make recycled fake names unique: use its position
+
         var name = symbol.Name ?? throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
 
         if (symbol.HasFakeName)
@@ -323,6 +331,13 @@ public sealed class HeaderGenerator : IDisposable
 
     private Symbol[] GetType(Symbol def)
     {
+        // associated type is generally right before typedef but not always...
+
+        if (def.Tag == null || def.Type!.Value.Modifiers.Any())
+        {
+            throw new ArgumentOutOfRangeException(nameof(def), def, null);
+        }
+
         if (!def.IsTypeDefinition)
         {
             throw new ArgumentOutOfRangeException(nameof(def), def, null);
@@ -347,6 +362,8 @@ public sealed class HeaderGenerator : IDisposable
 
     private Symbol? GetTypeDefinition(Symbol type)
     {
+        // associated typedef is right after the type, but only when it has one
+
         if (!type.IsTypeHeader)
         {
             throw new ArgumentOutOfRangeException(nameof(type), type, null);
