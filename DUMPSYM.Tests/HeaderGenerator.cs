@@ -3,8 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 
 // ReSharper disable IdentifierTypo
 
-// ReSharper disable CommentTypo
-
 namespace DUMPSYM.Tests;
 
 public sealed class HeaderGenerator : IDisposable
@@ -221,7 +219,6 @@ public sealed class HeaderGenerator : IDisposable
         }
     }
 
-    [SuppressMessage("ReSharper", "ConvertIfStatementToConditionalTernaryExpression")]
     private void GenerateTypedefBasic(Symbol def)
     {
         var tdef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
