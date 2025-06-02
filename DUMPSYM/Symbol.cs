@@ -101,7 +101,7 @@ public sealed partial class Symbol
 
     public uint[]? Dimensions => Record is ISymbolDefinition2 d ? d.Dimensions : null;
 
-    public string? Tag => Record is ISymbolDefinition2 d ? d.Tag : null;
+    public string? Tag => Record is ISymbolDefinition2 d ? string.IsNullOrEmpty(d.Tag) ? null : d.Tag : null;
 
     #endregion
 
