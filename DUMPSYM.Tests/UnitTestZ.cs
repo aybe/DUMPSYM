@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using DUMPSYM.Generators;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo

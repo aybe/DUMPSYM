@@ -1,4 +1,4 @@
-﻿namespace DUMPSYM.Tests;
+﻿namespace DUMPSYM.Generators;
 
 public sealed class HeaderGeneratorOptions
 {

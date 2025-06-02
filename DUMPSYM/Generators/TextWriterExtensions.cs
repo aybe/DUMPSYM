@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace DUMPSYM.Tests;
+namespace DUMPSYM.Generators;
 
 public static class TextWriterExtensions
 {

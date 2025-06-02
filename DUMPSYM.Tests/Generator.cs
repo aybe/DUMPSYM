@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using DUMPSYM.Extensions;
+using DUMPSYM.Generators;
 
 // ReSharper disable CommentTypo
 

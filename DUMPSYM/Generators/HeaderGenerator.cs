@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 // ReSharper disable IdentifierTypo
 
-namespace DUMPSYM.Tests;
+namespace DUMPSYM.Generators;
 
 public sealed class HeaderGenerator : IDisposable
 // generating IDA-friendly code requires to not use typedef struct/union at all

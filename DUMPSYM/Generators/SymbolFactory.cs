@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 // ReSharper disable CommentTypo
 
-namespace DUMPSYM.Tests;
+namespace DUMPSYM.Generators;
 
 public sealed class SymbolFactory
 // TODO why does FLOATLIB.C (last file) has ~2000 names at end?

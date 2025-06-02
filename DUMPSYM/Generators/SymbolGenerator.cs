@@ -2,12 +2,13 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using DUMPSYM.Extensions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable StringLiteralTypo
 
 // ReSharper disable CommentTypo
 
-namespace DUMPSYM.Tests;
+namespace DUMPSYM.Generators;
 
 public sealed class SymbolGenerator(SymbolFactory factory)
 // BUG SpuStCallbackProc is typedef void (*SpuStCallbackProc)(unsigned long, long); in SDK but is Def class TPDEF type PTR FCN VOID size 0 name SpuStCallbackProc
@@ -79,9 +80,9 @@ public sealed class SymbolGenerator(SymbolFactory factory)
         return writer.InnerWriter.ToString();
     }
 
-    private void GenerateFiles()
+    private void GenerateFiles(string dir)
     {
-        var directory = Directory.CreateDirectory(Path.Combine(Solution.Directory, "Project1", "src")).FullName;
+        var directory = Directory.CreateDirectory(dir).FullName;
 
         var files = Factory.LineOf
             .Where(s => s.Key.IsFile)
