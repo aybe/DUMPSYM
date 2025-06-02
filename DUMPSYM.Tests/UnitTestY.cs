@@ -12,7 +12,7 @@ public sealed class UnitTestY : UnitTestBase
     [TestMethod]
     public void TestMethodY()
     {
-        var options = new HeaderGeneratorOptions
+        var options = new IdaHeaderGeneratorOptions
         {
             RemoveTypedefs =
             [
@@ -32,7 +32,7 @@ public sealed class UnitTestY : UnitTestBase
         };
 
         SymbolFile file = Sample.Default;
-        using var generator = new HeaderGenerator(file.Symbols.ToList(), options);
+        using var generator = new IdaHeaderGenerator(file.Symbols.ToList(), options);
 
         var contents = generator.Generate();
 

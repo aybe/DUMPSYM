@@ -1,6 +1,6 @@
 ﻿namespace DUMPSYM.Generators;
 
-public sealed class HeaderGeneratorOptions
+public sealed class IdaHeaderGeneratorOptions
 {
     public HashSet<string> RemoveTypedefs { get; init; } = [];
 }
