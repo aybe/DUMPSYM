@@ -1,5 +1,4 @@
-﻿using System.CodeDom.Compiler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -8,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DUMPSYM.Generators;
 
-public sealed class IdaFunctionGenerator : IDisposable
+public sealed class IdaFunctionGenerator
 // TODO return nice typedef like u_long
 // TODO encountered classes for parameters: REGPARM, ARG, REG, AUTO
 // TODO there are things inside function blocks, see if they're useful
@@ -19,22 +18,13 @@ public sealed class IdaFunctionGenerator : IDisposable
 
     private Symbol[] Symbols { get; set; } = null!; // TODO
 
-    private bool WriteFunctionName { get; } = true;
+    private bool WriteComments { get; } = true;
 
-    private bool WriterFunctionReturn { get; } = true;
-
-    private bool WriteFunctionParameters { get; } = true;
-
-    private bool WriteFunctionSignature { get; } = true;
+    private bool WriteDeclaration { get; } = true;
 
     private bool WriteNewLines { get; } = true;
 
-    private IndentedTextWriter Writer { get; } = new(new StringWriter());
-
-    public void Dispose()
-    {
-        Writer.Dispose();
-    }
+    private List<IdaFunction> Functions { get; } = [];
 
     public void Initialize(SymbolFile file)
     {
@@ -52,31 +42,50 @@ public sealed class IdaFunctionGenerator : IDisposable
 
         foreach (var symbols in funcs)
         {
-            ParseFunction(symbols);
+            var function = ParseFunction(symbols);
+
+            Functions.Add(function);
         }
 
-        var value = Writer.InnerWriter.ToString()!;
+        using var writer = new StringWriter();
+
+        foreach (var function in Functions)
+        {
+            writer.WriteLine($"// {function.Name}");
+            writer.WriteLine($"// {function.File}");
+            writer.WriteLine($"// {function.Header}");
+
+            if (WriteComments)
+            {
+                foreach (var comment in function.Comments)
+                {
+                    writer.WriteLine($"// {comment}");
+                }
+            }
+
+            if (WriteDeclaration)
+            {
+                writer.WriteLine(function.Declaration);
+            }
+
+            if (WriteNewLines)
+            {
+                writer.WriteLine();
+            }
+        }
+
+        var value = writer.ToString();
 
         Console.WriteLine(value);
     }
 
-    private void ParseFunction(Symbol[] symbols)
+    private IdaFunction ParseFunction(Symbol[] symbols)
     {
         var first = symbols[0];
 
         var function = (ISymbolFunction)first.Record;
 
-        if (WriteFunctionName)
-        {
-            Writer.WriteLine($"// {first.Header} {function.Name} {function.File}");
-        }
-
         var returns = Returns[first];
-
-        if (WriterFunctionReturn)
-        {
-            Writer.WriteLine($"// {returns}");
-        }
 
         var type = returns.Type!.Value;
 
@@ -106,23 +115,14 @@ public sealed class IdaFunctionGenerator : IDisposable
 
         var text = string.Join(", ", select);
 
-        if (WriteFunctionParameters)
+        return new IdaFunction
         {
-            foreach (var parameter in parameters)
-            {
-                Writer.WriteLine($"// {parameter}");
-            }
-        }
-
-        if (WriteFunctionSignature)
-        {
-            Writer.WriteLine($"{returnType}{pointers} {function.Name}({text});");
-        }
-
-        if (WriteNewLines)
-        {
-            Writer.WriteLine();
-        }
+            Comments = [returns.ToString(), ..parameters.Select(s => s.ToString())],
+            File = function.File,
+            Header = first.Header,
+            Name = function.Name,
+            Declaration = $"{returnType}{pointers} {function.Name}({text});",
+        };
     }
 
     private string GetParameterString(Symbol parameter)
