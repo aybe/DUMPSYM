@@ -8,7 +8,7 @@ public sealed class UnitTestZ : UnitTestBase
     [TestMethod]
     public void TestMethodY()
     {
-        var generator = new IdaFunctionGenerator();
+        var generator = new IdaScriptGenerator();
 
         generator.Initialize(Sample.Default);
     }
