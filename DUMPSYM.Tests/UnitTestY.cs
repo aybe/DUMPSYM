@@ -32,7 +32,7 @@ public sealed class UnitTestY : UnitTestBase
         };
 
         SymbolFile file = Sample.Default;
-        using var generator = new IdaHeaderGenerator(file.Symbols.ToList(), options);
+        using var generator = new IdaGenerator(file.Symbols.ToList(), options);
 
         var contents = generator.Generate();
 

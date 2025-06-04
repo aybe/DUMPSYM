@@ -5,11 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace DUMPSYM.Generators;
 
-public sealed class IdaHeaderGenerator : IDisposable
+public sealed class IdaGenerator : IDisposable
 // generating IDA-friendly code requires to not use typedef struct/union at all
 // else, IDA will rename every type with a fake name and add an extra typedef
 {
-    public IdaHeaderGenerator(List<Symbol> symbols, IdaHeaderGeneratorOptions options)
+    public IdaGenerator(List<Symbol> symbols, IdaHeaderGeneratorOptions options)
     {
         // symbols shall be cleaned first to produce correct output
         // functions are a trap as they contain types and typedefs
