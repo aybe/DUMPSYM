@@ -9,9 +9,10 @@ namespace DUMPSYM.Tests;
 [TestClass]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
-    [TestMethod]
-    public void TestHeaderGenerator()
+    private static IdaGenerator GetGenerator()
     {
+        var file = Sample.Default;
+
         var options = new IdaHeaderGeneratorOptions
         {
             RemoveTypedefs =
@@ -31,32 +32,47 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             ],
         };
 
-        var generator = new IdaGenerator(Sample.Default.Symbols.ToList(), options);
+        var generator = new IdaGenerator(file.Symbols.ToList(), options);
+
+        return generator;
+    }
+
+    [TestMethod]
+    public void TestHeaderGenerator()
+    {
+        var generator = GetGenerator();
 
         using var headerGenerator = new IdaHeaderGenerator(generator);
 
-        var contents = headerGenerator.Generate();
+        var generate = headerGenerator.Generate();
 
-        const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
+        WriteLine(generate);
 
-        File.WriteAllText(path, contents);
+        File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H", generate);
 
-        var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
-
-        Assert.AreEqual("a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523", hash, true);
+        Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
     }
 
     [TestMethod]
     public void TestScriptGenerator()
     {
-        var generator = new IdaScriptGenerator();
+        var generator = GetGenerator();
 
-        var contents = generator.Generate(Sample.Default);
+        var scriptGenerator = new IdaScriptGenerator(generator);
 
-        WriteLine(contents);
+        var generate = scriptGenerator.Generate(Sample.Default);
 
-        var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(contents)));
+        WriteLine(generate);
 
-        Assert.AreEqual("0023f3ddce4faa080116cb2db0c8f1dd68db0beb1f14914bd7f80228eb2ccb26", hash, true);
+        File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.OUT", generate);
+
+        Validate(generate, "0023f3ddce4faa080116cb2db0c8f1dd68db0beb1f14914bd7f80228eb2ccb26");
+    }
+
+    private static void Validate(string text, string sha256)
+    {
+        var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
+
+        Assert.AreEqual(sha256, hash, true);
     }
 }

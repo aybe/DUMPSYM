@@ -7,11 +7,13 @@
 
 namespace DUMPSYM.Generators;
 
-public sealed class IdaScriptGenerator
+public sealed class IdaScriptGenerator(IdaGenerator generator)
 // TODO return nice typedef like u_long
 // TODO encountered classes for parameters: REGPARM, ARG, REG, AUTO
 // TODO there are things inside function blocks, see if they're useful
 {
+    private IdaGenerator Generator { get; } = generator;
+
     private Dictionary<Symbol, Symbol> Returns { get; set; } = null!;
 
     private ILookup<uint, Symbol> SymbolsByAddress { get; set; } = null!; // TODO
