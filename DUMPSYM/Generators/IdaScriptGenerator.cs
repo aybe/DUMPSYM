@@ -26,7 +26,7 @@ public sealed class IdaScriptGenerator
 
     private List<IdaFunction> Functions { get; } = [];
 
-    public void Initialize(SymbolFile file)
+    public string Generate(SymbolFile file)
     {
         Symbols = file.Symbols.ToArray();
 
@@ -74,9 +74,9 @@ public sealed class IdaScriptGenerator
             }
         }
 
-        var value = writer.ToString();
+        var output = writer.ToString();
 
-        Console.WriteLine(value);
+        return output;
     }
 
     private IdaFunction ParseFunction(Symbol[] symbols)
