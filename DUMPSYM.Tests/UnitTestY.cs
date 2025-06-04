@@ -31,10 +31,11 @@ public sealed class UnitTestY : UnitTestBase
             ],
         };
 
-        SymbolFile file = Sample.Default;
-        using var generator = new IdaGenerator(file.Symbols.ToList(), options);
+        var generator = new IdaGenerator(Sample.Default.Symbols.ToList(), options);
 
-        var contents = generator.Generate();
+        using var headerGenerator = new IdaHeaderGenerator(generator);
+
+        var contents = headerGenerator.Generate();
 
         const string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H";
 
