@@ -10,7 +10,7 @@ namespace DUMPSYM.Generators;
 public sealed class IdaScriptGenerator(IdaGenerator generator)
 // TODO encountered classes for parameters: REGPARM, ARG, REG, AUTO
 // TODO there are things inside function blocks, see if they're useful
-// BUG some functions are wrong, e.g. 8003dbd0 is previous one in IDA
+// BUG some functions are wrong, e.g. 8003DBD0 is a stub for 8003D930 and lacks parameters, solution would be to override decls, log warnings
 {
     private IdaGenerator Generator { get; } = generator;
 
