@@ -171,7 +171,7 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
             // since this can't really be solved, we default to the most likely, i.e. u_short
             // if not doing this, we'd end up with many members being uid_t, which is worse
 
-            return Generator.TypedefsOverrides.TryGetValue(memberType.Kind, out var name) ? name : kind;
+            return Generator.TypedefsOverrides.GetValueOrDefault(memberType.Kind, kind);
         }
         else
         {

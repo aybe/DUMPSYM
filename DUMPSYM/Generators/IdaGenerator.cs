@@ -1,4 +1,6 @@
-﻿namespace DUMPSYM.Generators;
+﻿using System.Collections.Frozen;
+
+namespace DUMPSYM.Generators;
 
 public sealed class IdaGenerator
 {
@@ -64,13 +66,13 @@ public sealed class IdaGenerator
 
     public HashSet<Symbol> Typedefs { get; } = [];
 
-    public Dictionary<SymbolTypeKind, string> TypedefsOverrides { get; } = new()
+    public FrozenDictionary<SymbolTypeKind, string> TypedefsOverrides { get; } = new Dictionary<SymbolTypeKind, string>
     {
         { SymbolTypeKind.UCHAR, "u_char" },
         { SymbolTypeKind.USHORT, "u_short" },
         { SymbolTypeKind.UINT, "u_int" },
         { SymbolTypeKind.ULONG, "u_long" },
-    };
+    }.ToFrozenDictionary();
 
     private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> typedefs)
     {
