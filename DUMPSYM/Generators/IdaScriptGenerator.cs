@@ -8,7 +8,6 @@
 namespace DUMPSYM.Generators;
 
 public sealed class IdaScriptGenerator(IdaGenerator generator)
-// TODO return nice typedef like u_long
 // TODO encountered classes for parameters: REGPARM, ARG, REG, AUTO
 // TODO there are things inside function blocks, see if they're useful
 // BUG some functions are wrong, e.g. 8003dbd0 is previous one in IDA
@@ -171,7 +170,13 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
         {
             Assert.IsTrue(parameter.Tag is null);
 
-            return $"{SymbolGenerator.ToString(parameter.Type!.Value.Kind)}{pointers} {parameter.Name}";
+            // TODO DRY this typedef override stuff
+
+            var kindEnum = parameter.Type!.Value.Kind;
+
+            var kindText = Generator.TypedefsOverrides.GetValueOrDefault(kindEnum, SymbolGenerator.ToString(kindEnum));
+
+            return $"{kindText}{pointers} {parameter.Name}";
         }
     }
 

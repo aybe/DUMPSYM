@@ -66,7 +66,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.OUT", generate);
 
-        Validate(generate, "8dd5b25fdd62f4230c8b8461f594e2853f3f4e2fea617473c56abd0abac4d7d5");
+        Validate(generate, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
     }
 
     private static void Validate(string text, string sha256)
