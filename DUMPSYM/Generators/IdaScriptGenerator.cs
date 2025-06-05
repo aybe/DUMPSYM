@@ -11,6 +11,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 // TODO return nice typedef like u_long
 // TODO encountered classes for parameters: REGPARM, ARG, REG, AUTO
 // TODO there are things inside function blocks, see if they're useful
+// BUG some functions are wrong, e.g. 8003dbd0 is previous one in IDA
 {
     private IdaGenerator Generator { get; } = generator;
 
