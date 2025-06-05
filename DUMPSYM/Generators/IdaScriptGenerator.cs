@@ -108,7 +108,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
         else
         {
             Assert.IsFalse(returns.HasFakeTag);
-            returnType = returns.Name!;
+            returnType = returns.Tag!;
         }
 
         var parameters = symbols.TakeWhile(s => s.Record is not ISymbolFunctionBlock).Where(s => s.Record is ISymbolDefinition).ToArray();
