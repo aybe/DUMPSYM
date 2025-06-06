@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.CodeDom.Compiler;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -79,6 +80,28 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
         var output = writer.ToString();
 
         return output;
+    }
+
+    public string GenerateFunctionPrototypes()
+    {
+        using var writer = new IndentedTextWriter(new StringWriter());
+
+        writer.WriteLine($"# {Functions.Count} function prototypes");
+
+        writer.WriteLine("dumpsym_function_prototypes = [");
+
+        writer.Indent++;
+
+        foreach (var function in Functions)
+        {
+            writer.WriteLine("""(0x{0:X8}, "{1}", "{2}"),""", function.Header.Address, function.Name, function.Declaration);
+        }
+
+        writer.Indent--;
+
+        writer.WriteLine("]");
+
+        return writer.InnerWriter.ToString()!;
     }
 
     private IdaFunction ParseFunction(Symbol[] symbols)
