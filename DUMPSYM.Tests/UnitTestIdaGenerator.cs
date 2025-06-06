@@ -60,15 +60,17 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         var scriptGenerator = new IdaScriptGenerator(generator);
 
-        var generate = scriptGenerator.Generate(Sample.Default);
+        var output = scriptGenerator.Generate(Sample.Default);
 
-        WriteFunctionPrototypes(scriptGenerator);
+        WriteFunctionPrototypes(output);
 
-        WriteLine(generate);
+        var functions = output.GetFunctionsAsDebugString();
 
-        File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.OUT", generate);
+        WriteLine(functions);
 
-        Validate(generate, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
+        File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.OUT", functions);
+
+        Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
     }
 
     private static void Validate(string text, string sha256)
@@ -78,11 +80,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         Assert.AreEqual(sha256, hash, true);
     }
 
-    private void WriteFunctionPrototypes(IdaScriptGenerator scriptGenerator)
+    private void WriteFunctionPrototypes(IdaScriptGeneratorOutput output)
     {
-        var prototypes = scriptGenerator.GenerateFunctionPrototypes();
-
-        WriteLine(prototypes);
+        var prototypes = output.GetFunctionsAsPythonList();
 
         const string directory = @"C:\Files\GitHub\DUMPSYM\IDA";
 

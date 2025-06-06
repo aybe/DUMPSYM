@@ -1,5 +1,4 @@
-﻿using System.CodeDom.Compiler;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -21,15 +20,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
     private Symbol[] Symbols { get; set; } = null!; // TODO
 
-    private bool WriteComments { get; } = true;
-
-    private bool WriteDeclaration { get; } = true;
-
-    private bool WriteNewLines { get; } = true;
-
-    private List<IdaFunction> Functions { get; } = [];
-
-    public string Generate(SymbolFile file)
+    public IdaScriptGeneratorOutput Generate(SymbolFile file)
     {
         Symbols = file.Symbols.ToArray();
 
@@ -43,67 +34,18 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
             s => s,
             s => SymbolsByAddress[s.Header.Address].Single(t => t.Class is SymbolStorageClass.EXT or SymbolStorageClass.STAT));
 
+        var output = new IdaScriptGeneratorOutput();
+
         foreach (var symbols in funcs)
         {
             var function = ParseFunction(symbols);
 
-            Functions.Add(function);
+            output.Functions.Add(function);
         }
-
-        using var writer = new StringWriter();
-
-        foreach (var function in Functions)
-        {
-            writer.WriteLine($"// {function.Name}");
-            writer.WriteLine($"// {function.File}");
-            writer.WriteLine($"// {function.Header}");
-
-            if (WriteComments)
-            {
-                foreach (var comment in function.Comments)
-                {
-                    writer.WriteLine($"// {comment}");
-                }
-            }
-
-            if (WriteDeclaration)
-            {
-                writer.WriteLine(function.Declaration);
-            }
-
-            if (WriteNewLines)
-            {
-                writer.WriteLine();
-            }
-        }
-
-        var output = writer.ToString();
 
         return output;
     }
-
-    public string GenerateFunctionPrototypes()
-    {
-        using var writer = new IndentedTextWriter(new StringWriter());
-
-        writer.WriteLine($"# {Functions.Count} function prototypes");
-
-        writer.WriteLine("dumpsym_function_prototypes = [");
-
-        writer.Indent++;
-
-        foreach (var function in Functions)
-        {
-            writer.WriteLine("""(0x{0:X8}, "{1}", "{2}"),""", function.Header.Address, function.Name, function.Declaration);
-        }
-
-        writer.Indent--;
-
-        writer.WriteLine("]");
-
-        return writer.InnerWriter.ToString()!;
-    }
-
+    
     private IdaFunction ParseFunction(Symbol[] symbols)
     {
         var first = symbols[0];
