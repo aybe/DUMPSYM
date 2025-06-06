@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.CodeDom.Compiler;
+using System.Security.Cryptography;
 using System.Text;
 using DUMPSYM.Generators;
 
@@ -9,6 +10,8 @@ namespace DUMPSYM.Tests;
 [TestClass]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
+    private static string IdaOutputDirectory => Directory.CreateDirectory(@"C:\Files\GitHub\DUMPSYM\IDA").FullName;
+
     private static IdaGenerator GetGenerator()
     {
         var file = Sample.Default;
@@ -60,7 +63,23 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         var scriptGenerator = new IdaScriptGenerator(generator);
 
-        var output = scriptGenerator.Generate(Sample.Default);
+        var file = Sample.Default;
+
+        var output = scriptGenerator.Generate(file);
+
+        var variables = file.Symbols.Where(s => s.IsVariable);
+
+        foreach (var variable in variables)
+        {
+            if (output.Functions.Any(s => s.Header.Address == variable.Header.Address))
+            {
+                continue;
+            }
+
+            Console.WriteLine(variable);
+        }
+
+        GenerateScriptForNames(file);
 
         WriteFunctionPrototypes(output);
 
@@ -71,6 +90,30 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.OUT", functions);
 
         Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
+    }
+
+    private static void GenerateScriptForNames(SymbolFile file)
+    {
+        using var writer = new IndentedTextWriter(new StringWriter());
+
+        var names = file.Symbols.Where(s => s.IsVariable).ToArray();
+
+        writer.WriteLine($"# {names.Length} names");
+
+        writer.WriteLine("dumpsym_names = [");
+
+        writer.Indent++;
+
+        foreach (var symbol in names)
+        {
+            writer.WriteLine("""(0x{0:X8}, "{1}"),""", symbol.Header.Address, ((ISymbolVariable)symbol.Record).Name);
+        }
+
+        writer.Indent--;
+
+        writer.WriteLine("]");
+
+        File.WriteAllText(Path.Combine(IdaOutputDirectory, "dumpsym_names.py"), writer.InnerWriter.ToString());
     }
 
     private static void Validate(string text, string sha256)
@@ -84,11 +127,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     {
         var prototypes = output.GetFunctionsAsPythonList();
 
-        const string directory = @"C:\Files\GitHub\DUMPSYM\IDA";
-
-        Directory.CreateDirectory(directory);
-
-        var path = Path.Combine(directory, "dumpsym_function_prototypes.py");
+        var path = Path.Combine(IdaOutputDirectory, "dumpsym_function_prototypes.py");
 
         File.WriteAllText(path, prototypes);
     }

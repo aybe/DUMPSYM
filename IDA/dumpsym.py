@@ -1,4 +1,16 @@
+# autopep8: off
+
+import dumpsym_function_prototypes
+import dumpsym_names
+import importlib
+
+importlib.reload(dumpsym_function_prototypes)
+importlib.reload(dumpsym_names)
+
 from dumpsym_function_prototypes import dumpsym_function_prototypes
+from dumpsym_names import dumpsym_names
+
+# autopep8: on
 
 
 def dumpsym_initialize():
@@ -22,7 +34,7 @@ def dumpsym_apply_function_prototype(addr: int, name: str, decl: str) -> bool:
         print(f"Failed to set function prototype declaration.")
         return False
 
-    if not idc.set_name(addr, name):
+    if not idc.set_name(addr, name):  # TODO remove
         print(f"Failed to set function prototype name.")
         return False
 
@@ -38,8 +50,21 @@ def dumpsym_apply_function_prototypes(prototypes):
             break
 
 
+def dumpsym_apply_names(names):
+    import idc
+    import ida_name
+    print(f"Applying {len(names)} names...")
+    for addr, name in names:
+        print(f"Applying name to {hex(addr)}: {name}")
+        if not idc.set_name(addr, name, ida_name.SN_DELTAIL | ida_name.SN_FORCE):
+            print(f"Failed to set name {name} at {hex(addr)}")
+            break
+
+
 dumpsym_initialize()
 
 dumpsym_apply_function_prototypes(dumpsym_function_prototypes)
+
+dumpsym_apply_names(dumpsym_names)
 
 dumpsym_cleanup()
