@@ -52,7 +52,7 @@ public sealed class IdaScriptGeneratorOutput
 
         foreach (var function in Functions)
         {
-            writer.WriteLine("""(0x{0:X8}, "{1}", "{2}"),""", function.Header.Address, function.Name, function.Declaration);
+            writer.WriteLine("""(0x{0:X8}, "{1}"),""", function.Header.Address, function.Declaration);
         }
 
         writer.Indent--;

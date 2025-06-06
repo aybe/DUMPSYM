@@ -26,16 +26,11 @@ def dumpsym_cleanup():
     ida_kernwin.process_ui_action("hx:GenPseudo")
 
 
-def dumpsym_apply_function_prototype(addr: int, name: str, decl: str) -> bool:
+def dumpsym_apply_function_prototype(addr: int, decl: str) -> bool:
     import ida_typeinf
-    import idc
 
     if not ida_typeinf.apply_cdecl(None, addr, decl):
         print(f"Failed to set function prototype declaration.")
-        return False
-
-    if not idc.set_name(addr, name):  # TODO remove
-        print(f"Failed to set function prototype name.")
         return False
 
     return True
@@ -45,7 +40,7 @@ def dumpsym_apply_function_prototypes(prototypes):
     print(f"Applying {len(prototypes)} function prototypes...")
     for addr, name, decl in prototypes:
         print(f"Applying function prototype to {hex(addr)}")
-        if not dumpsym_apply_function_prototype(addr, name, decl):
+        if not dumpsym_apply_function_prototype(addr, decl):
             print("Applying function prototype failed, aborting.")
             break
 
