@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordSetSldLineNum : SymbolRecord, ISymbolLineModifier
 {
-    public SymbolRecordSetSldLineNum()
-    {
-    }
-
     public SymbolRecordSetSldLineNum(SymbolContext context)
     {
         Line = context.Line = context.Read<uint>();

@@ -1,6 +1,5 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordEndSldInfo : SymbolRecord, ISymbolFileEnd
 {
     public override string ToString()

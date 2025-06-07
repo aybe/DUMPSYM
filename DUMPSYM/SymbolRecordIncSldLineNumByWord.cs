@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLineModifier
 {
-    public SymbolRecordIncSldLineNumByWord()
-    {
-    }
-
     public SymbolRecordIncSldLineNumByWord(SymbolContext context)
     {
         Increment = context.Read<ushort>();

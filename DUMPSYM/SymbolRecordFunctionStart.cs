@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordFunctionStart : SymbolRecord, ISymbolFunction
 {
-    public SymbolRecordFunctionStart()
-    {
-    }
-
     public SymbolRecordFunctionStart(SymbolContext context)
     {
         FramePointer = context.Read<ushort>();

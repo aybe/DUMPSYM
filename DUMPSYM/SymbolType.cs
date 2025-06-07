@@ -1,6 +1,5 @@
 namespace DUMPSYM;
 
-[Serializable]
 public record struct SymbolType
 {
     public SymbolType(SymbolTypeKind kind, params SymbolTypeModifier[] modifiers)

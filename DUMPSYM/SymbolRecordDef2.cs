@@ -3,24 +3,9 @@ using JetBrains.Annotations;
 
 namespace DUMPSYM;
 
-[Serializable]
 [NoReorder]
 public sealed record SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
 {
-    public SymbolRecordDef2()
-    {
-    }
-
-    public SymbolRecordDef2(SymbolStorageClass @class, SymbolType type, uint size, uint[] dimensions, string tag, string name)
-    {
-        Class = @class;
-        Type = type;
-        Size = size;
-        Dimensions = dimensions;
-        Tag = tag;
-        Name = name;
-    }
-
     public SymbolRecordDef2(SymbolContext context)
     {
         Class = context.Read<SymbolStorageClass>();

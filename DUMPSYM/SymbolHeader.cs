@@ -2,13 +2,8 @@ using Whatever.Extensions;
 
 namespace DUMPSYM;
 
-[Serializable]
 public record struct SymbolHeader
 {
-    public SymbolHeader()
-    {
-    }
-
     public SymbolHeader(Stream stream)
     {
         Position = stream.Position;

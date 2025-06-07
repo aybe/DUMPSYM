@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordBlockEnd : SymbolRecord, ISymbolFunctionBlock
 {
-    public SymbolRecordBlockEnd()
-    {
-    }
-
     public SymbolRecordBlockEnd(SymbolContext context)
     {
         Line = context.Read<uint>();

@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordSetSldToLineOfFile : SymbolRecord, ISymbolFileStart
 {
-    public SymbolRecordSetSldToLineOfFile()
-    {
-    }
-
     public SymbolRecordSetSldToLineOfFile(SymbolContext context)
     {
         Line = context.Line = context.Read<uint>();

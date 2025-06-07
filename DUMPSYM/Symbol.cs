@@ -3,13 +3,8 @@ using DUMPSYM.Extensions;
 
 namespace DUMPSYM;
 
-[Serializable]
 public sealed partial class Symbol
 {
-    public Symbol()
-    {
-    }
-
     public Symbol(SymbolHeader header, SymbolRecord record)
     {
         Header = header;

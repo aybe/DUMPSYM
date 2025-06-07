@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordFunction2Start : SymbolRecord, ISymbolFunction
 {
-    public SymbolRecordFunction2Start()
-    {
-    }
-
     public SymbolRecordFunction2Start(SymbolContext context)
     {
         FMask = context.Read<uint>();

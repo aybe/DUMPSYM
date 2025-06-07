@@ -1,12 +1,7 @@
 namespace DUMPSYM;
 
-[Serializable]
 public sealed record SymbolRecordOverlay : SymbolRecord, ISymbolOverlay
 {
-    public SymbolRecordOverlay()
-    {
-    }
-
     public SymbolRecordOverlay(SymbolContext context)
     {
         Length = context.Read<uint>();
