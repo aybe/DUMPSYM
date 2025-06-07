@@ -1,11 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿// ReSharper disable All
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-// ReSharper disable StringLiteralTypo
+namespace DUMPSYM.Versions;
 
-namespace dumpsym_cli;
-
-public static class Program
+/// <summary>
+///     https://github.com/lab313ru/dumpsym_src
+/// </summary>
+public static class OriginalManaged
 {
     private static readonly byte[] ClassTypes =
     {
@@ -14,7 +16,7 @@ public static class Program
         0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
     };
 
-    private static int Main(string[] args)
+    private static int __main(string[] args)
     {
         if (args.Length != 1)
         {

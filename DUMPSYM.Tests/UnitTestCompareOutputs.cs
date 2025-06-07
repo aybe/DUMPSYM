@@ -17,7 +17,7 @@ public sealed class UnitTestCompareOutputs : UnitTestBase
             consoleCapture.OutputToSource = false;
             consoleCapture.OutputToTarget = true;
 
-            Globals.__main(["", path]);
+            Original.__main(["", path]);
 
             source = consoleCapture.ToString();
         }

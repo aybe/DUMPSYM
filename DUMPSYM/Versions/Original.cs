@@ -1,19 +1,18 @@
-﻿// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable CommentTypo
-// ReSharper disable StringLiteralTypo
-
+﻿// ReSharper disable All
 using DUMPSYM.Extensions;
 
-namespace DUMPSYM.Tests;
+namespace DUMPSYM;
 
-public static class Globals
+/// <summary>
+///     https://github.com/lab313ru/dumpsym_src
+/// </summary>
+public static class Original
 {
     private static readonly byte[] class_types =
     {
         0x6B, 0x6A, 0x69, 0x68, 0x67, 0x66, 0x65, 0x13, 0x12,
         0x11, 0x10, 0x0F, 0x0E, 0x0D, 0x0C, 0x0B, 0x0A, 0x09,
-        0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
+        0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00,
     };
 
     private static unsafe void parse_class(uint class_type1)
@@ -27,10 +26,12 @@ public static class Globals
         }
 
         var index = 28;
+
         fixed (byte* tp = &class_types[0])
         {
             var b = tp;
             bool found;
+
             do
             {
                 if (index == 0)
@@ -73,7 +74,7 @@ public static class Globals
                 25 => "LINE",
                 26 => "ALIAS",
                 27 => "HIDDEN",
-                _  => throw new NotSupportedException(index.ToString())
+                _  => throw new NotSupportedException(index.ToString()),
             };
 
             Console.Write($"{type} ");
@@ -93,7 +94,7 @@ public static class Globals
                 0 => throw new NotSupportedException(type1.ToString()),
                 1 => "PTR",
                 2 => "FCN",
-                _ => "ARY"
+                _ => "ARY",
             };
 
             Console.Write($"{type2} ");
@@ -119,7 +120,7 @@ public static class Globals
             13 => "USHORT",
             14 => "UINT",
             15 => "ULONG",
-            _  => throw new NotSupportedException(class_type2.ToString())
+            _  => throw new NotSupportedException(class_type2.ToString()),
         };
 
         Console.Write($"{type} ");
@@ -128,13 +129,13 @@ public static class Globals
     private static string ReadString(Stream stream)
     {
         var count = stream.ReadByte();
-        
+
         var ascii = stream.ReadStringAscii(count);
 
         return ascii;
     }
 
-    internal static int __main(string[] args)
+    public static int __main(string[] args)
     {
         if (args.Length != 2)
         {
@@ -168,12 +169,14 @@ public static class Globals
         {
             int tag;
             uint offset;
+
             while (true)
             {
                 var bin_pos = (int)f.Position;
                 Console.Write($"{bin_pos:x6}: ");
                 offset = f.ReadUInt32();
                 tag = f.ReadByte();
+
                 if (tag != 8)
                 {
                     break;
@@ -272,6 +275,7 @@ public static class Globals
                     Console.Write($"size {class_def2_obj_size} ");
                     var class_def2_dims_count = f.ReadUInt16();
                     Console.Write($"dims {class_def2_dims_count} ");
+
                     for (; class_def2_dims_count != 0; --class_def2_dims_count)
                     {
                         var class_def2_dim = f.ReadUInt32();
