@@ -22,5 +22,5 @@ public enum SymbolStorageClass : ushort
     REGPARM = 0x11,
     FIELD   = 0x12,
     EOS     = 0x66,
-    FILE    = 0x67
+    FILE    = 0x67,
 }

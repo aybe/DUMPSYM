@@ -101,7 +101,7 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
                 0x92 => new SymbolRecordBlockEnd(ctx),
                 0x9A => new SymbolRecordSetOverlay(),
                 0x9C => new SymbolRecordFunction2Start(ctx),
-                _    => throw new NotImplementedException($"0x{hdr.Type:x2} @ {stream.Position - 5:X8}")
+                _    => throw new NotImplementedException($"0x{hdr.Type:x2} @ {stream.Position - 5:X8}"),
             };
 
             symbols.Add(new Symbol(hdr, rec));

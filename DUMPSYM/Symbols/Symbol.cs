@@ -36,7 +36,7 @@ public sealed partial class Symbol
             new(s => s.IsFileHeader(), s => s.IsFileFooter()),
             new(s => s.IsFunctionHeader(), s => s.IsFunctionFooter()),
             new(s => s.IsStructHeader(), s => s.IsTypeFooter()),
-            new(s => s.IsUnionHeader(), s => s.IsTypeFooter())
+            new(s => s.IsUnionHeader(), s => s.IsTypeFooter()),
         };
 
         for (var i = 0; i < records.Length; i++)

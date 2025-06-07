@@ -21,5 +21,5 @@ public enum SymbolTypeKind : ushort
     UCHAR  = 0xC,
     USHORT = 0xD,
     UINT   = 0xE,
-    ULONG  = 0xF
+    ULONG  = 0xF,
 }

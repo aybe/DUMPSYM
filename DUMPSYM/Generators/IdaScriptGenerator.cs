@@ -46,7 +46,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         return output;
     }
-    
+
     private IdaFunction ParseFunction(Symbol[] symbols)
     {
         var first = symbols[0];

@@ -1,4 +1,5 @@
 ﻿// ReSharper disable All
+
 using DUMPSYM.Extensions;
 
 namespace DUMPSYM;

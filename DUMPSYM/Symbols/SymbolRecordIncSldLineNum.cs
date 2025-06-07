@@ -7,7 +7,7 @@ public sealed record SymbolRecordIncSldLineNum : SymbolRecord, ISymbolLineModifi
         Line = context.Line += 1;
     }
 
-    private uint Line { get; set; }
+    private uint Line { get; }
 
     public override string ToString()
     {

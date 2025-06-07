@@ -31,7 +31,7 @@ public static class StreamExtensions
 
         return value;
     }
-    
+
     public static uint ReadUInt32(this Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(uint)];
