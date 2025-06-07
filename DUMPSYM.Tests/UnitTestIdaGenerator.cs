@@ -13,9 +13,18 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 {
     private static string IdaOutputDirectory => Directory.CreateDirectory(@"C:\Files\GitHub\DUMPSYM\IDA").FullName;
 
+    private static SymbolFile GetSampleFile(string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM")
+    {
+        using var stream = File.OpenRead(path);
+
+        var file = SymbolFile.Dump(stream);
+
+        return file;
+    }
+
     private static IdaGenerator GetGenerator()
     {
-        var file = Sample.Default;
+        var file = GetSampleFile();
 
         var options = new IdaHeaderGeneratorOptions
         {
@@ -64,7 +73,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         var scriptGenerator = new IdaScriptGenerator(generator);
 
-        var file = Sample.Default;
+        var file = GetSampleFile();
 
         var output = scriptGenerator.Generate(file);
 
