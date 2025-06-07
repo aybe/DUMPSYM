@@ -82,9 +82,6 @@ public sealed partial class Symbol
 {
     private static Regex RegexFakeName { get; } = new(@"^\.\d+fake$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    public static IComparer<Symbol> PositionComparer { get; } =
-        Comparer<Symbol>.Create((x, y) => x.Header.Position.CompareTo(y.Header.Position));
-
     #region ISymbolDefinition
 
     public SymbolStorageClass? Class => Record is ISymbolDefinition d ? d.Class : null;
@@ -107,8 +104,6 @@ public sealed partial class Symbol
 
     #region Extras
 
-    public string? File => Record is ISymbolFileStart f ? f.File : null;
-
     public bool HasFakeName => !string.IsNullOrEmpty(Name) && RegexFakeName.IsMatch(Name);
 
     public bool HasFakeTag => !string.IsNullOrEmpty(Tag) && RegexFakeName.IsMatch(Tag);
@@ -127,37 +122,7 @@ public sealed partial class Symbol
 
     public bool IsTypeHeader => Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG;
 
-    public bool IsTypeFooter => Class is SymbolStorageClass.EOS;
-
     public bool IsVariable => Record is ISymbolVariable;
 
     #endregion
-}
-
-public sealed partial class Symbol
-{
-    public static IEqualityComparer<Symbol> RecordEqualityComparer { get; } = new RecordEqualityComparerImpl();
-
-    private sealed class RecordEqualityComparerImpl : EqualityComparer<Symbol>
-    {
-        public override bool Equals(Symbol? x, Symbol? y)
-        {
-            if (ReferenceEquals(x, y))
-            {
-                return true;
-            }
-
-            if (x is null || y is null)
-            {
-                return false;
-            }
-
-            return x.Record.Equals(y.Record);
-        }
-
-        public override int GetHashCode(Symbol obj)
-        {
-            return obj.Record.GetHashCode();
-        }
-    }
 }

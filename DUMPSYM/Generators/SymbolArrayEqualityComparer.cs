@@ -8,11 +8,6 @@ public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
     }
 
     /// <summary>
-    ///     Compare header/footer/members.
-    /// </summary>
-    public static SymbolArrayEqualityComparer Everything { get; } = new(new Range(0, ^0));
-
-    /// <summary>
     ///     Compare members only.
     /// </summary>
     public static SymbolArrayEqualityComparer Members { get; } = new(new Range(1, ^1));

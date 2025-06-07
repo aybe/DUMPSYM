@@ -1,5 +1,4 @@
 using System.Collections;
-using Newtonsoft.Json;
 using Whatever.Extensions;
 
 namespace DUMPSYM;
@@ -26,13 +25,6 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
     public int TargetUnit { get; set; }
 
     public List<Symbol> Symbols { get; set; } = null!;
-
-    [JsonIgnore]
-    public SortedList<SymbolHeader, SymbolRecord> Records => RecordsLazy.Value;
-
-    [JsonIgnore]
-    private Lazy<SortedList<SymbolHeader, SymbolRecord>> RecordsLazy => 
-        new(() => new SortedList<SymbolHeader, SymbolRecord>(Symbols.ToDictionary(s => s.Header, s => s.Record), SymbolHeader.PositionComparer));
 
     public IEnumerator<SymbolRecord> GetEnumerator()
     {

@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace DUMPSYM;
 
 [Serializable]
@@ -21,10 +19,8 @@ public record struct SymbolType
 
     public ushort Value { get; set; }
 
-    [JsonIgnore]
     public SymbolTypeKind Kind => (SymbolTypeKind)(Value & 0xF);
 
-    [JsonIgnore]
     public IEnumerable<SymbolTypeModifier> Modifiers
     {
         get

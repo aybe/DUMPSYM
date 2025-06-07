@@ -63,7 +63,7 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
 
         var tag = def == null ? GetSafeName(header) : def.Tag == def.Name || def.HasFakeTag ? def.Name! : def.Tag!;
 
-        tag = $"{SymbolGenerator.ToString((def ?? header).Type!.Value.Kind)} {tag}";
+        tag = $"{IdaGenerator.ToString((def ?? header).Type!.Value.Kind)} {tag}";
 
         Writer.WriteLine2($"{tag} ", $"// {def}".TrimEnd());
 
@@ -118,11 +118,11 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
 
     private void GenerateTypedefBasic(Symbol def)
     {
-        var tdef = SymbolGenerator.ToString(SymbolStorageClass.TPDEF);
+        var tdef = IdaGenerator.ToString(SymbolStorageClass.TPDEF);
 
         var type = def.Type!.Value;
 
-        var kind = SymbolGenerator.ToString(type.Kind);
+        var kind = IdaGenerator.ToString(type.Kind);
 
         var mods = type.Modifiers.ToArray();
 
@@ -163,7 +163,7 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
     {
         var memberType = member.Type!.Value;
 
-        var kind = SymbolGenerator.ToString(memberType.Kind);
+        var kind = IdaGenerator.ToString(memberType.Kind);
 
         if (string.IsNullOrWhiteSpace(member.Tag))
         {

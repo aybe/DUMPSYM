@@ -412,8 +412,6 @@ DUMPSYM/Properties/launchSettings.json
 *.sym.md
 *.sym.txt
 *.txt
-TestData
-Project1/**/*.cpp
 *.dgml
 *.out
 IDA/dumpsym_function_prototypes.py

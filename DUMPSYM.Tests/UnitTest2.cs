@@ -3,8 +3,6 @@ namespace DUMPSYM.Tests;
 [TestClass]
 public class UnitTest2
 {
-    public required TestContext TestContext { get; set; }
-
     [TestMethod]
     public void TestMethod1()
     {

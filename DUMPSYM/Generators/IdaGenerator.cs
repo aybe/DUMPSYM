@@ -109,4 +109,57 @@ public sealed class IdaGenerator
 
         symbols.InsertRange(index + 1, array);
     }
+
+    public static string ToString(SymbolStorageClass value)
+    {
+        var s = value switch
+        {
+            SymbolStorageClass.AUTO    => null,
+            SymbolStorageClass.EXT     => "extern",
+            SymbolStorageClass.STAT    => "static",
+            SymbolStorageClass.REG     => null,
+            SymbolStorageClass.LABEL   => null,
+            SymbolStorageClass.MOS     => null,
+            SymbolStorageClass.ARG     => null,
+            SymbolStorageClass.STRTAG  => "struct",
+            SymbolStorageClass.MOU     => null,
+            SymbolStorageClass.UNTAG   => "union",
+            SymbolStorageClass.TPDEF   => "typedef",
+            SymbolStorageClass.ENTAG   => "enum",
+            SymbolStorageClass.MOE     => null,
+            SymbolStorageClass.REGPARM => null,
+            SymbolStorageClass.FIELD   => null,
+            SymbolStorageClass.EOS     => null,
+            SymbolStorageClass.FILE    => null,
+            _                          => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+        };
+
+        return s ?? throw new NotImplementedException(value.ToString());
+    }
+
+    public static string ToString(SymbolTypeKind value)
+    {
+        var s = value switch
+        {
+            SymbolTypeKind.NULL   => "null",
+            SymbolTypeKind.VOID   => "void",
+            SymbolTypeKind.CHAR   => "char",
+            SymbolTypeKind.SHORT  => "short",
+            SymbolTypeKind.INT    => "int",
+            SymbolTypeKind.LONG   => "long",
+            SymbolTypeKind.FLOAT  => "float",
+            SymbolTypeKind.DOUBLE => "double",
+            SymbolTypeKind.STRUCT => "struct",
+            SymbolTypeKind.UNION  => "union",
+            SymbolTypeKind.ENUM   => "enum",
+            SymbolTypeKind.MOE    => null,
+            SymbolTypeKind.UCHAR  => "unsigned char",
+            SymbolTypeKind.USHORT => "unsigned short",
+            SymbolTypeKind.UINT   => "unsigned int",
+            SymbolTypeKind.ULONG  => "unsigned long",
+            _                     => throw new ArgumentOutOfRangeException(nameof(value), value, null),
+        };
+
+        return s ?? throw new NotImplementedException(value.ToString());
+    }
 }

@@ -68,7 +68,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         if (returns.Tag == null)
         {
-            returnType = SymbolGenerator.ToString(type.Kind);
+            returnType = IdaGenerator.ToString(type.Kind);
         }
         else
         {
@@ -129,7 +129,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
             Assert.IsTrue(kind is SymbolTypeKind.STRUCT or SymbolTypeKind.UNION);
 
-            return $"{SymbolGenerator.ToString(kind)} {type.Name}{pointers} {parameter.Name}";
+            return $"{IdaGenerator.ToString(kind)} {type.Name}{pointers} {parameter.Name}";
         }
         else
         {
@@ -139,7 +139,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
             var kindEnum = parameter.Type!.Value.Kind;
 
-            var kindText = Generator.TypedefsOverrides.GetValueOrDefault(kindEnum, SymbolGenerator.ToString(kindEnum));
+            var kindText = Generator.TypedefsOverrides.GetValueOrDefault(kindEnum, IdaGenerator.ToString(kindEnum));
 
             return $"{kindText}{pointers} {parameter.Name}";
         }

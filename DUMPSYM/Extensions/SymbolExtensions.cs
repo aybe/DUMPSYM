@@ -1,16 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace DUMPSYM.Extensions;
+﻿namespace DUMPSYM.Extensions;
 
 public static class SymbolExtensions // TODO move
 {
     #region Is*
-
-    public static bool IsLineModifier(this ISymbol symbol)
-    {
-        return symbol is ISymbolLineModifier;
-    }
 
     public static bool IsExternal(this ISymbol symbol)
     {
@@ -32,200 +24,18 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.STAT };
     }
 
-    public static bool IsType(this ISymbol symbol)
-    {
-        return IsType(symbol, out _);
-    }
-
-    public static bool IsType(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
-    {
-        result = null;
-
-        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG } def)
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
-    public static bool IsType(this ISymbol symbol, Predicate<ISymbolDefinition> predicate)
-    {
-        return IsType(symbol, predicate, out _);
-    }
-
-    public static bool IsType(this ISymbol symbol, Predicate<ISymbolDefinition> predicate, [MaybeNullWhen(false)] out ISymbolDefinition result)
-    {
-        result = null;
-
-        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG } def && predicate(def))
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
     public static bool IsTypedef(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF };
-    }
-
-    public static bool IsTypedef(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
-    {
-        result = null;
-
-        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def)
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
-    public static bool IsTypedef1(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition result)
-    {
-        result = null;
-
-        if (symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def and not ISymbolDefinition2)
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
-    public static bool IsTypedef2(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition2 result)
-    {
-        result = null;
-
-        if (symbol is ISymbolDefinition2 { Class: SymbolStorageClass.TPDEF } def)
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
-    public static bool IsTypedef2(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolDefinition2 result, Func<ISymbolDefinition2, bool> predicate)
-    {
-        result = null;
-
-        if (symbol.IsTypedef2(out var def) && predicate(def))
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
-    public static bool IsTypedef(this ISymbol symbol, Predicate<ISymbolDefinition> predicate)
-    {
-        return symbol is ISymbolDefinition { Class: SymbolStorageClass.TPDEF } def && predicate(def);
-    }
-
-    #endregion
-
-    #region Single
-
-    private static List<ISymbol> Where(List<ISymbol> symbols, Func<ISymbol, bool> predicate)
-    {
-        return symbols.Where(predicate).ToList();
-    }
-
-    public static List<ISymbol> GetExternals(List<ISymbol> symbols)
-    {
-        return Where(symbols, s => s is ISymbolDefinition { Class: SymbolStorageClass.EXT });
-    }
-
-    public static List<ISymbol> GetFilesOrphans(List<ISymbol> symbols)
-    {
-        return Where(symbols, s => s is ISymbolFileEnd);
-    }
-
-    public static List<ISymbol> GetStatics(List<ISymbol> symbols)
-    {
-        return Where(symbols, s => s is ISymbolDefinition { Class: SymbolStorageClass.STAT });
-    }
-
-    public static List<ISymbol> GetTypedefs(List<ISymbol> symbols)
-    {
-        return Where(symbols, s => s is ISymbolDefinition { Class: SymbolStorageClass.TPDEF });
-    }
-
-    public static List<ISymbol> GetVariables(List<ISymbol> symbols)
-    {
-        return Where(symbols, s => s is ISymbolVariable);
     }
 
     #endregion
 
     #region Multiple
 
-    private static List<List<ISymbol>> GetSymbols(List<ISymbol> symbols, Predicate<ISymbol> header, Predicate<ISymbol> footer)
-    {
-        var lists = new List<List<ISymbol>>();
-
-        var index = 0;
-
-        while (true)
-        {
-            var headerIndex = symbols.FindIndex(index, header);
-
-            if (headerIndex == -1)
-            {
-                break;
-            }
-
-            index = headerIndex;
-
-            var footerIndex = symbols.FindIndex(index, footer);
-
-            index = footerIndex + 1;
-
-            var list = symbols[headerIndex..(footerIndex + 1)];
-
-            lists.Add(list);
-        }
-
-        return lists;
-    }
-
-    public static List<List<ISymbol>> GetFiles(List<ISymbol> symbols)
-    {
-        return GetSymbols(symbols, s => s.IsFileHeader(), s => s.IsFileFooter());
-    }
-
-    public static List<List<ISymbol>> GetFunctions(List<ISymbol> symbols)
-    {
-        return GetSymbols(symbols, s => s.IsFunctionHeader(), s => s.IsFunctionFooter());
-    }
-
-    public static List<List<ISymbol>> GetStructs(List<ISymbol> symbols)
-    {
-        return GetSymbols(symbols, s => s.IsStructHeader(), s => s.IsTypeFooter());
-    }
-
-    public static List<List<ISymbol>> GetUnions(List<ISymbol> symbols)
-    {
-        return GetSymbols(symbols, s => s.IsUnionHeader(), s => s.IsTypeFooter());
-    }
-
     public static bool IsFileHeader(this ISymbol symbol)
     {
         return symbol is ISymbolFileStart;
-    }
-
-    public static bool IsFileHeader(this ISymbol symbol, [MaybeNullWhen(false)] out ISymbolFileStart result)
-    {
-        result = null;
-
-        if (symbol is ISymbolFileStart start)
-        {
-            result = start;
-        }
-
-        return result != null;
     }
 
     public static bool IsFileFooter(this ISymbol symbol)
@@ -257,96 +67,6 @@ public static class SymbolExtensions // TODO move
     public static bool IsTypeFooter(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" };
-    }
-
-    public static bool IsTypeFooter(this ISymbol symbol, ISymbolDefinition type)
-    {
-        return symbol is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def && def.Tag == type.Name;
-    }
-
-    public static bool IsTypeFooter(this ISymbol symbol, ISymbolDefinition type, [MaybeNullWhen(false)] out ISymbolDefinition2 result)
-    {
-        result = null;
-
-        if (symbol is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def && def.Tag == type.Name)
-        {
-            result = def;
-        }
-
-        return result != null;
-    }
-
-    #endregion
-
-    #region Obsolete // TODO delete
-
-    [Obsolete("Use other functions.")]
-    public static List<LinkedList<SymbolRecord>> GetTypes(LinkedList<SymbolRecord> records)
-    {
-        var types = new List<LinkedList<SymbolRecord>>();
-
-        var current = records.First;
-
-        while (current != null)
-        {
-            if (!TryFindNode(IsHeader, current, out current, out var header))
-            {
-                continue;
-            }
-
-            var headerNode = current!;
-
-            if (!TryFindNode(IsFooter, current, out current, out var footer))
-            {
-                continue;
-            }
-
-            var footerNode = current!;
-
-            Assert.AreEqual(header!.Name, footer!.Tag);
-
-            var type = new LinkedList<SymbolRecord>();
-
-            type.CopyFrom(headerNode, footerNode);
-
-            types.Add(type);
-        }
-
-        return types;
-
-        static ISymbolDefinition? IsHeader(SymbolRecord record)
-        {
-            return record is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT } def ? def : null;
-        }
-
-        static ISymbolDefinition2? IsFooter(SymbolRecord record)
-        {
-            return record is ISymbolDefinition2 { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" } def ? def : null;
-        }
-    }
-
-    private static bool TryFindNode<TNode, TResult>(
-        Selector<TNode, TResult> selector, LinkedListNode<TNode>? from, out LinkedListNode<TNode>? next, out TResult? result)
-    {
-        next = default;
-
-        result = default;
-
-        for (var node = from; node != null; node = node.Next)
-        {
-            result = selector(node.Value);
-
-            if (result == null)
-            {
-                continue;
-            }
-
-            next = node;
-
-            return true;
-        }
-
-        return false;
     }
 
     #endregion
