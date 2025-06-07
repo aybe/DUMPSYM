@@ -11,6 +11,6 @@ public sealed record SymbolRecordFunctionEnd : SymbolRecord, ISymbolFunctionEnd
 
     public override string ToString()
     {
-        return $"Function_end   line {Line}";
+        return $"Function end   line {Line}";
     }
 }

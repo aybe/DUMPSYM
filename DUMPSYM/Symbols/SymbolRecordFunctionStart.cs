@@ -32,7 +32,7 @@ public sealed record SymbolRecordFunctionStart : SymbolRecord, ISymbolFunction
 
     public override string ToString()
     {
-        return $"Function_start\r\n" +
+        return $"Function start\r\n" +
                $"    fp = {FramePointer}\r\n" +
                $"    fsize = {Size}\r\n" +
                $"    retreg = {ReturnAddressRegister}\r\n" +
