@@ -1,4 +1,6 @@
-﻿namespace DUMPSYM.Generators;
+﻿using DUMPSYM.Symbols;
+
+namespace DUMPSYM.Generators;
 
 public sealed class SymbolArrayEqualityComparer : EqualityComparer<Symbol[]>
 {

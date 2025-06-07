@@ -1,4 +1,5 @@
 ﻿using System.Collections.Frozen;
+using DUMPSYM.Symbols;
 
 namespace DUMPSYM.Generators;
 

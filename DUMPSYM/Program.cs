@@ -1,4 +1,4 @@
-﻿using DUMPSYM;
+﻿using DUMPSYM.Symbols;
 
 if (args.Length != 1)
 {

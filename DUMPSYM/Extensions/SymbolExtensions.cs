@@ -1,4 +1,6 @@
-﻿namespace DUMPSYM.Extensions;
+﻿using DUMPSYM.Symbols;
+
+namespace DUMPSYM.Extensions;
 
 public static class SymbolExtensions // TODO move
 {

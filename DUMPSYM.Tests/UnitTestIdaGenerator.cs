@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using DUMPSYM.Generators;
+using DUMPSYM.Symbols;
 
 // ReSharper disable StringLiteralTypo
 

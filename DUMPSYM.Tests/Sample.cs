@@ -1,4 +1,6 @@
-﻿namespace DUMPSYM.Tests;
+﻿using DUMPSYM.Symbols;
+
+namespace DUMPSYM.Tests;
 
 public static class Sample
 {

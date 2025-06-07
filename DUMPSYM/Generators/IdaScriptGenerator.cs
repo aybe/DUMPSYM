@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DUMPSYM.Symbols;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo

@@ -1,5 +1,6 @@
 ﻿using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
+using DUMPSYM.Symbols;
 
 // ReSharper disable IdentifierTypo
 

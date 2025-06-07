@@ -1,9 +1,0 @@
-namespace DUMPSYM;
-
-public abstract record SymbolRecord : ISymbol // TODO make these really true records without setters
-{
-    public override string ToString()
-    {
-        return string.Empty;
-    }
-}
