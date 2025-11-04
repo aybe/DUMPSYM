@@ -417,3 +417,4 @@ DUMPSYM/Properties/launchSettings.json
 IDA/dumpsym_function_prototypes.py
 IDA/dumpsym_names.py
 MAIN.SYM*
+Output/

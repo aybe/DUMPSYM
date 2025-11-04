@@ -3,17 +3,21 @@ using System.Security.Cryptography;
 using System.Text;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
+using JetBrains.Annotations;
 
 // ReSharper disable StringLiteralTypo
 
 namespace DUMPSYM.Tests;
 
 [TestClass]
+[UsedImplicitly]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
-    private static string IdaOutputDirectory => Directory.CreateDirectory(@"C:\Files\GitHub\DUMPSYM\IDA").FullName;
+    private static string OutputDirectory { get; } = Directory.CreateDirectory(Path.Combine(Solution.Directory, "Output")).FullName;
 
-    private static SymbolFile GetSampleFile(string path = @"C:\Files\GitHub\DUMPSYM\MAIN.SYM")
+    private static string IdaOutputDirectory { get; } = Directory.CreateDirectory(Path.Combine(OutputDirectory, "IDA")).FullName;
+
+    private static SymbolFile GetSampleFile(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
     {
         using var stream = File.OpenRead(path);
 
@@ -22,9 +26,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         return file;
     }
 
-    private static IdaGenerator GetGenerator()
+    private static IdaGenerator GetGenerator(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
     {
-        var file = GetSampleFile();
+        var file = GetSampleFile(path);
 
         var options = new IdaHeaderGeneratorOptions
         {
@@ -61,7 +65,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         WriteLine(generate);
 
-        File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.H", generate);
+        File.WriteAllText(Path.Combine(OutputDirectory, "MAIN.SYM.H"), generate);
 
         Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
     }
@@ -97,7 +101,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         WriteLine(functions);
 
-        File.WriteAllText(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM.OUT", functions);
+        File.WriteAllText(Path.Combine(OutputDirectory, "MAIN.SYM.OUT"), functions);
 
         Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
     }
