@@ -134,7 +134,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             Console.WriteLine(variable);
         }
 
-        GenerateScriptForNames(file);
+        var names = GenerateScriptForNames(file);
+
+        File.WriteAllText(Path.Combine(pair.Target, "dumpsym_names.py"), names);
 
         WriteFunctionPrototypes(output);
 
@@ -154,7 +156,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         }
     }
 
-    private static void GenerateScriptForNames(SymbolFile file)
+    private static string? GenerateScriptForNames(SymbolFile file)
     {
         using var writer = new IndentedTextWriter(new StringWriter());
 
@@ -175,7 +177,11 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         writer.WriteLine("]");
 
-        File.WriteAllText(Path.Combine(IdaOutputDirectory, "dumpsym_names.py"), writer.InnerWriter.ToString());
+        writer.Flush();
+
+        var contents = writer.InnerWriter.ToString();
+
+        return contents;
     }
 
     private static void Validate(string text, string sha256)
