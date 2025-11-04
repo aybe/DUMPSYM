@@ -15,10 +15,6 @@ namespace DUMPSYM.Tests;
 [UsedImplicitly]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
-    private static string OutputDirectory { get; } = Directory.CreateDirectory(Path.Combine(Solution.Directory, "Output")).FullName;
-
-    private static string IdaOutputDirectory { get; } = Directory.CreateDirectory(Path.Combine(OutputDirectory, "IDA")).FullName;
-
     private static SymbolFile GetSampleFile(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
     {
         using var stream = File.OpenRead(path);
@@ -138,7 +134,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         File.WriteAllText(Path.Combine(pair.Target, "dumpsym_names.py"), names);
 
-        WriteFunctionPrototypes(output);
+        var prototypes = output.GetFunctionsAsPythonList();
+
+        File.WriteAllText(Path.Combine(pair.Target, "dumpsym_function_prototypes.py"), prototypes);
 
         var functions = output.GetFunctionsAsDebugString();
 
@@ -189,15 +187,6 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
 
         Assert.AreEqual(sha256, hash, true);
-    }
-
-    private void WriteFunctionPrototypes(IdaScriptGeneratorOutput output)
-    {
-        var prototypes = output.GetFunctionsAsPythonList();
-
-        var path = Path.Combine(IdaOutputDirectory, "dumpsym_function_prototypes.py");
-
-        File.WriteAllText(path, prototypes);
     }
 
     [PublicAPI]
