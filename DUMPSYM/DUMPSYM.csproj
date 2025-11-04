@@ -5,7 +5,7 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<PublishAot>true</PublishAot>
+		<!--<PublishAot>true</PublishAot>--> <!--BUG screws LUT stack trace-->
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
