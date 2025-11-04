@@ -54,7 +54,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(TestHeaderGeneratorData), DynamicDataDisplayName = nameof(TestHeaderGeneratorName))]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
     public void TestHeaderGenerator(TestPair pair)
     {
         var (source, target) = pair;
@@ -86,12 +86,12 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         }
     }
 
-    public static string TestHeaderGeneratorName(MethodInfo methodInfo, object[] data)
+    public static string GetTestName(MethodInfo methodInfo, object[] data)
     {
         return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
     }
 
-    public static IEnumerable<object[]> TestHeaderGeneratorData()
+    public static IEnumerable<object[]> GetTestData()
     {
         var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
 
@@ -107,7 +107,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(TestHeaderGeneratorData), DynamicDataDisplayName = nameof(TestHeaderGeneratorName))]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
     public void TestScriptGenerator(TestPair pair)
     {
         var generator = GetGenerator(pair.Source);
