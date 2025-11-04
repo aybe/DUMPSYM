@@ -110,13 +110,15 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     }
 
     [TestMethod]
-    public void TestScriptGenerator()
+    [UsedImplicitly]
+    [DynamicData(nameof(TestHeaderGeneratorData), DynamicDataDisplayName = nameof(TestHeaderGeneratorName))]
+    public void TestScriptGenerator(TestPair pair)
     {
-        var generator = GetGenerator();
+        var generator = GetGenerator(pair.Source);
 
         var scriptGenerator = new IdaScriptGenerator(generator);
 
-        var file = GetSampleFile();
+        var file = GetSampleFile(pair.Source);
 
         var output = scriptGenerator.Generate(file);
 
@@ -140,9 +142,16 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         WriteLine(functions);
 
-        File.WriteAllText(Path.Combine(OutputDirectory, "MAIN.SYM.OUT"), functions);
+        var name = Path.GetFileName(pair.Source);
 
-        Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
+        File.WriteAllText(Path.Combine(pair.Target, Path.ChangeExtension(name, ".out")), functions);
+
+        switch (name) // TODO others
+        {
+            case "MAIN.SYM":
+                Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
+                break;
+        }
     }
 
     private static void GenerateScriptForNames(SymbolFile file)
