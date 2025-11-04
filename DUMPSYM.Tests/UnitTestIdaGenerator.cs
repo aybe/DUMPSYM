@@ -15,7 +15,7 @@ namespace DUMPSYM.Tests;
 [UsedImplicitly]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
-    private static SymbolFile GetSampleFile(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
+    private static SymbolFile GetSampleFile(string path)
     {
         using var stream = File.OpenRead(path);
 
@@ -24,7 +24,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         return file;
     }
 
-    private static IdaGenerator GetGenerator(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
+    private static IdaGenerator GetGenerator(string path)
     {
         var file = GetSampleFile(path);
 
