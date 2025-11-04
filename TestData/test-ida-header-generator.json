@@ -1,0 +1,14 @@
+[
+  {
+    "source": "C:\\GitHub\\DUMPSYM\\Tests\\Source\\Destruction Derby (Japan)\\DEMOLISH.SYM",
+    "target": "C:\\GitHub\\DUMPSYM\\Tests\\Target\\Destruction Derby (Japan)"
+  },
+  {
+    "source": "C:\\GitHub\\DUMPSYM\\Tests\\Source\\Hi-Octane (Europe) (En,Fr,De,Es)\\MAIN.SYM",
+    "target": "C:\\GitHub\\DUMPSYM\\Tests\\Target\\Hi-Octane (Europe) (En,Fr,De,Es)"
+  },
+  {
+    "source": "C:\\GitHub\\DUMPSYM\\Tests\\Source\\Wipeout XL (USA) (Beta)\\NTSC.SYM",
+    "target": "C:\\GitHub\\DUMPSYM\\Tests\\Target\\Wipeout XL (USA) (Beta)"
+  }
+]
