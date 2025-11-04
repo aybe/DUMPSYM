@@ -15,43 +15,6 @@ namespace DUMPSYM.Tests;
 [UsedImplicitly]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
-    private static SymbolFile GetSampleFile(string path)
-    {
-        using var stream = File.OpenRead(path);
-
-        var file = SymbolFile.Dump(stream);
-
-        return file;
-    }
-
-    private static IdaGenerator GetGenerator(string path)
-    {
-        var file = GetSampleFile(path);
-
-        var options = new IdaHeaderGeneratorOptions
-        {
-            RemoveTypedefs =
-            [
-                "PSBYTE",
-                "PSLONG",
-                "PSWORD",
-                "PUBYTE",
-                "PULONG",
-                "PUWORD",
-                "SBYTE",
-                "SLONG",
-                "SWORD",
-                "UBYTE",
-                "ULONG",
-                "UWORD",
-            ],
-        };
-
-        var generator = new IdaGenerator(file.Symbols.ToList(), options);
-
-        return generator;
-    }
-
     [TestMethod]
     [UsedImplicitly]
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
@@ -83,25 +46,6 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             case "MAIN.SYM":
                 Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
                 break;
-        }
-    }
-
-    public static string GetTestName(MethodInfo methodInfo, object[] data)
-    {
-        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
-    }
-
-    public static IEnumerable<object[]> GetTestData()
-    {
-        var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
-
-        var text = File.ReadAllText(path);
-
-        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
-
-        foreach (var pair in data)
-        {
-            yield return [pair];
         }
     }
 
@@ -151,6 +95,62 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             case "MAIN.SYM":
                 Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
                 break;
+        }
+    }
+
+    private static SymbolFile GetSampleFile(string path)
+    {
+        using var stream = File.OpenRead(path);
+
+        var file = SymbolFile.Dump(stream);
+
+        return file;
+    }
+
+    private static IdaGenerator GetGenerator(string path)
+    {
+        var file = GetSampleFile(path);
+
+        var options = new IdaHeaderGeneratorOptions
+        {
+            RemoveTypedefs =
+            [
+                "PSBYTE",
+                "PSLONG",
+                "PSWORD",
+                "PUBYTE",
+                "PULONG",
+                "PUWORD",
+                "SBYTE",
+                "SLONG",
+                "SWORD",
+                "UBYTE",
+                "ULONG",
+                "UWORD",
+            ],
+        };
+
+        var generator = new IdaGenerator(file.Symbols.ToList(), options);
+
+        return generator;
+    }
+
+    public static string GetTestName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
+    }
+
+    public static IEnumerable<object[]> GetTestData()
+    {
+        var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
+
+        var text = File.ReadAllText(path);
+
+        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
+
+        foreach (var pair in data)
+        {
+            yield return [pair];
         }
     }
 
