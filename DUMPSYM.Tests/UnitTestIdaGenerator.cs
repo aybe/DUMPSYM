@@ -90,7 +90,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         var name = Path.GetFileName(pair.Source);
 
-        File.WriteAllText(Path.Combine(pair.Target, Path.ChangeExtension(name, ".out")), functions);
+        File.WriteAllText(Path.Combine(pair.Target, Path.ChangeExtension(name, ".functions.txt")), functions);
 
         switch (name) // TODO others
         {
