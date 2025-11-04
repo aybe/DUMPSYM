@@ -27,9 +27,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             throw new FileNotFoundException(null, source);
         }
 
-        var file = GetSampleFile(source);
+        var file = GetSymbolFile(source);
 
-        var generator = GetGenerator(file);
+        var generator = GetSymbolGenerator(file);
 
         using var headerGenerator = new IdaHeaderGenerator(generator);
 
@@ -56,9 +56,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
     public void TestScriptGenerator(TestPair pair)
     {
-        var file = GetSampleFile(pair.Source);
+        var file = GetSymbolFile(pair.Source);
 
-        var generator = GetGenerator(file);
+        var generator = GetSymbolGenerator(file);
 
         var scriptGenerator = new IdaScriptGenerator(generator);
 
@@ -76,7 +76,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             Console.WriteLine(variable);
         }
 
-        var names = GenerateScriptForNames(file);
+        var names = GetSymbolNamesScript(file);
 
         File.WriteAllText(Path.Combine(pair.Target, "dumpsym_names.py"), names);
 
@@ -100,7 +100,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         }
     }
 
-    private static SymbolFile GetSampleFile(string path)
+    private static SymbolFile GetSymbolFile(string path)
     {
         using var stream = File.OpenRead(path);
 
@@ -109,7 +109,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         return file;
     }
 
-    private static IdaGenerator GetGenerator(SymbolFile file)
+    private static IdaGenerator GetSymbolGenerator(SymbolFile file)
     {
         var options = new IdaHeaderGeneratorOptions
         {
@@ -154,7 +154,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         }
     }
 
-    private static string? GenerateScriptForNames(SymbolFile file)
+    private static string? GetSymbolNamesScript(SymbolFile file)
     {
         using var writer = new IndentedTextWriter(new StringWriter());
 
