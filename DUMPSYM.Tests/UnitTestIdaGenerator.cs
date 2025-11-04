@@ -58,6 +58,8 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     {
         var file = GetSymbolFile(pair.Source);
 
+        File.WriteAllText(Path.Combine(pair.Target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(pair.Source), ".dumpsym.txt")), file.ToString());
+
         var generator = GetSymbolGenerator(file);
 
         var scriptGenerator = new IdaScriptGenerator(generator);
