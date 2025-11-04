@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using DUMPSYM.Generators;
@@ -55,9 +56,16 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     }
 
     [TestMethod]
-    public void TestHeaderGenerator()
+    [UsedImplicitly]
+    [DynamicData(nameof(TestHeaderGeneratorData), DynamicDataDisplayName = nameof(TestHeaderGeneratorName))]
+    public void TestHeaderGenerator(string sourceFile, string targetDirectory)
     {
-        var generator = GetGenerator();
+        if (!File.Exists(sourceFile))
+        {
+            throw new FileNotFoundException(null, sourceFile);
+        }
+
+        var generator = GetGenerator(sourceFile);
 
         using var headerGenerator = new IdaHeaderGenerator(generator);
 
@@ -65,9 +73,42 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         WriteLine(generate);
 
-        File.WriteAllText(Path.Combine(OutputDirectory, "MAIN.SYM.H"), generate);
+        Directory.CreateDirectory(targetDirectory);
 
-        Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
+        var path = Path.Combine(targetDirectory, Path.ChangeExtension(Path.GetFileNameWithoutExtension(sourceFile), ".H"));
+
+        File.WriteAllText(path, generate);
+
+        switch (Path.GetFileName(sourceFile)) // TODO others
+        {
+            case "MAIN.SYM":
+                Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
+                break;
+        }
+    }
+
+    public static string TestHeaderGeneratorName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name}(\"{Path.GetFileName(data[0] as string)}\")";
+    }
+
+    public static IEnumerable<object[]> TestHeaderGeneratorData() // TODO use JSON file
+    {
+        return
+        [
+            [
+                @"C:\GitHub\DUMPSYM\Tests\Source\Destruction Derby (Japan)\DEMOLISH.SYM",
+                @"C:\GitHub\DUMPSYM\Tests\Target\Destruction Derby (Japan)",
+            ],
+            [
+                @"C:\GitHub\DUMPSYM\Tests\Source\Hi-Octane (Europe) (En,Fr,De,Es)\MAIN.SYM",
+                @"C:\GitHub\DUMPSYM\Tests\Target\Hi-Octane (Europe) (En,Fr,De,Es)",
+            ],
+            [
+                @"C:\GitHub\DUMPSYM\Tests\Source\Wipeout XL (USA) (Beta)\NTSC.SYM",
+                @"C:\GitHub\DUMPSYM\Tests\Target\Wipeout XL (USA) (Beta)",
+            ],
+        ];
     }
 
     [TestMethod]
