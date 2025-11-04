@@ -100,6 +100,25 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         }
     }
 
+    public static IEnumerable<object[]> GetTestData()
+    {
+        var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
+
+        var text = File.ReadAllText(path);
+
+        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
+
+        foreach (var pair in data)
+        {
+            yield return [pair];
+        }
+    }
+
+    public static string GetTestName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
+    }
+
     private static SymbolFile GetSymbolFile(string path)
     {
         using var stream = File.OpenRead(path);
@@ -133,25 +152,6 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         var generator = new IdaGenerator(file.Symbols.ToList(), options);
 
         return generator;
-    }
-
-    public static string GetTestName(MethodInfo methodInfo, object[] data)
-    {
-        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
-    }
-
-    public static IEnumerable<object[]> GetTestData()
-    {
-        var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
-
-        var text = File.ReadAllText(path);
-
-        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
-
-        foreach (var pair in data)
-        {
-            yield return [pair];
-        }
     }
 
     private static string? GetSymbolNamesScript(SymbolFile file)
