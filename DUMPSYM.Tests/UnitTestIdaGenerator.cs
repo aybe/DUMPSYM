@@ -102,7 +102,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
     public static IEnumerable<object[]> GetTestData()
     {
-        var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
+        var path = Path.Combine(Solution.Directory, "Tests", "test-ida-generators.json");
 
         var text = File.ReadAllText(path);
 
