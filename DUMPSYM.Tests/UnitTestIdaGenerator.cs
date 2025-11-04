@@ -56,9 +56,11 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
     public void TestScriptGenerator(TestPair pair)
     {
-        var file = GetSymbolFile(pair.Source);
+        var (source, target) = pair;
 
-        File.WriteAllText(Path.Combine(pair.Target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(pair.Source), ".dumpsym.txt")), file.ToString());
+        var file = GetSymbolFile(source);
+
+        File.WriteAllText(Path.Combine(target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(source), ".dumpsym.txt")), file.ToString());
 
         var generator = GetSymbolGenerator(file);
 
@@ -80,19 +82,19 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         var names = GetSymbolNamesScript(file);
 
-        File.WriteAllText(Path.Combine(pair.Target, "dumpsym_names.py"), names);
+        File.WriteAllText(Path.Combine(target, "dumpsym_names.py"), names);
 
         var prototypes = output.GetFunctionsAsPythonList();
 
-        File.WriteAllText(Path.Combine(pair.Target, "dumpsym_function_prototypes.py"), prototypes);
+        File.WriteAllText(Path.Combine(target, "dumpsym_function_prototypes.py"), prototypes);
 
         var functions = output.GetFunctionsAsDebugString();
 
         WriteLine(functions);
 
-        var name = Path.GetFileName(pair.Source);
+        var name = Path.GetFileName(source);
 
-        File.WriteAllText(Path.Combine(pair.Target, Path.ChangeExtension(name, ".functions.txt")), functions);
+        File.WriteAllText(Path.Combine(target, Path.ChangeExtension(name, ".functions.txt")), functions);
 
         switch (name) // TODO others
         {
