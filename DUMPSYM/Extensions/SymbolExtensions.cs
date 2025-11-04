@@ -55,6 +55,11 @@ public static class SymbolExtensions // TODO move
         return symbol is ISymbolFunctionEnd;
     }
 
+    public static bool IsEnumHeader(this ISymbol symbol)
+    {
+        return symbol is ISymbolDefinition { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM };
+    }
+
     public static bool IsStructHeader(this ISymbol symbol)
     {
         return symbol is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT };

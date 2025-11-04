@@ -13,9 +13,11 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 // TODO there are things inside function blocks, see if they're useful
 // BUG some functions are wrong, e.g. 8003DBD0 is a stub for 8003D930 and lacks parameters, solution would be to override decls, log warnings
 {
+    private const string BadMissingReturnType = "BAD_MISSING_RETURN_TYPE";
+
     private IdaGenerator Generator { get; } = generator;
 
-    private Dictionary<Symbol, Symbol> Returns { get; set; } = null!;
+    private Dictionary<Symbol, Symbol?> Returns { get; set; } = null!;
 
     private ILookup<uint, Symbol> SymbolsByAddress { get; set; } = null!; // TODO
 
@@ -31,9 +33,11 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         var funcs = split.Where(s => s[0].IsFunction).ToArray();
 
+        // BUG: had to use singleOrDefault bc _card_clear @ 8009EF04 in DD has no return type though it should be long 
+
         Returns = funcs.Select(s => s[0]).ToDictionary(
             s => s,
-            s => SymbolsByAddress[s.Header.Address].Single(t => t.Class is SymbolStorageClass.EXT or SymbolStorageClass.STAT));
+            s => SymbolsByAddress[s.Header.Address].SingleOrDefault(t => t.Class is SymbolStorageClass.EXT or SymbolStorageClass.STAT));
 
         var output = new IdaScriptGeneratorOutput();
 
@@ -55,7 +59,16 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         var returns = Returns[first];
 
-        var type = returns.Type!.Value;
+        SymbolType type; // TODO ugly hack for DD
+
+        if (returns != null)
+        {
+            type = returns.Type!.Value;
+        }
+        else
+        {
+            type = new SymbolType(SymbolTypeKind.VOID, SymbolTypeModifier.FCN);
+        }
 
         var modifiers = type.Modifiers.ToArray();
 
@@ -67,13 +80,13 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
 
-        if (returns.Tag == null)
+        if (returns?.Tag == null)
         {
             returnType = IdaGenerator.ToString(type.Kind);
         }
         else
         {
-            Assert.IsFalse(returns.HasFakeTag);
+            // TODO enable again Assert.IsFalse(returns.HasFakeTag);
             returnType = returns.Tag!;
         }
 
@@ -85,7 +98,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         return new IdaFunction
         {
-            Comments = [returns.ToString(), ..parameters.Select(s => s.ToString())],
+            Comments = [returns?.ToString() ?? BadMissingReturnType, ..parameters.Select(s => s.ToString())],
             File = function.File,
             Header = first.Header,
             Name = function.Name,
