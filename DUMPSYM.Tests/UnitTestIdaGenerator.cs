@@ -27,7 +27,9 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
             throw new FileNotFoundException(null, source);
         }
 
-        var generator = GetGenerator(source);
+        var file = GetSampleFile(source);
+
+        var generator = GetGenerator(file);
 
         using var headerGenerator = new IdaHeaderGenerator(generator);
 
@@ -54,11 +56,11 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
     public void TestScriptGenerator(TestPair pair)
     {
-        var generator = GetGenerator(pair.Source);
+        var file = GetSampleFile(pair.Source);
+
+        var generator = GetGenerator(file);
 
         var scriptGenerator = new IdaScriptGenerator(generator);
-
-        var file = GetSampleFile(pair.Source);
 
         var output = scriptGenerator.Generate(file);
 
@@ -107,10 +109,8 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         return file;
     }
 
-    private static IdaGenerator GetGenerator(string path)
+    private static IdaGenerator GetGenerator(SymbolFile file)
     {
-        var file = GetSampleFile(path);
-
         var options = new IdaHeaderGeneratorOptions
         {
             RemoveTypedefs =
