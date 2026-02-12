@@ -35,4 +35,21 @@ public sealed record SymbolRecordFunction2Start : SymbolRecord, ISymbolFunction
     public string File { get; set; } = null!;
 
     public string Name { get; set; } = null!;
+
+    public override string ToString()
+    {
+        // BUG: should be DUMPSYM style
+        return
+            $"{base.ToString()}, " +
+            $"{nameof(FMask)}: {FMask}, " +
+            $"{nameof(FMaskOffset)}: {FMaskOffset}, " +
+            $"{nameof(FramePointer)}: {FramePointer}, " +
+            $"{nameof(Size)}: {Size}, " +
+            $"{nameof(ReturnAddressRegister)}: {ReturnAddressRegister}, " +
+            $"{nameof(Mask)}: {Mask}, " +
+            $"{nameof(MaskOffset)}: {MaskOffset}, " +
+            $"{nameof(Line)}: {Line}, " +
+            $"{nameof(File)}: {File}, " +
+            $"{nameof(Name)}: {Name}";
+    }
 }

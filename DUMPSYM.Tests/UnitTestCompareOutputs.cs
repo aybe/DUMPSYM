@@ -7,7 +7,7 @@ namespace DUMPSYM.Tests;
 public sealed class UnitTestCompareOutputs : UnitTestBase
 {
     [TestMethod]
-    [DataRow(@"C:\Files\GitHub\DUMPSYM\MAIN.SYM")]
+    [DataRow(@"C:\GitHub\DUMPSYM\MAIN.SYM")]
     public void TestCompareOutputs(string path)
     {
         string source;
