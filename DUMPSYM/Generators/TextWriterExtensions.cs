@@ -6,7 +6,7 @@ namespace DUMPSYM.Generators;
 
 public static class TextWriterExtensions
 {
-    private const int DefaultPadding = 40;
+    private const int DefaultPadding = 50;
 
     private static FieldInfo TabString { get; } =
         typeof(IndentedTextWriter)
