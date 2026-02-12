@@ -153,7 +153,7 @@ public sealed class IdaGenerator
             SymbolTypeKind.STRUCT => "struct",
             SymbolTypeKind.UNION  => "union",
             SymbolTypeKind.ENUM   => "enum",
-            SymbolTypeKind.MOE    => null,
+            SymbolTypeKind.MOE    => "", // TODO enum ends with , not ;
             SymbolTypeKind.UCHAR  => "unsigned char",
             SymbolTypeKind.USHORT => "unsigned short",
             SymbolTypeKind.UINT   => "unsigned int",

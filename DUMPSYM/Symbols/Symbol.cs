@@ -35,6 +35,7 @@ public sealed partial class Symbol
             new(s => s.IsFileEnd(), s => s.IsFileEnd()),
             new(s => s.IsFileHeader(), s => s.IsFileFooter()),
             new(s => s.IsFunctionHeader(), s => s.IsFunctionFooter()),
+            new(s => s.IsEnumHeader(), s => s.IsTypeFooter()),
             new(s => s.IsStructHeader(), s => s.IsTypeFooter()),
             new(s => s.IsUnionHeader(), s => s.IsTypeFooter()),
         };
@@ -115,7 +116,7 @@ public sealed partial class Symbol
 
     public bool IsTypeDefinition => Class is SymbolStorageClass.TPDEF;
 
-    public bool IsTypeHeader => Class is SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG;
+    public bool IsTypeHeader => Class is SymbolStorageClass.ENTAG or SymbolStorageClass.STRTAG or SymbolStorageClass.UNTAG;
 
     public bool IsVariable => Record is ISymbolVariable;
 

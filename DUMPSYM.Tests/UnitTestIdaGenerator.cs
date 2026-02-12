@@ -15,11 +15,115 @@ namespace DUMPSYM.Tests;
 [UsedImplicitly]
 public sealed class UnitTestIdaGenerator : UnitTestBase
 {
-    private static string OutputDirectory { get; } = Directory.CreateDirectory(Path.Combine(Solution.Directory, "Output")).FullName;
+    [TestMethod]
+    [UsedImplicitly]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
+    public void TestHeaderGenerator(TestPair pair)
+    {
+        var (source, target) = pair;
 
-    private static string IdaOutputDirectory { get; } = Directory.CreateDirectory(Path.Combine(OutputDirectory, "IDA")).FullName;
+        if (!File.Exists(source))
+        {
+            throw new FileNotFoundException(null, source);
+        }
 
-    private static SymbolFile GetSampleFile(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
+        var file = GetSymbolFile(source);
+
+        var generator = GetSymbolGenerator(file);
+
+        using var headerGenerator = new IdaHeaderGenerator(generator);
+
+        var generate = headerGenerator.Generate();
+
+        WriteLine(generate);
+
+        Directory.CreateDirectory(target);
+
+        var path = Path.Combine(target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(source), ".H"));
+
+        File.WriteAllText(path, generate);
+
+        switch (Path.GetFileName(source)) // TODO others
+        {
+            case "MAIN.SYM":
+                Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
+                break;
+        }
+    }
+
+    [TestMethod]
+    [UsedImplicitly]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
+    public void TestScriptGenerator(TestPair pair)
+    {
+        var (source, target) = pair;
+
+        var file = GetSymbolFile(source);
+
+        File.WriteAllText(Path.Combine(target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(source), ".dumpsym.txt")), file.ToString());
+
+        var generator = GetSymbolGenerator(file);
+
+        var scriptGenerator = new IdaScriptGenerator(generator);
+
+        var output = scriptGenerator.Generate(file);
+
+        var variables = file.Symbols.Where(s => s.IsVariable);
+
+        foreach (var variable in variables)
+        {
+            if (output.Functions.Any(s => s.Header.Address == variable.Header.Address))
+            {
+                continue;
+            }
+
+            Console.WriteLine(variable);
+        }
+
+        var names = GetSymbolNamesScript(file);
+
+        File.WriteAllText(Path.Combine(target, "dumpsym_names.py"), names);
+
+        var prototypes = output.GetFunctionsAsPythonList();
+
+        File.WriteAllText(Path.Combine(target, "dumpsym_function_prototypes.py"), prototypes);
+
+        var functions = output.GetFunctionsAsDebugString();
+
+        WriteLine(functions);
+
+        var name = Path.GetFileName(source);
+
+        File.WriteAllText(Path.Combine(target, Path.ChangeExtension(name, ".functions.txt")), functions);
+
+        switch (name) // TODO others
+        {
+            case "MAIN.SYM":
+                Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
+                break;
+        }
+    }
+
+    public static IEnumerable<object[]> GetTestData()
+    {
+        var path = Path.Combine(Solution.Directory, "Tests", "test-ida-generators.json");
+
+        var text = File.ReadAllText(path);
+
+        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
+
+        foreach (var pair in data)
+        {
+            yield return [pair];
+        }
+    }
+
+    public static string GetTestName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
+    }
+
+    private static SymbolFile GetSymbolFile(string path)
     {
         using var stream = File.OpenRead(path);
 
@@ -28,10 +132,8 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         return file;
     }
 
-    private static IdaGenerator GetGenerator(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
+    private static IdaGenerator GetSymbolGenerator(SymbolFile file)
     {
-        var file = GetSampleFile(path);
-
         var options = new IdaHeaderGeneratorOptions
         {
             RemoveTypedefs =
@@ -56,96 +158,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         return generator;
     }
 
-    [TestMethod]
-    [UsedImplicitly]
-    [DynamicData(nameof(TestHeaderGeneratorData), DynamicDataDisplayName = nameof(TestHeaderGeneratorName))]
-    public void TestHeaderGenerator(TestPair pair)
-    {
-        var (source, target) = pair;
-
-        if (!File.Exists(source))
-        {
-            throw new FileNotFoundException(null, source);
-        }
-
-        var generator = GetGenerator(source);
-
-        using var headerGenerator = new IdaHeaderGenerator(generator);
-
-        var generate = headerGenerator.Generate();
-
-        WriteLine(generate);
-
-        Directory.CreateDirectory(target);
-
-        var path = Path.Combine(target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(source), ".H"));
-
-        File.WriteAllText(path, generate);
-
-        switch (Path.GetFileName(source)) // TODO others
-        {
-            case "MAIN.SYM":
-                Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
-                break;
-        }
-    }
-
-    public static string TestHeaderGeneratorName(MethodInfo methodInfo, object[] data)
-    {
-        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
-    }
-
-    public static IEnumerable<object[]> TestHeaderGeneratorData()
-    {
-        var path = Path.Combine(Solution.Directory, "TestData", "test-ida-header-generator.json");
-
-        var text = File.ReadAllText(path);
-
-        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
-
-        foreach (var pair in data)
-        {
-            yield return [pair];
-        }
-    }
-
-    [TestMethod]
-    public void TestScriptGenerator()
-    {
-        var generator = GetGenerator();
-
-        var scriptGenerator = new IdaScriptGenerator(generator);
-
-        var file = GetSampleFile();
-
-        var output = scriptGenerator.Generate(file);
-
-        var variables = file.Symbols.Where(s => s.IsVariable);
-
-        foreach (var variable in variables)
-        {
-            if (output.Functions.Any(s => s.Header.Address == variable.Header.Address))
-            {
-                continue;
-            }
-
-            Console.WriteLine(variable);
-        }
-
-        GenerateScriptForNames(file);
-
-        WriteFunctionPrototypes(output);
-
-        var functions = output.GetFunctionsAsDebugString();
-
-        WriteLine(functions);
-
-        File.WriteAllText(Path.Combine(OutputDirectory, "MAIN.SYM.OUT"), functions);
-
-        Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
-    }
-
-    private static void GenerateScriptForNames(SymbolFile file)
+    private static string? GetSymbolNamesScript(SymbolFile file)
     {
         using var writer = new IndentedTextWriter(new StringWriter());
 
@@ -166,7 +179,11 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         writer.WriteLine("]");
 
-        File.WriteAllText(Path.Combine(IdaOutputDirectory, "dumpsym_names.py"), writer.InnerWriter.ToString());
+        writer.Flush();
+
+        var contents = writer.InnerWriter.ToString();
+
+        return contents;
     }
 
     private static void Validate(string text, string sha256)
@@ -174,15 +191,6 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
 
         Assert.AreEqual(sha256, hash, true);
-    }
-
-    private void WriteFunctionPrototypes(IdaScriptGeneratorOutput output)
-    {
-        var prototypes = output.GetFunctionsAsPythonList();
-
-        var path = Path.Combine(IdaOutputDirectory, "dumpsym_function_prototypes.py");
-
-        File.WriteAllText(path, prototypes);
     }
 
     [PublicAPI]
