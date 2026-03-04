@@ -10,7 +10,7 @@ namespace DUMPSYM.Tests;
 
 [TestClass]
 [UsedImplicitly]
-public sealed class TestIdaGenerator : TestBase
+public sealed class TestGenerators : TestBase
 {
     #region New region
 
