@@ -6,7 +6,7 @@ namespace DUMPSYM.Tests;
 public sealed class TestCompareOutputs : TestBase
 {
     [TestMethod]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestCompare(string sourcePath, string targetPath)
     {
         var source = GetSourceText(sourcePath);

@@ -49,7 +49,7 @@ public abstract class TestBase
         WriteLine($"{valueName}: {value}");
     }
 
-    public static IEnumerable<object[]> GetTestData()
+    public static IEnumerable<object[]> GetDynamicTestData()
     {
         var path = Path.Combine(Solution.Directory, "Tests", "test-ida-generators.json");
 
@@ -63,7 +63,7 @@ public abstract class TestBase
         }
     }
 
-    public static string GetTestName(MethodInfo methodInfo, object[] data)
+    public static string GetDynamicTestName(MethodInfo methodInfo, object[] data)
     {
         return $"{methodInfo.Name}(\"{Path.GetFileName((string)data[0])}\")";
     }

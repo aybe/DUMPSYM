@@ -17,7 +17,7 @@ public sealed class TestIdaGenerator : TestBase
 {
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestHeaderGenerator(string sourcePath, string targetPath)
     {
         if (!File.Exists(sourcePath))
@@ -51,7 +51,7 @@ public sealed class TestIdaGenerator : TestBase
 
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestScriptGenerator(string sourcePath, string targetPath)
     {
         var file = GetSymbolFile(sourcePath);
