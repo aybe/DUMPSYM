@@ -7,13 +7,11 @@ public sealed class UnitTestCompareOutputs : UnitTestBase
 {
     [TestMethod]
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
-    public void TestCompareOutputs(TestPair pair)
+    public void TestCompareOutputs(string sourcePath, string targetPath)
     {
-        var path = pair.Source;
+        var source = GetSourceText(sourcePath);
 
-        var source = GetSourceText(path);
-
-        var target = GetTargetText(path);
+        var target = GetTargetText(sourcePath);
 
         CompareLines(source, target);
     }

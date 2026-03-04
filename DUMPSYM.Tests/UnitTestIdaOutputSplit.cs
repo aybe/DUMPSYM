@@ -12,9 +12,9 @@ public sealed class UnitTestIdaOutputSplit : UnitTestBase
 {
     [TestMethod]
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
-    public void Test(TestPair pair)
+    public void Test(string sourcePath, string targetPath)
     {
-        var text = File.ReadAllText(pair.Source);
+        var text = File.ReadAllText(sourcePath);
 
         var output = IdaOutput.Parse(text);
 

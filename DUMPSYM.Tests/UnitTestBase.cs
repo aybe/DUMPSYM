@@ -56,16 +56,18 @@ public abstract class UnitTestBase
 
         var text = File.ReadAllText(path);
 
-        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
+        var data = JsonConvert.DeserializeObject<TestItem[]>(text)!;
 
-        foreach (var pair in data)
+        foreach (var item in data)
         {
-            yield return [pair];
+            yield return [item.Source, item.Target];
         }
     }
 
     public static string GetTestName(MethodInfo methodInfo, object[] data)
     {
-        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
+        return $"{methodInfo.Name}(\"{Path.GetFileName((string)data[0])}\")";
     }
+
+    private sealed record TestItem(string Source, string Target);
 }

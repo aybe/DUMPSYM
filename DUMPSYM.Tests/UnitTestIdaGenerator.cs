@@ -18,16 +18,14 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     [TestMethod]
     [UsedImplicitly]
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
-    public void TestHeaderGenerator(TestPair pair)
+    public void TestHeaderGenerator(string sourcePath, string targetPath)
     {
-        var (source, target) = pair;
-
-        if (!File.Exists(source))
+        if (!File.Exists(sourcePath))
         {
-            throw new FileNotFoundException(null, source);
+            throw new FileNotFoundException(null, sourcePath);
         }
 
-        var file = GetSymbolFile(source);
+        var file = GetSymbolFile(sourcePath);
 
         var generator = GetSymbolGenerator(file);
 
@@ -37,13 +35,13 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         WriteLine(generate);
 
-        Directory.CreateDirectory(target);
+        Directory.CreateDirectory(targetPath);
 
-        var path = Path.Combine(target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(source), ".H"));
+        var path = Path.Combine(targetPath, Path.ChangeExtension(Path.GetFileNameWithoutExtension(sourcePath), ".H"));
 
         File.WriteAllText(path, generate);
 
-        switch (Path.GetFileName(source)) // TODO others
+        switch (Path.GetFileName(sourcePath)) // TODO others
         {
             case "MAIN.SYM":
                 Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
@@ -54,13 +52,11 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
     [TestMethod]
     [UsedImplicitly]
     [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
-    public void TestScriptGenerator(TestPair pair)
+    public void TestScriptGenerator(string sourcePath, string targetPath)
     {
-        var (source, target) = pair;
+        var file = GetSymbolFile(sourcePath);
 
-        var file = GetSymbolFile(source);
-
-        File.WriteAllText(Path.Combine(target, Path.ChangeExtension(Path.GetFileNameWithoutExtension(source), ".dumpsym.txt")), file.ToString());
+        File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(Path.GetFileNameWithoutExtension(sourcePath), ".dumpsym.txt")), file.ToString());
 
         var generator = GetSymbolGenerator(file);
 
@@ -82,19 +78,19 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
         var names = GetSymbolNamesScript(file);
 
-        File.WriteAllText(Path.Combine(target, "dumpsym_names.py"), names);
+        File.WriteAllText(Path.Combine(targetPath, "dumpsym_names.py"), names);
 
         var prototypes = output.GetFunctionsAsPythonList();
 
-        File.WriteAllText(Path.Combine(target, "dumpsym_function_prototypes.py"), prototypes);
+        File.WriteAllText(Path.Combine(targetPath, "dumpsym_function_prototypes.py"), prototypes);
 
         var functions = output.GetFunctionsAsDebugString();
 
         WriteLine(functions);
 
-        var name = Path.GetFileName(source);
+        var name = Path.GetFileName(sourcePath);
 
-        File.WriteAllText(Path.Combine(target, Path.ChangeExtension(name, ".functions.txt")), functions);
+        File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(name, ".functions.txt")), functions);
 
         switch (name) // TODO others
         {
