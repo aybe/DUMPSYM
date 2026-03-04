@@ -55,7 +55,9 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
             Writer.WriteLine();
         }
 
-        return Writer.InnerWriter.ToString()!;
+        var generate = Writer.InnerWriter.ToString()!;
+
+        return generate;
     }
 
     private void GenerateType(Symbol[] symbols, Symbol? def)
@@ -66,7 +68,7 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
 
         tag = $"{IdaGenerator.ToString((def ?? header).Type!.Value.Kind)} {tag}";
 
-        Writer.WriteLine2($"{tag} ", $"// {def}".TrimEnd());
+        Writer.WriteLine2($"{tag} ", $"// {def?.ToString() ?? "typedef = NULL"}".TrimEnd());
 
         Writer.WriteLine2("{", $"// {header}");
 
@@ -160,6 +162,7 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
     }
 
     [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
+    [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
     private string GetMemberType(Symbol member)
     {
         var memberType = member.Type!.Value;
@@ -172,19 +175,23 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
             // since this can't really be solved, we default to the most likely, i.e. u_short
             // if not doing this, we'd end up with many members being uid_t, which is worse
 
-            return Generator.TypedefsOverrides.GetValueOrDefault(memberType.Kind, kind);
+            var type = Generator.TypedefsOverrides.GetValueOrDefault(memberType.Kind, kind);
+
+            return type;
         }
         else
         {
             // this is slightly more complex, type name is found in a previous symbol
 
-            return $"{kind} {GetMemberTypeName(member)}";
+            var type = $"{kind} {GetMemberTypeName(member)}";
+
+            return type;
         }
     }
 
     private string GetMemberTypeName(Symbol member)
     {
-        // easy case: in the tag, when there's one and it isn't fake
+        // easy case: in the tag, when there's one, and it isn't fake
         // hard case: in a previous symbol whose name may be fake
 
         if (!member.HasFakeTag)
@@ -198,14 +205,18 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
         {
             var symbol = Generator.Symbols[i];
 
-            if (symbol.IsTypeHeader && symbol.Name == member.Tag)
+            var symbolName = symbol.Name ?? throw new InvalidOperationException();
+
+            if (symbol.IsTypeHeader && symbolName == member.Tag)
             {
-                return GetSafeName(symbol);
+                var name = GetSafeName(symbol);
+
+                return name;
             }
 
             if (symbol.IsTypeDefinition && symbol.Tag == member.Tag)
             {
-                return symbol.Name!;
+                return symbolName;
             }
         }
 
@@ -226,6 +237,7 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
         return name;
     }
 
+    [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
     private Symbol[] GetType(Symbol def)
     {
         // associated type is generally right before typedef but not always...
@@ -254,7 +266,9 @@ public sealed class IdaHeaderGenerator(IdaGenerator generator) : IDisposable
             throw new InvalidOperationException();
         }
 
-        return Generator.SymbolsGroups[index2];
+        var type = Generator.SymbolsGroups[index2];
+
+        return type;
     }
 
     private Symbol? GetTypeDefinition(Symbol type)
