@@ -98,15 +98,6 @@ public sealed class TestIdaGenerator : TestBase
         }
     }
 
-    private static SymbolFile GetSymbolFile(string path)
-    {
-        using var stream = File.OpenRead(path);
-
-        var file = SymbolFile.Dump(stream);
-
-        return file;
-    }
-
     private static IdaGenerator GetSymbolGenerator(SymbolFile file)
     {
         var options = new IdaHeaderGeneratorOptions

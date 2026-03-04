@@ -87,15 +87,6 @@ public sealed class TestIdaSplit : TestBase
         }
     }
 
-    private static SymbolFile GetSymbolFile(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
-    {
-        using var stream = File.OpenRead(path);
-
-        var file = SymbolFile.Dump(stream);
-
-        return file;
-    }
-
     private static List<string> GetChunk(List<string> lines, string header)
     {
         var index1 = lines.FindIndex(s => s == header);

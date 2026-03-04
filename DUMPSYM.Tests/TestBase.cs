@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using DUMPSYM.Symbols;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -66,6 +67,15 @@ public abstract class TestBase
     public static string GetDynamicTestName(MethodInfo methodInfo, object[] data)
     {
         return $"{methodInfo.Name}(\"{Path.GetFileName((string)data[0])}\")";
+    }
+
+    protected static SymbolFile GetSymbolFile(string path = @"C:\GitHub\DUMPSYM\MAIN.SYM")
+    {
+        using var stream = File.OpenRead(path);
+
+        var file = SymbolFile.Dump(stream);
+
+        return file;
     }
 
     private sealed record TestItem(string Source, string Target);
