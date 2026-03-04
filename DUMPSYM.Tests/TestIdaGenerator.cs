@@ -1,11 +1,9 @@
 ﻿using System.CodeDom.Compiler;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
 
 // ReSharper disable StringLiteralTypo
 

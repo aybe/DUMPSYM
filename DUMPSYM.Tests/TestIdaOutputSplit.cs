@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using static DUMPSYM.Tests.TestIdaGenerator;
 
 // ReSharper disable IdentifierTypo
 
@@ -127,7 +126,10 @@ public sealed record IdaOutput
 
 public sealed record IdaOutputFunction(string Name, IdaOutputChunk Code, IdaOutputChunk Comments)
 {
-    public override string ToString() => Name;
+    public override string ToString()
+    {
+        return Name;
+    }
 }
 
 public sealed record IdaOutputChunk(Range Lines, string Value);
