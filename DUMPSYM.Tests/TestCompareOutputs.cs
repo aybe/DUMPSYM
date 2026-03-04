@@ -7,7 +7,7 @@ public sealed class TestCompareOutputs : TestBase
 {
     [TestMethod]
     [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
-    public void TestCompare(string sourcePath, string targetPath)
+    public void TestOriginalVsManagedOutput(string sourcePath, string targetPath)
     {
         var sourceText = GetSourceText(sourcePath);
 
