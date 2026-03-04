@@ -3,11 +3,11 @@ using DUMPSYM.Symbols;
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed class UnitTestCompareOutputs : UnitTestBase
+public sealed class TestCompareOutputs : TestBase
 {
     [TestMethod]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
-    public void TestCompareOutputs(string sourcePath, string targetPath)
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    public void TestCompare(string sourcePath, string targetPath)
     {
         var source = GetSourceText(sourcePath);
 

@@ -1,17 +1,17 @@
 ﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using static DUMPSYM.Tests.UnitTestIdaGenerator;
+using static DUMPSYM.Tests.TestIdaGenerator;
 
 // ReSharper disable IdentifierTypo
 
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed class UnitTestIdaOutputSplit : UnitTestBase
+public sealed class TestIdaOutputSplit : TestBase
 {
     [TestMethod]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void Test(string sourcePath, string targetPath)
     {
         var text = File.ReadAllText(sourcePath);

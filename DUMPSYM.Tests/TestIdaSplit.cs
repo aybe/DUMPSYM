@@ -8,7 +8,7 @@ using DUMPSYM.Symbols;
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed class UnitTestIdaSplit : UnitTestBase
+public sealed class TestIdaSplit : TestBase
 {
     [TestMethod]
     public void Test()

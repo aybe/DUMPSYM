@@ -7,9 +7,8 @@ using Newtonsoft.Json;
 namespace DUMPSYM.Tests;
 
 [PublicAPI]
-public abstract class UnitTestBase
+public abstract class TestBase
 {
-
     public required TestContext TestContext { get; [UsedImplicitly] set; }
 
     protected void Write(object? value = null)
