@@ -3,7 +3,7 @@ using DUMPSYM.Symbols;
 namespace DUMPSYM.Tests;
 
 [TestClass]
-public sealed class TestCompareOutputs : TestBase
+public sealed class TestDumper : TestBase
 {
     [TestMethod]
     [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
