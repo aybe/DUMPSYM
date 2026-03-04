@@ -6,7 +6,7 @@ namespace DUMPSYM.Tests;
 public sealed class TestDumper : TestBase
 {
     [TestMethod]
-    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    [DynamicData(nameof(GetTestData1), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestOriginalVsManagedOutput(string sourcePath, string targetPath)
     {
         var sourceText = GetSourceText(sourcePath);

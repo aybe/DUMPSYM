@@ -15,11 +15,12 @@ public sealed class TestGenerators : TestBase
     #region New region
 
     [TestMethod]
-    public void TestGenerateFiles()
+    [DynamicData(nameof(GetTestData2), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    public void TestGenerateFiles(string sourcePath, string targetPath)
     {
         // TODO globals
 
-        var lines = File.ReadAllLines(@"C:\GitHub\HigherOctane\TEMP\001-only-types-and-functions-applied.c").ToList();
+        var lines = File.ReadAllLines(sourcePath).ToList();
 
         var functionDeclarations = GetIdaOutputChunk(lines, "// Function declarations");
 
@@ -47,15 +48,13 @@ public sealed class TestGenerators : TestBase
 
         var symbols = sf.ToList();
 
-        const string output = @"C:\GitHub\HigherOctane\TEMP\OUTPUT";
-
-        Directory.CreateDirectory(output);
+        Directory.CreateDirectory(targetPath);
 
         var funcs = sf.Symbols.Where(s => s.Record is ISymbolFunction).ToDictionary(s => (ISymbolFunction)s.Record, s => s.Header);
 
         foreach (var start in symbols.OfType<ISymbolFileStart>())
         {
-            var source = Path.Combine(output, Path.GetFileName(start.File));
+            var source = Path.Combine(targetPath, Path.GetFileName(start.File));
             var header = Path.ChangeExtension(source, ".H");
 
             using var sourceWriter = File.CreateText(source);
@@ -146,7 +145,7 @@ public sealed class TestGenerators : TestBase
 
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    [DynamicData(nameof(GetTestData1), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestGenerateHeader(string sourcePath, string targetPath)
     {
         if (!File.Exists(sourcePath))
@@ -173,7 +172,7 @@ public sealed class TestGenerators : TestBase
 
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
+    [DynamicData(nameof(GetTestData1), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestGenerateScript(string sourcePath, string targetPath)
     {
         var file = GetSymbolFile(sourcePath);

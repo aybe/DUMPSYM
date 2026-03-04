@@ -50,9 +50,19 @@ public abstract class TestBase
         WriteLine($"{valueName}: {value}");
     }
 
-    public static IEnumerable<object[]> GetDynamicTestData()
+    public static IEnumerable<object[]> GetTestData1()
     {
-        var path = Path.Combine(Solution.Directory, "Tests", "test-ida-generators.json");
+        return GetTestDataJson("test-generate-header-and-script.json");
+    }
+
+    public static IEnumerable<object[]> GetTestData2()
+    {
+        return GetTestDataJson("test-split-output.json");
+    }
+
+    private static IEnumerable<object[]> GetTestDataJson(string path)
+    {
+        path = Path.Combine(Solution.Directory, "Tests", path);
 
         var text = File.ReadAllText(path);
 
@@ -64,7 +74,7 @@ public abstract class TestBase
         }
     }
 
-    public static string GetDynamicTestName(MethodInfo methodInfo, object[] data)
+    public static string GetTestName(MethodInfo methodInfo, object[] data)
     {
         return $"{methodInfo.Name}(\"{Path.GetFileName((string)data[0])}\")";
     }
