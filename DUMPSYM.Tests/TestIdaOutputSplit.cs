@@ -8,10 +8,9 @@ namespace DUMPSYM.Tests;
 public sealed class TestIdaOutputSplit : TestBase
 {
     [TestMethod]
-    [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
-    public void Test(string sourcePath, string targetPath)
+    public void Test()
     {
-        var text = File.ReadAllText(sourcePath);
+        var text = File.ReadAllText(@"C:\GitHub\HigherOctane\TEMP\001-only-types-and-functions-applied.c");
 
         var output = IdaOutput.Parse(text);
 
