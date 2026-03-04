@@ -9,38 +9,40 @@ public sealed class TestCompareOutputs : TestBase
     [DynamicData(nameof(GetDynamicTestData), DynamicDataDisplayName = nameof(GetDynamicTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestCompare(string sourcePath, string targetPath)
     {
-        var source = GetSourceText(sourcePath);
+        var sourceText = GetSourceText(sourcePath);
 
-        var target = GetTargetText(sourcePath);
+        var targetText = GetTargetText(sourcePath);
 
-        TextComparer.CompareLineByLine(source, target, Console.WriteLine);
-    }
+        TextComparer.CompareLineByLine(sourceText, targetText, Console.WriteLine);
 
-    private static string GetSourceText(string path)
-    {
-        using var writer = new StringWriter();
+        return;
 
-        var previous = Console.Out;
+        static string GetSourceText(string path)
+        {
+            using var writer = new StringWriter();
 
-        Console.SetOut(writer);
+            var previous = Console.Out;
 
-        Original.__main(["", path]);
+            Console.SetOut(writer);
 
-        Console.SetOut(previous);
+            Original.__main(["", path]);
 
-        var text = writer.ToString();
+            Console.SetOut(previous);
 
-        return text;
-    }
+            var text = writer.ToString();
 
-    private static string GetTargetText(string path)
-    {
-        using var stream = File.OpenRead(path);
+            return text;
+        }
 
-        var file = SymbolFile.Dump(stream);
+        static string GetTargetText(string path)
+        {
+            using var stream = File.OpenRead(path);
 
-        var text = file.ToString();
+            var file = SymbolFile.Dump(stream);
 
-        return text;
+            var text = file.ToString();
+
+            return text;
+        }
     }
 }
