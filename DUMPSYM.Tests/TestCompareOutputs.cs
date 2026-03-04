@@ -13,7 +13,7 @@ public sealed class TestCompareOutputs : TestBase
 
         var target = GetTargetText(sourcePath);
 
-        CompareLines(source, target);
+        TextComparer.CompareLineByLine(source, target, Console.WriteLine);
     }
 
     private static string GetSourceText(string path)
@@ -42,49 +42,5 @@ public sealed class TestCompareOutputs : TestBase
         var text = file.ToString();
 
         return text;
-    }
-
-    private void CompareLines(string sourceText, string targetText)
-    {
-        var separator = new[] { "\r\n", "\r", "\n" };
-
-        const StringSplitOptions options = StringSplitOptions.None;
-
-        var sourceLines = sourceText.Split(separator, options);
-        var targetLines = targetText.Split(separator, options);
-
-        Assert.HasCount(sourceLines.Length, targetLines, "Lines count don't match.");
-
-        var line = 0;
-
-        var list = new List<(int LineIndex, string SourceLine, string TargetLine)>();
-
-        for (var i = 0; i < sourceLines.Length; i++)
-        {
-            var sourceLine = sourceLines[i];
-            var targetLine = targetLines[i];
-
-            if (!string.Equals(sourceLine, targetLine, StringComparison.Ordinal))
-            {
-                list.Add((line, sourceLine, targetLine));
-            }
-
-            line++;
-        }
-
-        foreach (var (lineIndex, sourceLine, targetLine) in list)
-        {
-            WriteLine(
-                $"Line {lineIndex} doesn't match:\n" +
-                $"\tSource: \"{sourceLine}\"\n" +
-                $"\tTarget: \"{targetLine}\"");
-        }
-
-        var pass = sourceLines.Length - list.Count;
-        var fail = list.Count;
-
-        Assert.AreEqual(0, fail,
-            $"PASS = {pass} ({(double)pass / sourceLines.Length:P}), " +
-            $"FAIL = {fail} ({(double)fail / sourceLines.Length:P})");
     }
 }
