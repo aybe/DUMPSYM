@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace DUMPSYM.Tests;
 
@@ -46,5 +48,24 @@ public abstract class UnitTestBase
     protected void WriteLineVar(object? value, [CallerArgumentExpression(nameof(value))] string valueName = null!)
     {
         WriteLine($"{valueName}: {value}");
+    }
+
+    public static IEnumerable<object[]> GetTestData()
+    {
+        var path = Path.Combine(Solution.Directory, "Tests", "test-ida-generators.json");
+
+        var text = File.ReadAllText(path);
+
+        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
+
+        foreach (var pair in data)
+        {
+            yield return [pair];
+        }
+    }
+
+    public static string GetTestName(MethodInfo methodInfo, object[] data)
+    {
+        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
     }
 }

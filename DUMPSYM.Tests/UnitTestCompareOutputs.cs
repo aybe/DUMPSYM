@@ -6,9 +6,11 @@ namespace DUMPSYM.Tests;
 public sealed class UnitTestCompareOutputs : UnitTestBase
 {
     [TestMethod]
-    [DataRow(@"C:\GitHub\DUMPSYM\MAIN.SYM")]
-    public void TestCompareOutputs(string path)
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
+    public void TestCompareOutputs(TestPair pair)
     {
+        var path = pair.Source;
+
         var source = GetSourceText(path);
 
         var target = GetTargetText(path);

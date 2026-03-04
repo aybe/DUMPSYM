@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using static DUMPSYM.Tests.UnitTestIdaGenerator;
 
 // ReSharper disable IdentifierTypo
 
@@ -10,10 +11,10 @@ namespace DUMPSYM.Tests;
 public sealed class UnitTestIdaOutputSplit : UnitTestBase
 {
     [TestMethod]
-    [DataRow(@"C:\Users\aybe\OneDrive\Desktop\IDA\Hi-Octane (Europe) (En,Fr,De,Es)\SLES_001.15.c")]
-    public void Test(string path)
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
+    public void Test(TestPair pair)
     {
-        var text = File.ReadAllText(path);
+        var text = File.ReadAllText(pair.Source);
 
         var output = IdaOutput.Parse(text);
 

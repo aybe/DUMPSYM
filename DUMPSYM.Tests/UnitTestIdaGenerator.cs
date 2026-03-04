@@ -17,7 +17,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 {
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
     public void TestHeaderGenerator(TestPair pair)
     {
         var (source, target) = pair;
@@ -53,7 +53,7 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
 
     [TestMethod]
     [UsedImplicitly]
-    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName))]
+    [DynamicData(nameof(GetTestData), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(UnitTestBase))]
     public void TestScriptGenerator(TestPair pair)
     {
         var (source, target) = pair;
@@ -102,25 +102,6 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
                 Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
                 break;
         }
-    }
-
-    public static IEnumerable<object[]> GetTestData()
-    {
-        var path = Path.Combine(Solution.Directory, "Tests", "test-ida-generators.json");
-
-        var text = File.ReadAllText(path);
-
-        var data = JsonConvert.DeserializeObject<TestPair[]>(text)!;
-
-        foreach (var pair in data)
-        {
-            yield return [pair];
-        }
-    }
-
-    public static string GetTestName(MethodInfo methodInfo, object[] data)
-    {
-        return $"{methodInfo.Name}(\"{Path.GetFileName(((TestPair)data[0]).Source)}\")";
     }
 
     private static SymbolFile GetSymbolFile(string path)
@@ -191,19 +172,5 @@ public sealed class UnitTestIdaGenerator : UnitTestBase
         var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
 
         Assert.AreEqual(sha256, hash, true);
-    }
-
-    [PublicAPI]
-    public sealed record TestPair
-    {
-        public required string Source { get; set; }
-
-        public required string Target { get; set; }
-
-        public void Deconstruct(out string source, out string target)
-        {
-            source = Source;
-            target = Target;
-        }
     }
 }
