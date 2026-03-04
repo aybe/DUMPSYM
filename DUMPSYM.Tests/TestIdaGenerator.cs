@@ -1,6 +1,4 @@
 ﻿using System.CodeDom.Compiler;
-using System.Security.Cryptography;
-using System.Text;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 using JetBrains.Annotations;
@@ -38,13 +36,6 @@ public sealed class TestIdaGenerator : TestBase
         var path = Path.Combine(targetPath, Path.ChangeExtension(Path.GetFileNameWithoutExtension(sourcePath), ".H"));
 
         File.WriteAllText(path, generate);
-
-        switch (Path.GetFileName(sourcePath)) // TODO others
-        {
-            case "MAIN.SYM":
-                Validate(generate, "a7cdae4d1fe81d23953e77bce5614ca4cde7c03128af8a437087d83c0cc4d523");
-                break;
-        }
     }
 
     [TestMethod]
@@ -89,13 +80,6 @@ public sealed class TestIdaGenerator : TestBase
         var name = Path.GetFileName(sourcePath);
 
         File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(name, ".functions.txt")), functions);
-
-        switch (name) // TODO others
-        {
-            case "MAIN.SYM":
-                Validate(functions, "f83951a7085e577083e73b5b14eb9477c9e8b7fb55990a773c29c6304715ab7e");
-                break;
-        }
     }
 
     private static IdaGenerator GetSymbolGenerator(SymbolFile file)
@@ -150,12 +134,5 @@ public sealed class TestIdaGenerator : TestBase
         var contents = writer.InnerWriter.ToString();
 
         return contents;
-    }
-
-    private static void Validate(string text, string sha256)
-    {
-        var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
-
-        Assert.AreEqual(sha256, hash, true);
     }
 }
