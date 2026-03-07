@@ -3,17 +3,11 @@ using DUMPSYM.Extensions;
 
 namespace DUMPSYM.Symbols;
 
-public sealed partial class Symbol
+public sealed partial class Symbol(SymbolHeader header, SymbolRecord record)
 {
-    public Symbol(SymbolHeader header, SymbolRecord record)
-    {
-        Header = header;
-        Record = record;
-    }
+    public SymbolHeader Header { get; } = header;
 
-    public SymbolHeader Header { get; set; }
-
-    public SymbolRecord Record { get; set; } = null!;
+    public SymbolRecord Record { get; } = record;
 
     public override string ToString()
     {
