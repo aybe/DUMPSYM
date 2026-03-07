@@ -28,16 +28,16 @@ public sealed partial class Symbol
 
         var searches = new SymbolSearch[]
         {
-            new(s => s.IsName(), s => s.IsName()),
-            new(s => s.IsExternal(), s => s.IsExternal()),
-            new(s => s.IsStatic(), s => s.IsStatic()),
-            new(s => s.IsTypedef(), s => s.IsTypedef()),
-            new(s => s.IsFileEnd(), s => s.IsFileEnd()),
-            new(s => s.IsFileHeader(), s => s.IsFileFooter()),
-            new(s => s.IsFunctionHeader(), s => s.IsFunctionFooter()),
-            new(s => s.IsEnumHeader(), s => s.IsTypeFooter()),
-            new(s => s.IsStructHeader(), s => s.IsTypeFooter()),
-            new(s => s.IsUnionHeader(), s => s.IsTypeFooter()),
+            new(s => s.IsVariable, s => s.IsVariable),
+            new(s => s.IsExternal, s => s.IsExternal),
+            new(s => s.IsStatic, s => s.IsStatic),
+            new(s => s.IsTypedef, s => s.IsTypedef),
+            new(s => s.IsFileFooter, s => s.IsFileFooter),
+            new(s => s.IsFileHeader, s => s.IsFileFooter),
+            new(s => s.IsFunctionHeader, s => s.IsFunctionFooter),
+            new(s => s.IsEnumHeader, s => s.IsTypeFooter),
+            new(s => s.IsStructHeader, s => s.IsTypeFooter),
+            new(s => s.IsUnionHeader, s => s.IsTypeFooter),
         };
 
         for (var i = 0; i < records.Length; i++)
