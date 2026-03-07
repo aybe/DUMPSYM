@@ -22,11 +22,9 @@ public sealed partial class Symbol
 
     public static Symbol[][] Split(Symbol[] symbols)
     {
-        var records = symbols.Select(s => s.Record).Cast<ISymbol>().ToArray();
-
         var split = new List<Symbol[]>();
 
-        var searches = new SymbolSearch[]
+        var searches = new (Predicate<ISymbol> Header, Predicate<ISymbol> Footer)[]
         {
             new(s => s.IsVariable, s => s.IsVariable),
             new(s => s.IsExternal, s => s.IsExternal),
@@ -39,6 +37,8 @@ public sealed partial class Symbol
             new(s => s.IsStructHeader, s => s.IsTypeFooter),
             new(s => s.IsUnionHeader, s => s.IsTypeFooter),
         };
+
+        var records = symbols.Select(s => s.Record).Cast<ISymbol>().ToArray();
 
         for (var i = 0; i < records.Length; i++)
         {
@@ -70,8 +70,6 @@ public sealed partial class Symbol
 
         return split.ToArray();
     }
-
-    private sealed record SymbolSearch(Predicate<ISymbol> Header, Predicate<ISymbol> Footer);
 }
 
 public sealed partial class Symbol
