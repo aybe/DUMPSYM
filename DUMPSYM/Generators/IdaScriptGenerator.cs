@@ -1,4 +1,5 @@
-﻿using DUMPSYM.Symbols;
+﻿using System.Diagnostics.CodeAnalysis;
+using DUMPSYM.Symbols;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable CommentTypo
@@ -112,12 +113,12 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         if (modifiers.Any(s => s is SymbolTypeModifier.ARY))
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(nameof(SymbolTypeModifier.ARY));
         }
 
         if (modifiers.Any(s => s is SymbolTypeModifier.FCN))
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException(nameof(SymbolTypeModifier.FCN));
         }
 
         var pointers = new string('*', modifiers.Count(s => s is SymbolTypeModifier.PTR));
@@ -126,7 +127,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
 
         if (type != null)
         {
-            Assert.IsTrue(parameter.Tag is not null);
+            Assert.IsNotNull(parameter.Tag);
 
             if (type.Tag == null)
             {
@@ -134,7 +135,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
             }
             else // when tag is fake, name is the type
             {
-                Assert.IsTrue(type.Class is SymbolStorageClass.TPDEF, type.ToString());
+                Assert.AreEqual(SymbolStorageClass.TPDEF, type.Class, type.ToString());
 
                 Assert.IsFalse(type.HasFakeName);
             }
@@ -147,7 +148,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
         }
         else
         {
-            Assert.IsTrue(parameter.Tag is null);
+            Assert.IsNull(parameter.Tag);
 
             // TODO DRY this typedef override stuff
 
@@ -159,6 +160,7 @@ public sealed class IdaScriptGenerator(IdaGenerator generator)
         }
     }
 
+    [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
     private Symbol? GetParameterType(Symbol symbol)
     {
         if (symbol.Tag == null)
