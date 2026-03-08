@@ -1,4 +1,5 @@
-﻿using DUMPSYM.Symbols;
+﻿using System.CommandLine;
+using DUMPSYM.Symbols;
 
 namespace DUMPSYM;
 
@@ -6,43 +7,43 @@ internal static class Program
 {
     public static int Main(string[] args)
     {
-        if (args.Length != 1)
-        {    
-            Console.WriteLine("""
-                              dumpsym 2.02 (c) 1997 SN Systems Software Ltd
-                              Usage: dumpsym sym_file
-                              """);
+        var path = new Argument<FileInfo>("sym_file");
+
+        var ida = new Option<bool>("--ida") { Description = "Generate IDA scripts" };
+
+        var root = new RootCommand("dumpsym 2.02 (c) 1997 SN Systems Software Ltd") { path, ida };
+
+        var result = root.Parse(args);
+
+        if (result.Action != null)
+        {
+            return result.Invoke();
+        }
+
+        var info = result.GetRequiredValue(path);
+
+        if (!info.Exists)
+        {
+            Console.WriteLine($"Error: Can't open file '{info.FullName}' for input");
 
             return 1;
         }
 
-        var path = args[0];
+        using var stream = info.OpenRead();
 
-        if (!File.Exists(path))
+        var file = SymbolFile.Dump(stream);
+
+        if (result.GetValue(ida))
         {
-            Console.WriteLine($"Error: Can't open file '{path}' for input");
-
-            return 1;
+            // TODO
         }
-
-        try
+        else
         {
-            using var stream = File.OpenRead(path);
-
-            var file = SymbolFile.Dump(stream);
-
             var text = file.ToString();
 
             Console.WriteLine(text);
-
-            return 0;
         }
-        catch (Exception e)
-        {
-            Console.WriteLine("Failed to parse .SYM file:");
-            Console.WriteLine(e);
 
-            return 1;
-        }
+        return 0;
     }
 }
