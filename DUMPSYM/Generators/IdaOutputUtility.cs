@@ -1,16 +1,18 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 using DUMPSYM.Symbols;
+
 // ReSharper disable StringLiteralTypo
 
 namespace DUMPSYM.Generators;
 
 public static class IdaOutputUtility
 {
-    public static void SplitFiles(SymbolFile symbolFile, string sourcePath, string targetPath)
+    public static List<Source> SplitFiles(SymbolFile symbolFile, string text)
     {
         // TODO globals
 
-        var lines = File.ReadAllLines(sourcePath).ToList();
+        var lines = text.Split(["\r\n", "\n"], StringSplitOptions.None).ToList();
 
         var functionDeclarations = GetIdaOutputChunk(lines, "// Function declarations");
 
@@ -36,17 +38,17 @@ public static class IdaOutputUtility
 
         var symbols = symbolFile.ToList();
 
-        Directory.CreateDirectory(targetPath);
-
         var funcs = symbolFile.Symbols.Where(s => s.Record is ISymbolFunction).ToDictionary(s => (ISymbolFunction)s.Record, s => s.Header);
+
+        var sources = new List<Source>();
 
         foreach (var start in symbols.OfType<ISymbolFileStart>())
         {
-            var source = Path.Combine(targetPath, Path.GetFileName(start.File));
+            var source = Path.GetFileName(start.File);
             var header = Path.ChangeExtension(source, ".H");
 
-            using var sourceWriter = File.CreateText(source);
-            using var headerWriter = File.CreateText(header);
+            var sourceWriter = new StringBuilder();
+            var headerWriter = new StringBuilder();
 
             var pairs = funcs.Where(s => s.Key.File == start.File);
 
@@ -56,13 +58,13 @@ public static class IdaOutputUtility
 
                 if (fn.TryGetValue(key, out var value))
                 {
-                    sourceWriter.WriteLine($"//----- ({key}) --------------------------------------------------------");
-                    sourceWriter.WriteLine((string?)value);
-                    sourceWriter.WriteLine();
+                    sourceWriter.AppendLine($"//----- ({key}) --------------------------------------------------------");
+                    sourceWriter.AppendLine((string?)value);
+                    sourceWriter.AppendLine();
 
                     if (functionDeclarationsMap.TryGetValue(pair.Key.Name, out var declaration))
                     {
-                        headerWriter.WriteLine(declaration);
+                        headerWriter.AppendLine(declaration);
                     }
                     else
                     {
@@ -72,10 +74,15 @@ public static class IdaOutputUtility
                 }
                 else
                 {
-                    sourceWriter.WriteLine($"#error \"function {key} was in symbols but not in IDA output\"");
+                    sourceWriter.AppendLine($"#error \"function {key} was in symbols but not in IDA output\"");
                 }
             }
+
+            sources.Add(new Source(source, sourceWriter.ToString()));
+            sources.Add(new Source(header, headerWriter.ToString()));
         }
+
+        return sources;
     }
 
     private static List<string> GetIdaOutputChunk(List<string> lines, string header)
