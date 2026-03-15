@@ -15,25 +15,16 @@ internal static class Program
     {
         var root = new RootCommand("dumpsym 2.02 (c) 1997 SN Systems Software Ltd")
         {
-            GetIdaCommand(),
-            GetSymCommand(),
+            GetIdaScriptsCommand(),
+            GetIdaSplitCommand(),
+            GetSymDumpCommand(),
+            GetSymHeaderCommand(),
         };
 
         return root.Parse(args).Invoke();
     }
 
     #region ida
-
-    private static Command GetIdaCommand()
-    {
-        var ida = new Command("ida") { Description = "IDA related commands" };
-
-        ida.Add(GetIdaSplitCommand());
-
-        ida.Add(GetIdaScriptsCommand());
-
-        return ida;
-    }
 
     #region ida scripts
 
@@ -143,17 +134,6 @@ internal static class Program
     #endregion
 
     #region sym
-
-    private static Command GetSymCommand()
-    {
-        var cmd = new Command("sym") { Description = "SYM related commands" };
-
-        cmd.Add(GetSymDumpCommand());
-
-        cmd.Add(GetSymHeaderCommand());
-
-        return cmd;
-    }
 
     #region sym dump
 
