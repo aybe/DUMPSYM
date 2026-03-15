@@ -26,9 +26,9 @@ internal static class Program
 
     private static Command GetDumpCommand()
     {
-        var cmd = new Command("dump") { Description = ".SYM file dumper" };
+        var cmd = new Command("dump") { Description = "Dump .SYM file to stdout" };
 
-        var symArg = new Argument<FileInfo>("sym") { Description = ".SYM file" };
+        var symArg = new Argument<FileInfo>("source-sym") { Description = "Source .SYM file" };
 
         symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
@@ -61,9 +61,9 @@ internal static class Program
 
         var cmd = new Command("header") { Description = "Generate .H file from .SYM file" };
 
-        var symArg = new Argument<FileInfo>("source.sym") { Description = "Source .SYM file" };
+        var symArg = new Argument<FileInfo>("source-sym") { Description = "Source .SYM file" };
 
-        var hdrArg = new Argument<FileInfo>("target.h") { Description = "Target .H file" };
+        var hdrArg = new Argument<FileInfo>("target-h") { Description = "Target .H file" };
 
         symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
@@ -100,11 +100,11 @@ internal static class Program
 
     private static Command GetScriptsCommand()
     {
-        var cmd = new Command("scripts") { Description = "Generate IDA scripts from .SYM file" };
+        var cmd = new Command("scripts") { Description = "Generate IDAPython scripts from .SYM file" };
 
-        var symArg = new Argument<FileInfo>("source_sym") { Description = "Source .SYM file" };
+        var symArg = new Argument<FileInfo>("source-sym") { Description = "Source .SYM file" };
 
-        var dirArg = new Argument<DirectoryInfo>("target_dir") { Description = "Target directory" };
+        var dirArg = new Argument<DirectoryInfo>("target-dir") { Description = "Target directory" };
 
         symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
@@ -137,13 +137,13 @@ internal static class Program
 
     private static Command GetSplitCommand()
     {
-        var cmd = new Command("split") { Description = "Split output .C file" };
+        var cmd = new Command("split") { Description = "Split IDA .C file using files from .SYM file" };
 
-        var srcArg = new Argument<FileInfo>("source_c") { Description = "Source .C file" };
+        var srcArg = new Argument<FileInfo>("source-c") { Description = "Source .C file" };
 
-        var symArg = new Argument<FileInfo>("source_sym") { Description = "Source .SYM file" };
+        var symArg = new Argument<FileInfo>("source-sym") { Description = "Source .SYM file" };
 
-        var dirArg = new Argument<DirectoryInfo>("target_dir") { Description = "Target directory" };
+        var dirArg = new Argument<DirectoryInfo>("target-dir") { Description = "Target directory" };
 
         srcArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
