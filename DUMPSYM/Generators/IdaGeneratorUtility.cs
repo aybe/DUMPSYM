@@ -1,4 +1,6 @@
-﻿using System.CodeDom.Compiler;
+﻿// TODO cleanup/DRY
+
+using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using DUMPSYM.Symbols;
 
@@ -15,6 +17,41 @@ public static class IdaGeneratorUtility
         var generate = idaHeaderGenerator.Generate();
 
         return generate;
+    }
+
+    public static void GenerateScripts(SymbolFile symbolFile, string targetDirectory)
+    {
+        File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_output.txt"), symbolFile.ToString());
+
+        var generator = GetSymbolGenerator(symbolFile);
+
+        var scriptGenerator = new IdaScriptGenerator(generator);
+
+        var output = scriptGenerator.Generate(symbolFile);
+
+        var variables = symbolFile.Symbols.Where(s => s.IsVariable);
+
+        foreach (var variable in variables)
+        {
+            if (output.Functions.Any(s => s.Header.Address == variable.Header.Address))
+            {
+                continue;
+            }
+
+            Console.WriteLine(variable);
+        }
+
+        var names = GetSymbolNamesScript(symbolFile);
+
+        File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_names.py"), names);
+
+        var prototypes = output.GetFunctionsAsPythonList();
+
+        File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_function_prototypes.py"), prototypes);
+
+        var functions = output.GetFunctionsAsDebugString();
+
+        File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_function_prototypes.txt"), functions);
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

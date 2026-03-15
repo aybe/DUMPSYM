@@ -11,6 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="..\IDA\dumpsym.py" Link="dumpsym.py" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="MSTest.TestFramework" Version="4.1.0" />
 		<PackageReference Include="System.CommandLine" Version="2.0.3" />
 		<PackageReference Include="Whatever.Extensions" Version="1.0.0.2" />

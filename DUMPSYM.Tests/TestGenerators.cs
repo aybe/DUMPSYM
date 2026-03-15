@@ -170,43 +170,9 @@ public sealed class TestGenerators : TestBase
     [DynamicData(nameof(GetTestData1), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
     public void TestGenerateScript(string sourcePath, string targetPath)
     {
-        var file = GetSymbolFile(sourcePath);
+        var file = SymbolFile.Dump(sourcePath);
 
-        File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(Path.GetFileNameWithoutExtension(sourcePath), ".dumpsym.txt")), file.ToString());
-
-        var generator = IdaGeneratorUtility.GetSymbolGenerator(file);
-
-        var scriptGenerator = new IdaScriptGenerator(generator);
-
-        var output = scriptGenerator.Generate(file);
-
-        var variables = file.Symbols.Where(s => s.IsVariable);
-
-        foreach (var variable in variables)
-        {
-            if (output.Functions.Any(s => s.Header.Address == variable.Header.Address))
-            {
-                continue;
-            }
-
-            Console.WriteLine(variable);
-        }
-
-        var names = IdaGeneratorUtility.GetSymbolNamesScript(file);
-
-        File.WriteAllText(Path.Combine(targetPath, "dumpsym_names.py"), names);
-
-        var prototypes = output.GetFunctionsAsPythonList();
-
-        File.WriteAllText(Path.Combine(targetPath, "dumpsym_function_prototypes.py"), prototypes);
-
-        var functions = output.GetFunctionsAsDebugString();
-
-        WriteLine(functions);
-
-        var name = Path.GetFileName(sourcePath);
-
-        File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(name, ".functions.txt")), functions);
+        IdaGeneratorUtility.GenerateScripts(file, targetPath);
     }
 
     #endregion

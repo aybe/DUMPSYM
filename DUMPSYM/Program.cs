@@ -1,4 +1,8 @@
-﻿using System.CommandLine;
+﻿// TODO cleanup/DRY API
+// BUG: figure out why hot reload fails at start although nothing was changed: new stuff = embedded resource
+using System.CommandLine;
+using System.Reflection;
+using System.Text;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 
@@ -32,17 +36,23 @@ internal static class Program
 
     private static Command GetIdaScriptsCommand()
     {
-        var root = new Command("scripts") { Description = "Generate IDA scripts from a .SYM file" };
+        var root = new Command("scripts") { Description = "Generate IDA scripts from .SYM file" };
 
-        var symArg = new Argument<FileInfo>("source_sym") { Description = "Input .SYM file" };
+        var symArg = new Argument<FileInfo>("source_sym") { Description = "Source .SYM file" };
+
+        var dirArg = new Argument<DirectoryInfo>("target_dir") { Description = "Target directory" };
 
         root.Add(symArg);
+
+        root.Add(dirArg);
 
         root.SetAction(result =>
         {
             var sym = result.GetRequiredValue(symArg);
 
-            RunIdaScriptsCommand(sym);
+            var dir = result.GetRequiredValue(dirArg);
+
+            RunIdaScriptsCommand(sym, dir);
         });
 
         return root;
@@ -83,11 +93,32 @@ internal static class Program
         return cmd;
     }
 
-    private static void RunIdaScriptsCommand(FileInfo sym)
+    private static void RunIdaScriptsCommand(FileInfo sym, DirectoryInfo dir)
     {
-        Console.WriteLine(sym.FullName);
+        IdaGeneratorUtility.GenerateScripts(SymbolFile.Dump(sym.FullName), dir.FullName);
 
-        // TODO
+        // TODO utility should write main script instead
+
+        var combine = Path.Combine(dir.FullName, "dumpsym.py");
+
+        var contents = GetPythonScript();
+
+        File.WriteAllText(combine, contents);
+
+        return;
+
+        static string GetPythonScript()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            using var stream = assembly.GetManifestResourceStream("DUMPSYM.dumpsym.py")!;
+
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+
+            var s = reader.ReadToEnd();
+
+            return s;
+        }
     }
 
     private static void RunIdaSplitCommand(FileInfo src, FileInfo sym, DirectoryInfo dir)
