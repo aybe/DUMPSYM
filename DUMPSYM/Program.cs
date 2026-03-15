@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 
 namespace DUMPSYM;
@@ -108,6 +109,8 @@ internal static class Program
 
         cmd.Add(GetSymDumpCommand());
 
+        cmd.Add(GetSymHeaderCommand());
+
         return cmd;
     }
 
@@ -129,6 +132,38 @@ internal static class Program
         return cmd;
     }
 
+    private static Command GetSymHeaderCommand()
+    {
+        // TODO symbol cleaner options
+
+        var cmd = new Command("header") { Description = "Generate .H file from .SYM file" };
+
+        var symArg = new Argument<FileInfo>("source.sym") { Description = "Source .SYM file" };
+
+        var hdrArg = new Argument<FileInfo>("target.h") { Description = "Target .H file" };
+
+        symArg.Validators.Add(_ => symArg.AcceptExistingOnly());
+
+        symArg.Validators.Add(_ => symArg.AcceptLegalFileNamesOnly());
+
+        hdrArg.Validators.Add(_ => hdrArg.AcceptLegalFileNamesOnly());
+
+        cmd.Add(symArg);
+
+        cmd.Add(hdrArg);
+
+        cmd.SetAction(result =>
+        {
+            var sym = result.GetRequiredValue(symArg);
+
+            var hdr = result.GetRequiredValue(hdrArg);
+
+            RunSymHeaderCommand(sym, hdr);
+        });
+
+        return cmd;
+    }
+
     private static void RunSymDumpCommand(FileInfo sym)
     {
         using var stream = sym.OpenRead();
@@ -136,6 +171,15 @@ internal static class Program
         var file = SymbolFile.Dump(stream);
 
         Console.WriteLine(file.ToString());
+    }
+
+    private static void RunSymHeaderCommand(FileInfo sym, FileInfo hdr)
+    {
+        var file = SymbolFile.Dump(sym.FullName);
+
+        var header = IdaGeneratorUtility.GenerateHeader(file);
+
+        File.WriteAllText(hdr.FullName, header);
     }
 
     #endregion

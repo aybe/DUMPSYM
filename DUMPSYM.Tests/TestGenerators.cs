@@ -1,5 +1,4 @@
-﻿using System.CodeDom.Compiler;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 using JetBrains.Annotations;
@@ -153,13 +152,9 @@ public sealed class TestGenerators : TestBase
             throw new FileNotFoundException(null, sourcePath);
         }
 
-        var file = GetSymbolFile(sourcePath);
+        var file = SymbolFile.Dump(sourcePath);
 
-        var generator = GetSymbolGenerator(file);
-
-        using var headerGenerator = new IdaHeaderGenerator(generator);
-
-        var generate = headerGenerator.Generate();
+        var generate = IdaGeneratorUtility.GenerateHeader(file);
 
         WriteLine(generate);
 
@@ -179,7 +174,7 @@ public sealed class TestGenerators : TestBase
 
         File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(Path.GetFileNameWithoutExtension(sourcePath), ".dumpsym.txt")), file.ToString());
 
-        var generator = GetSymbolGenerator(file);
+        var generator = IdaGeneratorUtility.GetSymbolGenerator(file);
 
         var scriptGenerator = new IdaScriptGenerator(generator);
 
@@ -197,7 +192,7 @@ public sealed class TestGenerators : TestBase
             Console.WriteLine(variable);
         }
 
-        var names = GetSymbolNamesScript(file);
+        var names = IdaGeneratorUtility.GetSymbolNamesScript(file);
 
         File.WriteAllText(Path.Combine(targetPath, "dumpsym_names.py"), names);
 
@@ -212,60 +207,6 @@ public sealed class TestGenerators : TestBase
         var name = Path.GetFileName(sourcePath);
 
         File.WriteAllText(Path.Combine(targetPath, Path.ChangeExtension(name, ".functions.txt")), functions);
-    }
-
-    private static IdaGenerator GetSymbolGenerator(SymbolFile file)
-    {
-        var options = new IdaHeaderGeneratorOptions
-        {
-            RemoveTypedefs =
-            [
-                "PSBYTE",
-                "PSLONG",
-                "PSWORD",
-                "PUBYTE",
-                "PULONG",
-                "PUWORD",
-                "SBYTE",
-                "SLONG",
-                "SWORD",
-                "UBYTE",
-                "ULONG",
-                "UWORD",
-            ],
-        };
-
-        var generator = new IdaGenerator(file.Symbols.ToList(), options);
-
-        return generator;
-    }
-
-    private static string? GetSymbolNamesScript(SymbolFile file)
-    {
-        using var writer = new IndentedTextWriter(new StringWriter());
-
-        var names = file.Symbols.Where(s => s.IsVariable).ToArray();
-
-        writer.WriteLine($"# {names.Length} names");
-
-        writer.WriteLine("dumpsym_names = [");
-
-        writer.Indent++;
-
-        foreach (var symbol in names)
-        {
-            writer.WriteLine("""(0x{0:X8}, "{1}"),""", symbol.Header.Address, ((ISymbolVariable)symbol.Record).Name);
-        }
-
-        writer.Indent--;
-
-        writer.WriteLine("]");
-
-        writer.Flush();
-
-        var contents = writer.InnerWriter.ToString();
-
-        return contents;
     }
 
     #endregion

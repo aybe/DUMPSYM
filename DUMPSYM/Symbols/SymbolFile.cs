@@ -109,4 +109,13 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
 
         return new SymbolFile(header, version, targetUnit, symbols);
     }
+
+    public static SymbolFile Dump(string path)
+    {
+        using var stream = File.OpenRead(path);
+
+        var file = Dump(stream);
+
+        return file;
+    }
 }
