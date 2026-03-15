@@ -24,9 +24,7 @@ internal static class Program
         return root.Parse(args).Invoke();
     }
 
-    #region sym
-
-    #region sym dump
+    #region dump
 
     private static Command GetDumpCommand()
     {
@@ -57,7 +55,7 @@ internal static class Program
 
     #endregion
 
-    #region sym header
+    #region header
 
     private static Command GetHeaderCommand()
     {
@@ -100,11 +98,7 @@ internal static class Program
 
     #endregion
 
-    #endregion
-
-    #region ida
-
-    #region ida scripts
+    #region scripts
 
     private static Command GetScriptsCommand()
     {
@@ -164,7 +158,7 @@ internal static class Program
 
     #endregion
 
-    #region ida split
+    #region split
 
     private static Command GetSplitCommand()
     {
@@ -206,8 +200,6 @@ internal static class Program
 
         // TODO
     }
-
-    #endregion
 
     #endregion
 }
