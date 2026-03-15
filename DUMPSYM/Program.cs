@@ -2,8 +2,6 @@
 // BUG: figure out why hot reload fails at start although nothing was changed: new stuff = embedded resource
 
 using System.CommandLine;
-using System.Reflection;
-using System.Text;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 
@@ -131,29 +129,6 @@ internal static class Program
     private static void RunScriptsCommand(FileInfo sym, DirectoryInfo dir)
     {
         IdaGeneratorUtility.GenerateScripts(SymbolFile.Dump(sym.FullName), dir.FullName);
-
-        // TODO utility should write main script instead
-
-        var combine = Path.Combine(dir.FullName, "dumpsym.py");
-
-        var contents = GetPythonScript();
-
-        File.WriteAllText(combine, contents);
-
-        return;
-
-        static string GetPythonScript()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using var stream = assembly.GetManifestResourceStream("DUMPSYM.dumpsym.py")!;
-
-            using var reader = new StreamReader(stream, Encoding.UTF8);
-
-            var s = reader.ReadToEnd();
-
-            return s;
-        }
     }
 
     #endregion

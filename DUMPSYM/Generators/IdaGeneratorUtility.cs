@@ -2,6 +2,8 @@
 
 using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Text;
 using DUMPSYM.Symbols;
 
 namespace DUMPSYM.Generators;
@@ -22,6 +24,8 @@ public static class IdaGeneratorUtility
     public static void GenerateScripts(SymbolFile symbolFile, string targetDirectory)
     {
         File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_output.txt"), symbolFile.ToString());
+
+        File.WriteAllText(Path.Combine(targetDirectory, "dumpsym.py"), GetEmbeddedResourceAsString("DUMPSYM.dumpsym.py"));
 
         var generator = GetSymbolGenerator(symbolFile);
 
@@ -52,6 +56,19 @@ public static class IdaGeneratorUtility
         var functions = output.GetFunctionsAsDebugString();
 
         File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_function_prototypes.txt"), functions);
+    }
+
+    private static string GetEmbeddedResourceAsString(string name)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        using var stream = assembly.GetManifestResourceStream(name)!;
+
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+
+        var text = reader.ReadToEnd();
+
+        return text;
     }
 
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
