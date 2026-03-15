@@ -15,10 +15,10 @@ internal static class Program
     {
         var root = new RootCommand("dumpsym 2.02 (c) 1997 SN Systems Software Ltd")
         {
-            GetIdaScriptsCommand(),
-            GetIdaSplitCommand(),
             GetSymDumpCommand(),
             GetSymHeaderCommand(),
+            GetIdaScriptsCommand(),
+            GetIdaSplitCommand(),
         };
 
         return root.Parse(args).Invoke();
