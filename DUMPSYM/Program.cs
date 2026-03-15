@@ -1,5 +1,6 @@
 ﻿// TODO cleanup/DRY API
 // BUG: figure out why hot reload fails at start although nothing was changed: new stuff = embedded resource
+
 using System.CommandLine;
 using System.Reflection;
 using System.Text;
@@ -21,7 +22,7 @@ internal static class Program
         return root.Parse(args).Invoke();
     }
 
-    #region IDA
+    #region ida
 
     private static Command GetIdaCommand()
     {
@@ -33,6 +34,8 @@ internal static class Program
 
         return ida;
     }
+
+    #region ida scripts
 
     private static Command GetIdaScriptsCommand()
     {
@@ -57,6 +60,38 @@ internal static class Program
 
         return root;
     }
+
+    private static void RunIdaScriptsCommand(FileInfo sym, DirectoryInfo dir)
+    {
+        IdaGeneratorUtility.GenerateScripts(SymbolFile.Dump(sym.FullName), dir.FullName);
+
+        // TODO utility should write main script instead
+
+        var combine = Path.Combine(dir.FullName, "dumpsym.py");
+
+        var contents = GetPythonScript();
+
+        File.WriteAllText(combine, contents);
+
+        return;
+
+        static string GetPythonScript()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            using var stream = assembly.GetManifestResourceStream("DUMPSYM.dumpsym.py")!;
+
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+
+            var s = reader.ReadToEnd();
+
+            return s;
+        }
+    }
+
+    #endregion
+
+    #region ida split
 
     private static Command GetIdaSplitCommand()
     {
@@ -93,34 +128,6 @@ internal static class Program
         return cmd;
     }
 
-    private static void RunIdaScriptsCommand(FileInfo sym, DirectoryInfo dir)
-    {
-        IdaGeneratorUtility.GenerateScripts(SymbolFile.Dump(sym.FullName), dir.FullName);
-
-        // TODO utility should write main script instead
-
-        var combine = Path.Combine(dir.FullName, "dumpsym.py");
-
-        var contents = GetPythonScript();
-
-        File.WriteAllText(combine, contents);
-
-        return;
-
-        static string GetPythonScript()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using var stream = assembly.GetManifestResourceStream("DUMPSYM.dumpsym.py")!;
-
-            using var reader = new StreamReader(stream, Encoding.UTF8);
-
-            var s = reader.ReadToEnd();
-
-            return s;
-        }
-    }
-
     private static void RunIdaSplitCommand(FileInfo src, FileInfo sym, DirectoryInfo dir)
     {
         Console.WriteLine(src.FullName);
@@ -132,7 +139,9 @@ internal static class Program
 
     #endregion
 
-    #region SYM
+    #endregion
+
+    #region sym
 
     private static Command GetSymCommand()
     {
@@ -144,6 +153,8 @@ internal static class Program
 
         return cmd;
     }
+
+    #region sym dump
 
     private static Command GetSymDumpCommand()
     {
@@ -162,6 +173,19 @@ internal static class Program
 
         return cmd;
     }
+
+    private static void RunSymDumpCommand(FileInfo sym)
+    {
+        using var stream = sym.OpenRead();
+
+        var file = SymbolFile.Dump(stream);
+
+        Console.WriteLine(file.ToString());
+    }
+
+    #endregion
+
+    #region sym header
 
     private static Command GetSymHeaderCommand()
     {
@@ -195,15 +219,6 @@ internal static class Program
         return cmd;
     }
 
-    private static void RunSymDumpCommand(FileInfo sym)
-    {
-        using var stream = sym.OpenRead();
-
-        var file = SymbolFile.Dump(stream);
-
-        Console.WriteLine(file.ToString());
-    }
-
     private static void RunSymHeaderCommand(FileInfo sym, FileInfo hdr)
     {
         var file = SymbolFile.Dump(sym.FullName);
@@ -212,6 +227,8 @@ internal static class Program
 
         File.WriteAllText(hdr.FullName, header);
     }
+
+    #endregion
 
     #endregion
 }
