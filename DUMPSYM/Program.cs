@@ -7,43 +7,136 @@ internal static class Program
 {
     public static int Main(string[] args)
     {
-        var path = new Argument<FileInfo>("sym_file");
-
-        var ida = new Option<bool>("--ida") { Description = "Generate IDA scripts" };
-
-        var root = new RootCommand("dumpsym 2.02 (c) 1997 SN Systems Software Ltd") { path, ida };
-
-        var result = root.Parse(args);
-
-        if (result.Action != null)
+        var root = new RootCommand("dumpsym 2.02 (c) 1997 SN Systems Software Ltd")
         {
-            return result.Invoke();
-        }
+            GetIdaCommand(),
+            GetSymCommand(),
+        };
 
-        var info = result.GetRequiredValue(path);
+        return root.Parse(args).Invoke();
+    }
 
-        if (!info.Exists)
+    #region IDA
+
+    private static Command GetIdaCommand()
+    {
+        var ida = new Command("ida") { Description = "IDA related commands" };
+
+        ida.Add(GetIdaSplitCommand());
+
+        ida.Add(GetIdaScriptsCommand());
+
+        return ida;
+    }
+
+    private static Command GetIdaScriptsCommand()
+    {
+        var root = new Command("scripts") { Description = "Generate IDA scripts from a .SYM file" };
+
+        var symArg = new Argument<FileInfo>("source_sym") { Description = "Input .SYM file" };
+
+        root.Add(symArg);
+
+        root.SetAction(result =>
         {
-            Console.WriteLine($"Error: Can't open file '{info.FullName}' for input");
+            var sym = result.GetRequiredValue(symArg);
 
-            return 1;
-        }
+            RunIdaScriptsCommand(sym);
+        });
 
-        using var stream = info.OpenRead();
+        return root;
+    }
+
+    private static Command GetIdaSplitCommand()
+    {
+        var cmd = new Command("split") { Description = "Split output .C file" };
+
+        var srcArg = new Argument<FileInfo>("source_c") { Description = "Source .C file" };
+
+        var symArg = new Argument<FileInfo>("source_sym") { Description = "Source .SYM file" };
+
+        var dirArg = new Argument<DirectoryInfo>("target_dir") { Description = "Target directory" };
+
+        srcArg.Validators.Add(_ => srcArg.AcceptExistingOnly());
+        srcArg.Validators.Add(_ => srcArg.AcceptLegalFileNamesOnly());
+
+        symArg.Validators.Add(_ => symArg.AcceptExistingOnly());
+        symArg.Validators.Add(_ => symArg.AcceptLegalFileNamesOnly());
+
+        dirArg.Validators.Add(_ => dirArg.AcceptExistingOnly());
+        dirArg.Validators.Add(_ => dirArg.AcceptLegalFilePathsOnly());
+
+        cmd.Add(srcArg);
+        cmd.Add(symArg);
+        cmd.Add(dirArg);
+
+        cmd.SetAction(s =>
+        {
+            var src = s.GetRequiredValue(srcArg);
+            var sym = s.GetRequiredValue(symArg);
+            var dir = s.GetRequiredValue(dirArg);
+
+            RunIdaSplitCommand(src, sym, dir);
+        });
+
+        return cmd;
+    }
+
+    private static void RunIdaScriptsCommand(FileInfo sym)
+    {
+        Console.WriteLine(sym.FullName);
+
+        // TODO
+    }
+
+    private static void RunIdaSplitCommand(FileInfo src, FileInfo sym, DirectoryInfo dir)
+    {
+        Console.WriteLine(src.FullName);
+        Console.WriteLine(sym.FullName);
+        Console.WriteLine(dir.FullName);
+
+        // TODO
+    }
+
+    #endregion
+
+    #region SYM
+
+    private static Command GetSymCommand()
+    {
+        var cmd = new Command("sym") { Description = "SYM related commands" };
+
+        cmd.Add(GetSymDumpCommand());
+
+        return cmd;
+    }
+
+    private static Command GetSymDumpCommand()
+    {
+        var cmd = new Command("dump") { Description = ".SYM file dumper" };
+
+        var symArg = new Argument<FileInfo>("sym") { Description = ".SYM file" };
+
+        cmd.Add(symArg);
+
+        cmd.SetAction(result =>
+        {
+            var sym = result.GetRequiredValue(symArg);
+
+            RunSymDumpCommand(sym);
+        });
+
+        return cmd;
+    }
+
+    private static void RunSymDumpCommand(FileInfo sym)
+    {
+        using var stream = sym.OpenRead();
 
         var file = SymbolFile.Dump(stream);
 
-        if (result.GetValue(ida))
-        {
-            // TODO
-        }
-        else
-        {
-            var text = file.ToString();
-
-            Console.WriteLine(text);
-        }
-
-        return 0;
+        Console.WriteLine(file.ToString());
     }
+
+    #endregion
 }
