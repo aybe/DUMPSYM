@@ -1,7 +1,4 @@
-﻿// TODO cleanup/DRY API
-// BUG: figure out why hot reload fails at start although nothing was changed: new stuff = embedded resource
-
-using System.CommandLine;
+﻿using System.CommandLine;
 using DUMPSYM.Generators;
 using DUMPSYM.Symbols;
 
