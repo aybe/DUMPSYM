@@ -15,10 +15,10 @@ internal static class Program
     {
         var root = new RootCommand("dumpsym 2.02 (c) 1997 SN Systems Software Ltd")
         {
-            GetSymDumpCommand(),
-            GetSymHeaderCommand(),
-            GetIdaScriptsCommand(),
-            GetIdaSplitCommand(),
+            GetDumpCommand(),
+            GetHeaderCommand(),
+            GetScriptsCommand(),
+            GetSplitCommand(),
         };
 
         return root.Parse(args).Invoke();
@@ -28,7 +28,7 @@ internal static class Program
 
     #region ida scripts
 
-    private static Command GetIdaScriptsCommand()
+    private static Command GetScriptsCommand()
     {
         var cmd = new Command("scripts") { Description = "Generate IDA scripts from .SYM file" };
 
@@ -50,13 +50,13 @@ internal static class Program
 
             var dir = result.GetRequiredValue(dirArg);
 
-            RunIdaScriptsCommand(sym, dir);
+            RunScriptsCommand(sym, dir);
         });
 
         return cmd;
     }
 
-    private static void RunIdaScriptsCommand(FileInfo sym, DirectoryInfo dir)
+    private static void RunScriptsCommand(FileInfo sym, DirectoryInfo dir)
     {
         IdaGeneratorUtility.GenerateScripts(SymbolFile.Dump(sym.FullName), dir.FullName);
 
@@ -88,7 +88,7 @@ internal static class Program
 
     #region ida split
 
-    private static Command GetIdaSplitCommand()
+    private static Command GetSplitCommand()
     {
         var cmd = new Command("split") { Description = "Split output .C file" };
 
@@ -114,13 +114,13 @@ internal static class Program
             var sym = s.GetRequiredValue(symArg);
             var dir = s.GetRequiredValue(dirArg);
 
-            RunIdaSplitCommand(src, sym, dir);
+            RunSplitCommand(src, sym, dir);
         });
 
         return cmd;
     }
 
-    private static void RunIdaSplitCommand(FileInfo src, FileInfo sym, DirectoryInfo dir)
+    private static void RunSplitCommand(FileInfo src, FileInfo sym, DirectoryInfo dir)
     {
         Console.WriteLine(src.FullName);
         Console.WriteLine(sym.FullName);
@@ -137,7 +137,7 @@ internal static class Program
 
     #region sym dump
 
-    private static Command GetSymDumpCommand()
+    private static Command GetDumpCommand()
     {
         var cmd = new Command("dump") { Description = ".SYM file dumper" };
 
@@ -151,13 +151,13 @@ internal static class Program
         {
             var sym = result.GetRequiredValue(symArg);
 
-            RunSymDumpCommand(sym);
+            RunDumpCommand(sym);
         });
 
         return cmd;
     }
 
-    private static void RunSymDumpCommand(FileInfo sym)
+    private static void RunDumpCommand(FileInfo sym)
     {
         var file = SymbolFile.Dump(sym.FullName);
 
@@ -168,7 +168,7 @@ internal static class Program
 
     #region sym header
 
-    private static Command GetSymHeaderCommand()
+    private static Command GetHeaderCommand()
     {
         // TODO symbol cleaner options
 
@@ -192,13 +192,13 @@ internal static class Program
 
             var hdr = result.GetRequiredValue(hdrArg);
 
-            RunSymHeaderCommand(sym, hdr);
+            RunHeaderCommand(sym, hdr);
         });
 
         return cmd;
     }
 
-    private static void RunSymHeaderCommand(FileInfo sym, FileInfo hdr)
+    private static void RunHeaderCommand(FileInfo sym, FileInfo hdr)
     {
         var file = SymbolFile.Dump(sym.FullName);
 
