@@ -39,17 +39,21 @@ internal static class Program
 
     private static Command GetIdaScriptsCommand()
     {
-        var root = new Command("scripts") { Description = "Generate IDA scripts from .SYM file" };
+        var cmd = new Command("scripts") { Description = "Generate IDA scripts from .SYM file" };
 
         var symArg = new Argument<FileInfo>("source_sym") { Description = "Source .SYM file" };
 
         var dirArg = new Argument<DirectoryInfo>("target_dir") { Description = "Target directory" };
 
-        root.Add(symArg);
+        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
-        root.Add(dirArg);
+        dirArg.AcceptExistingOnly().AcceptLegalFilePathsOnly();
 
-        root.SetAction(result =>
+        cmd.Add(symArg);
+
+        cmd.Add(dirArg);
+
+        cmd.SetAction(result =>
         {
             var sym = result.GetRequiredValue(symArg);
 
@@ -58,7 +62,7 @@ internal static class Program
             RunIdaScriptsCommand(sym, dir);
         });
 
-        return root;
+        return cmd;
     }
 
     private static void RunIdaScriptsCommand(FileInfo sym, DirectoryInfo dir)
@@ -103,14 +107,11 @@ internal static class Program
 
         var dirArg = new Argument<DirectoryInfo>("target_dir") { Description = "Target directory" };
 
-        srcArg.Validators.Add(_ => srcArg.AcceptExistingOnly());
-        srcArg.Validators.Add(_ => srcArg.AcceptLegalFileNamesOnly());
+        srcArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
-        symArg.Validators.Add(_ => symArg.AcceptExistingOnly());
-        symArg.Validators.Add(_ => symArg.AcceptLegalFileNamesOnly());
+        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
-        dirArg.Validators.Add(_ => dirArg.AcceptExistingOnly());
-        dirArg.Validators.Add(_ => dirArg.AcceptLegalFilePathsOnly());
+        dirArg.AcceptExistingOnly().AcceptLegalFilePathsOnly();
 
         cmd.Add(srcArg);
         cmd.Add(symArg);
@@ -162,6 +163,8 @@ internal static class Program
 
         var symArg = new Argument<FileInfo>("sym") { Description = ".SYM file" };
 
+        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
+
         cmd.Add(symArg);
 
         cmd.SetAction(result =>
@@ -176,11 +179,9 @@ internal static class Program
 
     private static void RunSymDumpCommand(FileInfo sym)
     {
-        using var stream = sym.OpenRead();
+        var file = SymbolFile.Dump(sym.FullName);
 
-        var file = SymbolFile.Dump(stream);
-
-        Console.WriteLine(file.ToString());
+        Console.WriteLine(file);
     }
 
     #endregion
@@ -197,11 +198,9 @@ internal static class Program
 
         var hdrArg = new Argument<FileInfo>("target.h") { Description = "Target .H file" };
 
-        symArg.Validators.Add(_ => symArg.AcceptExistingOnly());
+        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
 
-        symArg.Validators.Add(_ => symArg.AcceptLegalFileNamesOnly());
-
-        hdrArg.Validators.Add(_ => hdrArg.AcceptLegalFileNamesOnly());
+        hdrArg.AcceptLegalFileNamesOnly();
 
         cmd.Add(symArg);
 
