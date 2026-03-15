@@ -24,6 +24,84 @@ internal static class Program
         return root.Parse(args).Invoke();
     }
 
+    #region sym
+
+    #region sym dump
+
+    private static Command GetDumpCommand()
+    {
+        var cmd = new Command("dump") { Description = ".SYM file dumper" };
+
+        var symArg = new Argument<FileInfo>("sym") { Description = ".SYM file" };
+
+        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
+
+        cmd.Add(symArg);
+
+        cmd.SetAction(result =>
+        {
+            var sym = result.GetRequiredValue(symArg);
+
+            RunDumpCommand(sym);
+        });
+
+        return cmd;
+    }
+
+    private static void RunDumpCommand(FileInfo sym)
+    {
+        var file = SymbolFile.Dump(sym.FullName);
+
+        Console.WriteLine(file);
+    }
+
+    #endregion
+
+    #region sym header
+
+    private static Command GetHeaderCommand()
+    {
+        // TODO symbol cleaner options
+
+        var cmd = new Command("header") { Description = "Generate .H file from .SYM file" };
+
+        var symArg = new Argument<FileInfo>("source.sym") { Description = "Source .SYM file" };
+
+        var hdrArg = new Argument<FileInfo>("target.h") { Description = "Target .H file" };
+
+        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
+
+        hdrArg.AcceptLegalFileNamesOnly();
+
+        cmd.Add(symArg);
+
+        cmd.Add(hdrArg);
+
+        cmd.SetAction(result =>
+        {
+            var sym = result.GetRequiredValue(symArg);
+
+            var hdr = result.GetRequiredValue(hdrArg);
+
+            RunHeaderCommand(sym, hdr);
+        });
+
+        return cmd;
+    }
+
+    private static void RunHeaderCommand(FileInfo sym, FileInfo hdr)
+    {
+        var file = SymbolFile.Dump(sym.FullName);
+
+        var header = IdaGeneratorUtility.GenerateHeader(file);
+
+        File.WriteAllText(hdr.FullName, header);
+    }
+
+    #endregion
+
+    #endregion
+
     #region ida
 
     #region ida scripts
@@ -127,84 +205,6 @@ internal static class Program
         Console.WriteLine(dir.FullName);
 
         // TODO
-    }
-
-    #endregion
-
-    #endregion
-
-    #region sym
-
-    #region sym dump
-
-    private static Command GetDumpCommand()
-    {
-        var cmd = new Command("dump") { Description = ".SYM file dumper" };
-
-        var symArg = new Argument<FileInfo>("sym") { Description = ".SYM file" };
-
-        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
-
-        cmd.Add(symArg);
-
-        cmd.SetAction(result =>
-        {
-            var sym = result.GetRequiredValue(symArg);
-
-            RunDumpCommand(sym);
-        });
-
-        return cmd;
-    }
-
-    private static void RunDumpCommand(FileInfo sym)
-    {
-        var file = SymbolFile.Dump(sym.FullName);
-
-        Console.WriteLine(file);
-    }
-
-    #endregion
-
-    #region sym header
-
-    private static Command GetHeaderCommand()
-    {
-        // TODO symbol cleaner options
-
-        var cmd = new Command("header") { Description = "Generate .H file from .SYM file" };
-
-        var symArg = new Argument<FileInfo>("source.sym") { Description = "Source .SYM file" };
-
-        var hdrArg = new Argument<FileInfo>("target.h") { Description = "Target .H file" };
-
-        symArg.AcceptExistingOnly().AcceptLegalFileNamesOnly();
-
-        hdrArg.AcceptLegalFileNamesOnly();
-
-        cmd.Add(symArg);
-
-        cmd.Add(hdrArg);
-
-        cmd.SetAction(result =>
-        {
-            var sym = result.GetRequiredValue(symArg);
-
-            var hdr = result.GetRequiredValue(hdrArg);
-
-            RunHeaderCommand(sym, hdr);
-        });
-
-        return cmd;
-    }
-
-    private static void RunHeaderCommand(FileInfo sym, FileInfo hdr)
-    {
-        var file = SymbolFile.Dump(sym.FullName);
-
-        var header = IdaGeneratorUtility.GenerateHeader(file);
-
-        File.WriteAllText(hdr.FullName, header);
     }
 
     #endregion
