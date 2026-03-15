@@ -169,11 +169,11 @@ internal static class Program
 
     private static void RunSplitCommand(FileInfo src, FileInfo sym, DirectoryInfo dir)
     {
-        Console.WriteLine(src.FullName);
-        Console.WriteLine(sym.FullName);
-        Console.WriteLine(dir.FullName);
+        var file = SymbolFile.Dump(sym.FullName);
 
-        // TODO
+        var text = File.ReadAllText(src.FullName);
+
+        IdaOutputUtility.SplitFiles(file, text, dir.FullName);
     }
 
     #endregion

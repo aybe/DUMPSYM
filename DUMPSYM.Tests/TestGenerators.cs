@@ -18,16 +18,7 @@ public sealed class TestGenerators : TestBase
     {
         var sf = GetSymbolFile();
 
-        var text = File.ReadAllText(sourcePath);
-
-        var sources = IdaOutputUtility.SplitFiles(sf, text);
-
-        Directory.CreateDirectory(targetPath);
-
-        foreach (var source in sources)
-        {
-            File.WriteAllText(Path.Combine(targetPath, source.Path), source.Text);
-        }
+        IdaOutputUtility.SplitFiles(sf, sourcePath, targetPath);
     }
 
     #endregion

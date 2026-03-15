@@ -8,7 +8,23 @@ namespace DUMPSYM.Generators;
 
 public static class IdaOutputUtility
 {
-    public static List<Source> SplitFiles(SymbolFile symbolFile, string text)
+    // TODO refactor params
+
+    public static void SplitFiles(SymbolFile symbolFile, string sourceCode, string targetDirectory)
+    {
+        var text = File.ReadAllText(sourceCode);
+
+        var sources = SplitFiles(symbolFile, text);
+
+        Directory.CreateDirectory(targetDirectory);
+
+        foreach (var source in sources)
+        {
+            File.WriteAllText(Path.Combine(targetDirectory, source.Path), source.Text);
+        }
+    }
+
+    private static List<Source> SplitFiles(SymbolFile symbolFile, string text)
     {
         // TODO globals
 
