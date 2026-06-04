@@ -4,13 +4,13 @@ public interface ISymbol
 {
     public bool IsExternal => this is ISymbolDefinition { Class: SymbolStorageClass.EXT };
 
-    public bool IsFileHeader => this is ISymbolFileStart;
+    public bool IsFileStart => this is ISymbolFileStart;
 
-    public bool IsFileFooter => this is ISymbolFileEnd;
+    public bool IsFileEnd => this is ISymbolFileEnd;
 
-    public bool IsFunctionHeader => this is ISymbolFunction;
+    public bool IsFunctionStart => this is ISymbolFunction;
 
-    public bool IsFunctionFooter => this is ISymbolFunctionEnd;
+    public bool IsFunctionEnd => this is ISymbolFunctionEnd;
 
     public bool IsStatic => this is ISymbolDefinition { Class: SymbolStorageClass.STAT };
 
@@ -20,13 +20,13 @@ public interface ISymbol
 
     #region Types
 
-    public bool IsEnumHeader => this is ISymbolDefinition { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM };
+    public bool IsEnum => this is ISymbolDefinition { Class: SymbolStorageClass.ENTAG, Type.Kind: SymbolTypeKind.ENUM };
 
-    public bool IsStructHeader => this is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT };
+    public bool IsStruct => this is ISymbolDefinition { Class: SymbolStorageClass.STRTAG, Type.Kind: SymbolTypeKind.STRUCT };
 
-    public bool IsUnionHeader => this is ISymbolDefinition { Class: SymbolStorageClass.UNTAG, Type.Kind: SymbolTypeKind.UNION };
+    public bool IsUnion => this is ISymbolDefinition { Class: SymbolStorageClass.UNTAG, Type.Kind: SymbolTypeKind.UNION };
 
-    public bool IsTypeFooter => this is ISymbolDefinition { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" };
+    public bool IsTypeEnd => this is ISymbolDefinition { Class: SymbolStorageClass.EOS, Type.Kind: SymbolTypeKind.NULL, Name: ".eos" };
 
     #endregion
 }

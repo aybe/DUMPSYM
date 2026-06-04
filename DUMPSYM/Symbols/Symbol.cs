@@ -24,12 +24,12 @@ public sealed partial class Symbol(SymbolHeader header, SymbolRecord record)
             new(s => s.IsExternal, s => s.IsExternal),
             new(s => s.IsStatic, s => s.IsStatic),
             new(s => s.IsTypedef, s => s.IsTypedef),
-            new(s => s.IsFileFooter, s => s.IsFileFooter),
-            new(s => s.IsFileHeader, s => s.IsFileFooter),
-            new(s => s.IsFunctionHeader, s => s.IsFunctionFooter),
-            new(s => s.IsEnumHeader, s => s.IsTypeFooter),
-            new(s => s.IsStructHeader, s => s.IsTypeFooter),
-            new(s => s.IsUnionHeader, s => s.IsTypeFooter),
+            new(s => s.IsFileEnd, s => s.IsFileEnd),
+            new(s => s.IsFileStart, s => s.IsFileEnd),
+            new(s => s.IsFunctionStart, s => s.IsFunctionEnd),
+            new(s => s.IsEnum, s => s.IsTypeEnd),
+            new(s => s.IsStruct, s => s.IsTypeEnd),
+            new(s => s.IsUnion, s => s.IsTypeEnd),
         };
 
         var records = symbols.Select(s => s.Record).Cast<ISymbol>().ToArray();
