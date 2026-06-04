@@ -5,41 +5,41 @@ namespace DUMPSYM.Extensions;
 
 public static class StreamExtensions
 {
-    public static string ReadStringAscii(this Stream stream, int length)
+    extension(Stream stream)
     {
-        if (length < 0)
+        public string ReadStringAscii(int length)
         {
-            throw new ArgumentOutOfRangeException(nameof(length));
+            ArgumentOutOfRangeException.ThrowIfNegative(length);
+
+            Span<byte> buffer = stackalloc byte[length];
+
+            stream.ReadExactly(buffer);
+
+            var value = Encoding.ASCII.GetString(buffer);
+
+            return value;
         }
 
-        var bytes = new byte[length];
+        public uint ReadUInt16()
+        {
+            Span<byte> buffer = stackalloc byte[sizeof(ushort)];
 
-        stream.ReadExactly(bytes);
+            stream.ReadExactly(buffer);
 
-        var ascii = Encoding.ASCII.GetString(bytes);
+            var value = BinaryPrimitives.ReadUInt16LittleEndian(buffer);
 
-        return ascii;
-    }
+            return value;
+        }
 
-    public static uint ReadUInt16(this Stream stream)
-    {
-        Span<byte> buffer = stackalloc byte[sizeof(ushort)];
+        public uint ReadUInt32()
+        {
+            Span<byte> buffer = stackalloc byte[sizeof(uint)];
 
-        stream.ReadExactly(buffer);
+            stream.ReadExactly(buffer);
 
-        var value = BinaryPrimitives.ReadUInt16LittleEndian(buffer);
+            var value = BinaryPrimitives.ReadUInt32LittleEndian(buffer);
 
-        return value;
-    }
-
-    public static uint ReadUInt32(this Stream stream)
-    {
-        Span<byte> buffer = stackalloc byte[sizeof(uint)];
-
-        stream.ReadExactly(buffer);
-
-        var value = BinaryPrimitives.ReadUInt32LittleEndian(buffer);
-
-        return value;
+            return value;
+        }
     }
 }
