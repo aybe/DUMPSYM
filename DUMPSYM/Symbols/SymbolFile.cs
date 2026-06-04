@@ -13,13 +13,13 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
         Symbols = symbols;
     }
 
-    public string Header { get; set; } = null!;
+    public string Header { get; }
 
-    public int Version { get; set; }
+    public int Version { get; }
 
-    public int TargetUnit { get; set; }
+    public int TargetUnit { get; }
 
-    public List<Symbol> Symbols { get; set; } = null!;
+    public List<Symbol> Symbols { get; }
 
     public IEnumerator<SymbolRecord> GetEnumerator()
     {
@@ -77,7 +77,7 @@ public sealed class SymbolFile : IEnumerable<SymbolRecord>
 
         while (stream.Position < stream.Length)
         {
-            var hdr = new SymbolHeader(stream);
+            var hdr = new SymbolHeader(stream.Position, stream.Read<uint>(), stream.Read<byte>());
 
             ctx.Header = hdr;
 

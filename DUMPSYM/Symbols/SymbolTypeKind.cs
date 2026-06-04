@@ -1,9 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace DUMPSYM.Symbols;
 
-[SuppressMessage("ReSharper", "InconsistentNaming")]
-[SuppressMessage("ReSharper", "IdentifierTypo")]
 public enum SymbolTypeKind : ushort
 {
     NULL   = 0x0,

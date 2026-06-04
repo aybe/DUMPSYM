@@ -1,8 +1,5 @@
-using JetBrains.Annotations;
-
 namespace DUMPSYM.Symbols;
 
-[NoReorder]
 public sealed record SymbolRecordName : SymbolRecord, ISymbolVariable
 {
     public SymbolRecordName(SymbolContext context)
@@ -10,10 +7,10 @@ public sealed record SymbolRecordName : SymbolRecord, ISymbolVariable
         Name = context.ReadStringAscii();
     }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; }
 
     public override string ToString()
     {
-        return $"{Name}";
+        return Name;
     }
 }

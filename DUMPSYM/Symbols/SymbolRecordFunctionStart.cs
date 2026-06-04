@@ -14,21 +14,21 @@ public sealed record SymbolRecordFunctionStart : SymbolRecord, ISymbolFunction
         Name = context.ReadStringAscii();
     }
 
-    public ushort FramePointer { get; set; }
+    public ushort FramePointer { get; }
 
-    public uint Size { get; set; }
+    public uint Size { get; }
 
-    public ushort ReturnAddressRegister { get; set; }
+    public ushort ReturnAddressRegister { get; }
 
-    public uint Mask { get; set; }
+    public uint Mask { get; }
 
-    public int MaskOffset { get; set; }
+    public int MaskOffset { get; }
 
-    public uint Line { get; set; }
+    public uint Line { get; }
 
-    public string File { get; set; } = null!;
+    public string File { get; }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; }
 
     public override string ToString()
     {

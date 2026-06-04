@@ -1,8 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace DUMPSYM.Symbols;
 
-[SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum SymbolTypeModifier
 {
     PTR = 1,

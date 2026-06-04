@@ -1,10 +1,10 @@
 namespace DUMPSYM.Symbols;
 
-public record struct SymbolType
+public readonly record struct SymbolType
 {
     public SymbolType(SymbolTypeKind kind, params SymbolTypeModifier[] modifiers)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(modifiers.Length, 6, nameof(modifiers));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(modifiers.Length, 6);
 
         var output = (int)kind & 0xF;
 
@@ -16,7 +16,7 @@ public record struct SymbolType
         Value = (ushort)output;
     }
 
-    public ushort Value { get; set; }
+    private ushort Value { get; }
 
     public SymbolTypeKind Kind => (SymbolTypeKind)(Value & 0xF);
 
@@ -38,16 +38,6 @@ public record struct SymbolType
                 yield return modifier;
             }
         }
-    }
-
-    public readonly bool Equals(SymbolType other)
-    {
-        return Value == other.Value;
-    }
-
-    public readonly override int GetHashCode()
-    {
-        return Value.GetHashCode();
     }
 
     public override string ToString()

@@ -8,5 +8,5 @@ public interface ISymbolDefinition : ISymbol
 
     uint Size { get; }
 
-    string Name { get; set; }
+    string Name { get; }
 }

@@ -11,9 +11,9 @@ public sealed record SymbolRecordIncSldLineNumByWord : SymbolRecord, ISymbolLine
         context.Line += Increment;
     }
 
-    public uint Line { get; set; }
+    public uint Line { get; }
 
-    public ushort Increment { get; set; }
+    public ushort Increment { get; }
 
     public override string ToString()
     {

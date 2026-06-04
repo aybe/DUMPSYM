@@ -2,5 +2,5 @@ namespace DUMPSYM.Symbols;
 
 public interface ISymbolFileStart : ISymbol
 {
-    string File { get; set; }
+    string File { get; }
 }

@@ -11,9 +11,9 @@ public sealed record SymbolRecordIncSldLineNumByByte : SymbolRecord, ISymbolLine
         context.Line += Increment;
     }
 
-    public uint Line { get; set; }
+    public uint Line { get; }
 
-    public byte Increment { get; set; }
+    public byte Increment { get; }
 
     public override string ToString()
     {

@@ -1,5 +1,3 @@
 namespace DUMPSYM.Symbols;
 
-public interface ISymbolLineModifier : ISymbol
-{
-}
+public interface ISymbolLineModifier : ISymbol;

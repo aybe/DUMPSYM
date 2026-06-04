@@ -1,6 +1,6 @@
 namespace DUMPSYM.Symbols;
 
-public sealed record SymbolRecordOverlay : SymbolRecord, ISymbolOverlay
+public sealed record SymbolRecordOverlay : SymbolRecord, ISymbolOverlay // TODO implement
 {
     public SymbolRecordOverlay(SymbolContext context)
     {

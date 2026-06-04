@@ -1,9 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace DUMPSYM.Symbols;
 
-[SuppressMessage("ReSharper", "InconsistentNaming")]
-[SuppressMessage("ReSharper", "IdentifierTypo")]
 public enum SymbolStorageClass : ushort
 {
     AUTO    = 0x01,

@@ -7,7 +7,7 @@ public sealed record SymbolRecordFunctionEnd : SymbolRecord, ISymbolFunctionEnd
         Line = context.Read<uint>();
     }
 
-    public uint Line { get; set; }
+    public uint Line { get; }
 
     public override string ToString()
     {

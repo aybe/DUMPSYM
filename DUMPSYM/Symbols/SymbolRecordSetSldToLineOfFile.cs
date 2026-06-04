@@ -8,9 +8,9 @@ public sealed record SymbolRecordSetSldToLineOfFile : SymbolRecord, ISymbolFileS
         File = context.ReadStringAscii();
     }
 
-    public uint Line { get; set; }
+    public uint Line { get; }
 
-    public string File { get; set; } = null!;
+    public string File { get; }
 
     public override string ToString()
     {

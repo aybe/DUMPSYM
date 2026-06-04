@@ -105,7 +105,7 @@ public sealed class IdaGenerator
         var index = symbols.FindIndex(s => s.IsFileEnd);
 
         var array = TypedefsOverrides
-            .Select(s => new Symbol(new SymbolHeader { Type = 0x94 }, new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(s.Key), 0, s.Value)))
+            .Select(s => new Symbol(new SymbolHeader(0, 0, 0x94), new SymbolRecordDef(SymbolStorageClass.TPDEF, new SymbolType(s.Key), 0, s.Value)))
             .ToArray();
 
         symbols.InsertRange(index + 1, array);

@@ -16,17 +16,17 @@ public sealed record SymbolRecordDef2 : SymbolRecord, ISymbolDefinition2
         Name = context.ReadStringAscii();
     }
 
-    public SymbolStorageClass Class { get; set; }
+    public SymbolStorageClass Class { get; }
 
-    public SymbolType Type { get; set; }
+    public SymbolType Type { get; }
 
-    public uint Size { get; set; }
+    public uint Size { get; }
 
-    public uint[] Dimensions { get; set; } = null!;
+    public uint[] Dimensions { get; }
 
-    public string Tag { get; set; } = null!;
+    public string Tag { get; }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; }
 
     public bool Equals(SymbolRecordDef2? other)
     {
