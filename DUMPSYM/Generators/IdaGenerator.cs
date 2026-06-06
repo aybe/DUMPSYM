@@ -54,11 +54,14 @@ public sealed class IdaGenerator
             map.Add(map.Count, item);
         }
 
-        Console.WriteLine($"{set.Count} unique typedefs/types found");
-
         Symbols = [..map.Values.SelectMany(s => s)];
 
         SymbolsGroups = [..map.Values];
+
+        var headers = map.Values.Select(s => s[0]).ToArray();
+
+        Console.WriteLine($"Remaining typedefs: {headers.Count(s => s.IsTypeDefinition)}");
+        Console.WriteLine($"Remaining types: {headers.Count(s => s.IsTypeHeader)}");
     }
 
     public Symbol[] Symbols { get; }
