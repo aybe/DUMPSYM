@@ -55,11 +55,14 @@ def dumpsym_apply_names(names):
             print(f"Failed to set name {name} at {hex(addr)}")
             break
 
+def main():
+    dumpsym_initialize()
 
-dumpsym_initialize()
+    dumpsym_apply_function_prototypes(dumpsym_function_prototypes)
 
-dumpsym_apply_function_prototypes(dumpsym_function_prototypes)
+    dumpsym_apply_names(dumpsym_names)
 
-dumpsym_apply_names(dumpsym_names)
+    dumpsym_cleanup()
 
-dumpsym_cleanup()
+if __name__ == "__main__":
+    main()
