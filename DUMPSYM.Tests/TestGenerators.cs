@@ -51,7 +51,7 @@ public sealed class TestGenerators : TestBase
     [TestMethod]
     [UsedImplicitly]
     [DynamicData(nameof(GetTestData1), DynamicDataDisplayName = nameof(GetTestName), DynamicDataDisplayNameDeclaringType = typeof(TestBase))]
-    public void TestGenerateScript(string sourcePath, string targetPath)
+    public void TestGenerateScripts(string sourcePath, string targetPath)
     {
         var file = SymbolFile.Dump(sourcePath);
 
