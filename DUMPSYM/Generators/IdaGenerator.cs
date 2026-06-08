@@ -11,19 +11,19 @@ public sealed class IdaGenerator
         // functions are a trap as they contain types and typedefs
         // and other symbols are useless for generating a header
 
-        Console.WriteLine($"{symbols.Count} symbols found");
+        WriteLine($"{symbols.Count} symbols found");
 
-        Console.WriteLine("Cleaning up symbols...");
+        WriteLine("Cleaning up symbols...");
 
         CleanupTypedefs(symbols, options.RemoveTypedefs);
 
         CleanupTypedefsUnsigned(symbols);
 
-        Console.WriteLine("Splitting symbols...");
+        WriteLine("Splitting symbols...");
 
         var split = Symbol.Split(symbols.ToArray()).ToList();
 
-        Console.WriteLine($"{split.Count} symbols found");
+        WriteLine($"{split.Count} symbols found");
 
         var remove1 = split.RemoveAll(s => s[0].IsExternal);
         var remove2 = split.RemoveAll(s => s[0].IsFile);
@@ -32,14 +32,14 @@ public sealed class IdaGenerator
         var remove5 = split.RemoveAll(s => s[0].IsStatic);
         var remove6 = split.RemoveAll(s => s[0].IsVariable);
 
-        Console.WriteLine($"Removed {remove1} externals");
-        Console.WriteLine($"Removed {remove2} files");
-        Console.WriteLine($"Removed {remove3} file endings");
-        Console.WriteLine($"Removed {remove4} functions");
-        Console.WriteLine($"Removed {remove5} statics");
-        Console.WriteLine($"Removed {remove6} variables");
+        WriteLine($"Removed {remove1} externals");
+        WriteLine($"Removed {remove2} files");
+        WriteLine($"Removed {remove3} file endings");
+        WriteLine($"Removed {remove4} functions");
+        WriteLine($"Removed {remove5} statics");
+        WriteLine($"Removed {remove6} variables");
 
-        Console.WriteLine($"{split.Count} symbols remaining");
+        WriteLine($"{split.Count} symbols remaining");
 
         // most types and typedefs are duplicates, except for fake types
         // these are compiler-generated and often reuse the same names
@@ -60,8 +60,8 @@ public sealed class IdaGenerator
 
         var headers = map.Values.Select(s => s[0]).ToArray();
 
-        Console.WriteLine($"Remaining typedefs: {headers.Count(s => s.IsTypeDefinition)}");
-        Console.WriteLine($"Remaining types: {headers.Count(s => s.IsTypeHeader)}");
+        WriteLine($"Remaining typedefs: {headers.Count(s => s.IsTypeDefinition)}");
+        WriteLine($"Remaining types: {headers.Count(s => s.IsTypeHeader)}");
     }
 
     public Symbol[] Symbols { get; }
@@ -78,6 +78,8 @@ public sealed class IdaGenerator
         { SymbolTypeKind.ULONG, "u_long" },
     }.ToFrozenDictionary();
 
+    public static Action<string?> WriteLine { get; set; } = _ => { }; // TODO use
+
     private static void CleanupTypedefs(List<Symbol> symbols, IEnumerable<string> typedefs)
     {
         // symbols are duplicated as many times as there are files
@@ -88,7 +90,7 @@ public sealed class IdaGenerator
 
             var count = symbols.RemoveAll(array.Contains);
 
-            Console.WriteLine($"Removed {count} instances of '{name}'");
+            WriteLine($"Removed {count} instances of '{name}'");
         }
     }
 
@@ -100,7 +102,7 @@ public sealed class IdaGenerator
 
         foreach (var typedef in TypedefsOverrides.Values)
         {
-            Console.WriteLine($"Added instance of '{typedef}'");
+            WriteLine($"Added instance of '{typedef}'");
         }
 
         // typedefs must be inserted after a file because of how symbols are split
