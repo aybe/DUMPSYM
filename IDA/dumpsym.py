@@ -55,6 +55,55 @@ def dumpsym_apply_names(names):
             print(f"Failed to set name {name} at {hex(addr)}")
             break
 
+
+def dumpsym_init_hexrays() -> bool:
+    import ida_hexrays  # pyright: ignore[reportMissingModuleSource]
+
+    return ida_hexrays.init_hexrays_plugin()
+
+
+def dumpsym_refresh_ui() -> None:
+    import ida_kernwin  # pyright: ignore[reportMissingModuleSource]
+
+    ida_kernwin.refresh_idaview_anyway()
+
+
+def dumpsym_rename_func_regs(ea: int, regs: list[tuple[int, str]]) -> None:
+    import ida_funcs  # pyright: ignore[reportMissingModuleSource]
+    import ida_hexrays  # pyright: ignore[reportMissingModuleSource]
+    import ida_idp  # pyright: ignore[reportMissingModuleSource]
+
+    func = ida_funcs.get_func(ea)
+    if not func:
+        raise RuntimeError("Couldn't get function at $%08X." % ea)
+
+    code = ida_hexrays.decompile(ea)
+    if not code:
+        raise RuntimeError("Couldn't decompile function at %08X." % ea)
+
+    old_names = ida_idp.ph_get_regnames()
+    new_names = {}
+
+    for reg_slot, reg_name in regs:
+        new_name = old_names[reg_slot]
+        new_names[new_name] = reg_name
+
+    lvars = code.get_lvars()
+    for lvar in lvars:
+        loc = ida_hexrays.print_vdloc(lvar.location, lvar.width)
+        if not loc in new_names:
+            continue
+
+        old_name = lvar.name
+        new_name = new_names[loc]
+        if not ida_hexrays.rename_lvar(ea, old_name, new_name):
+            raise RuntimeError("Couldn't rename %s to %s." % (old_name, new_name))
+
+        print(
+            "Renamed $%08X register '%s' from '%s' to '%s'."
+            % (ea, loc, old_name, new_name)
+        )
+
 def main():
     dumpsym_initialize()
 

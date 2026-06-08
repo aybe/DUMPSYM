@@ -110,6 +110,10 @@ public sealed partial class Symbol
 
     public bool IsFunction => Record is ISymbolFunction;
 
+    public bool IsFunctionEnd => Record is ISymbolFunctionEnd;
+
+    public bool IsRegister => Class is SymbolStorageClass.REG;
+
     public bool IsStatic => Class is SymbolStorageClass.STAT;
 
     public bool IsTypeDefinition => Class is SymbolStorageClass.TPDEF;
