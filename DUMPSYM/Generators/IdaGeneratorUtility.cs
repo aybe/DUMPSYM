@@ -33,18 +33,6 @@ public static class IdaGeneratorUtility
 
         var output = scriptGenerator.Generate(symbolFile);
 
-        var variables = symbolFile.Symbols.Where(s => s.IsVariable);
-
-        foreach (var variable in variables)
-        {
-            if (output.Functions.Any(s => s.Header.Address == variable.Header.Address))
-            {
-                continue;
-            }
-
-            Console.WriteLine(variable);
-        }
-
         var names = GetSymbolNamesScript(symbolFile);
 
         File.WriteAllText(Path.Combine(targetDirectory, "dumpsym_names.py"), names);
