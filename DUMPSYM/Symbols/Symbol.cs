@@ -9,6 +9,12 @@ public sealed partial class Symbol(SymbolHeader header, SymbolRecord record)
 
     public SymbolRecord Record { get; } = record;
 
+    public void Deconstruct(out SymbolHeader header, out SymbolRecord record)
+    {
+        header = Header;
+        record = Record;
+    }
+
     public override string ToString()
     {
         return $"{Header} {Record}";
